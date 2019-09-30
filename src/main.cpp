@@ -1,6 +1,10 @@
-#include <iostream>
+#include "game.h"
+
+using namespace xqdl;
 
 int main() {
-	std::cout << "Hello, World!" << std::endl;
+	Game game;
+	game.mainMenu();
+
 	return 0;
 }

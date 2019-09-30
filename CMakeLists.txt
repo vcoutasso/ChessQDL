@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(Chessqdl)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Chessqdl src/main.cpp)
+add_executable(Chessqdl src/main.cpp src/game.cpp src/game.h)
+
+find_package(SFML 2.5.1 REQUIRED graphics network audio window system)
+
+target_link_libraries(Chessqdl sfml-graphics sfml-audio sfml-window)
