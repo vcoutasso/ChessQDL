@@ -2,7 +2,7 @@
 
 declare -a names=( "King.png" "Queen.png" "Bishop.png" "Knight.png" "Rook.png" "Pawn.png" )
 declare -a prefix=( "w" "b")
-original="~/Downloads/270px-Chess_Pieces_Sprite.png"
+original="../img/270px-Chess_Pieces_Sprite.png"
 output="../img/"
 width=45
 height=45
