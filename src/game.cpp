@@ -19,7 +19,7 @@ Game::Game() {
 
 	for (int row = 0; row < 8; ++row) {
 		for (int col = 0; col < 8; ++col) {
-			tiles[row * 8 + col] = Tile(isWhite, length, sf::Vector2f(offsetX + col * length, offsetY + row * length));
+			tiles[row * 8 + col] = Tile(isWhite, length, sf::Vector2f(offsetX + col * length, offsetY + (7 - row) * length));
 			isWhite = !isWhite;
 		}
 		isWhite = !isWhite;
@@ -27,7 +27,7 @@ Game::Game() {
 
 	// TODO: Delete this and make something decent.
 
-	tiles[0].setPiece(new Rook(false));
+	tiles[0].setPiece(new King(false));
 	tiles[1].setPiece(new Knight(false));
 	tiles[2].setPiece(new Bishop(false));
 	tiles[3].setPiece(new Queen(false));
@@ -35,7 +35,7 @@ Game::Game() {
 	tiles[5].setPiece(new Bishop(false));
 	tiles[6].setPiece(new Knight(false));
 	tiles[7].setPiece(new Rook(false));
-	tiles[8].setPiece(new Pawn(false));
+	tiles[8].setPiece(new King(false));
 	tiles[9].setPiece(new Pawn(false));
 	tiles[10].setPiece(new Pawn(false));
 	tiles[11].setPiece(new Pawn(false));
@@ -69,6 +69,7 @@ void Game::createWindow() {
 	settings.antialiasingLevel = 4;
 
 	window.create(sf::VideoMode(1024, 768), "ChessQDL", sf::Style::Default, settings);
+	window.setFramerateLimit(24);
 }
 
 void Game::mainMenu() {
@@ -86,6 +87,8 @@ void Game::mainMenu() {
 }
 
 int Game::startGame() {
+
+	// INIT TILES
 
 
 	while (window.isOpen()) {

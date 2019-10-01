@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "tile.h"
+#include "board.h"
 
 namespace xqdl {
 
@@ -13,6 +14,7 @@ namespace xqdl {
 	private:
 		sf::RenderWindow window;
 		Tile tiles[64];
+		Board board;
 
 		void createWindow();
 
