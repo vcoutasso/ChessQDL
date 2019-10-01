@@ -2,21 +2,26 @@
 #define CHESSQDL_GAME_H
 
 #include <SFML/Graphics.hpp>
+#include "tile.h"
 
 namespace xqdl {
 
-	const sf::Color whiteTile = sf::Color(255, 206, 158);
-	const sf::Color blackTile = sf::Color(209, 139, 71);
+	const auto whiteTile = sf::Color(255, 206, 158);
+	const auto blackTile = sf::Color(209, 139, 71);
 
 	class Game {
 	private:
 		sf::RenderWindow window;
+		Tile tiles[64];
 
 		void createWindow();
 
 		int startGame();
 
 		void drawBoard();
+
+		void drawPieces();
+
 
 	public:
 		Game();
