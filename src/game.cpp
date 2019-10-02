@@ -9,6 +9,8 @@ using namespace xqdl;
 Game::Game() {
 	createWindow();
 
+	font.loadFromFile("resources/fonts/arial.ttf");
+
 	sf::Vector2u wsize = window.getSize();
 	bool isWhite = true;
 	int length = 80;
@@ -27,7 +29,7 @@ Game::Game() {
 
 	// TODO: Delete this and make something decent.
 
-	tiles[0].setPiece(new King(false));
+	tiles[0].setPiece(new Rook(false));
 	tiles[1].setPiece(new Knight(false));
 	tiles[2].setPiece(new Bishop(false));
 	tiles[3].setPiece(new Queen(false));
@@ -35,7 +37,7 @@ Game::Game() {
 	tiles[5].setPiece(new Bishop(false));
 	tiles[6].setPiece(new Knight(false));
 	tiles[7].setPiece(new Rook(false));
-	tiles[8].setPiece(new King(false));
+	tiles[8].setPiece(new Pawn(false));
 	tiles[9].setPiece(new Pawn(false));
 	tiles[10].setPiece(new Pawn(false));
 	tiles[11].setPiece(new Pawn(false));
@@ -109,12 +111,59 @@ int Game::startGame() {
 }
 
 void Game::drawBoard() {
+	sf::Text text;
+	text.setFont(font);
+	text.setString("a");
+	text.setCharacterSize(24);
+	text.setFillColor(sf::Color::Black);
+
+	char ch = 'A';
+	char num = '1';
+
+	// Always the same
+	sf::Vector2f size = tiles[0].shape.getSize();
 
 	window.clear(sf::Color::White);
 
 	for (int row = 0; row < 8; ++row) {
 		for (int col = 0; col < 8; ++col) {
 			window.draw(tiles[row * 8 + col].shape);
+
+			// Labels a - h
+			if (row == 0) {
+				// First row
+				sf::Vector2f pos = tiles[row * 8 + col].shape.getPosition();
+				text.setString(ch);
+				text.setOrigin(0, 0);
+				text.setPosition(pos.x + size.x / 2 - text.getLocalBounds().width / 2, pos.y + size.y);
+				window.draw(text);
+
+				// Last row
+				pos = tiles[7 * 8 + col].shape.getPosition();
+				// This 5 just shifts labels upwards so the g doesn't overlap with the tiles. Actually an arbitrary value. Bad practice but might fix it later idk
+				text.setPosition(pos.x + size.x / 2 - text.getLocalBounds().width / 2,
+								 pos.y - text.getCharacterSize() - 5);
+				window.draw(text);
+
+				++ch;
+			}
+
+			// Labels 1 - 8
+			if (col ==  0) {
+				// First col
+				sf::Vector2f pos = tiles[row * 8 + col].shape.getPosition();
+				text.setString(num);
+				text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
+				text.setPosition(pos.x - text.getCharacterSize() / 2, pos.y + size.y / 2 - text.getLocalBounds().height / 2);
+				window.draw(text);
+
+				// Last col
+				pos = tiles[row * 8 + 7].shape.getPosition();
+				text.setPosition(pos.x + size.x + text.getCharacterSize() / 2, pos.y + size.y / 2 - text.getLocalBounds().height / 2);
+				window.draw(text);
+
+				++num;
+			}
 		}
 	}
 

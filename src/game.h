@@ -16,6 +16,8 @@ namespace xqdl {
 		Tile tiles[64];
 		Board board;
 
+		sf::Font font;
+
 		void createWindow();
 
 		int startGame();
