@@ -3,6 +3,10 @@
 
 using namespace xqdl;
 
+Piece::Piece() {
+	hasMoved = false;
+}
+
 // TODO: Fix pieces resolution
 void Piece::loadTexture(const std::string &path) {
 	if (!texture.loadFromFile(path))
@@ -32,7 +36,7 @@ Knight::Knight(bool white) {
 }
 
 int Knight::move() {
-
+	return 1;
 }
 
 Bishop::Bishop(bool white) {
@@ -43,7 +47,7 @@ Bishop::Bishop(bool white) {
 }
 
 int Bishop::move() {
-
+	return 1;
 }
 
 Rook::Rook(bool white) {
@@ -54,7 +58,7 @@ Rook::Rook(bool white) {
 }
 
 int Rook::move() {
-
+	return 1;
 }
 
 Queen::Queen(bool white) {
@@ -65,7 +69,7 @@ Queen::Queen(bool white) {
 }
 
 int Queen::move() {
-
+	return 1;
 }
 
 
@@ -77,5 +81,5 @@ King::King(bool white) {
 }
 
 int King::move() {
-
+	return 1;
 }

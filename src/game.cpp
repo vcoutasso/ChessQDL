@@ -75,8 +75,6 @@ void Game::createWindow() {
 
 void Game::mainMenu() {
 
-	initTiles();
-
 	while (window.isOpen()) {
 		sf::Event event{};
 		while (window.pollEvent(event)) {
@@ -91,6 +89,7 @@ void Game::mainMenu() {
 
 int Game::startGame() {
 
+	initTiles();
 
 	while (window.isOpen()) {
 		sf::Event event{};

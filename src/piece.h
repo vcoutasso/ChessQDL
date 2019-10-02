@@ -13,9 +13,13 @@ namespace xqdl {
 	class Piece {
 	protected:
 		sf::Texture texture;
+
 	public:
 		virtual int move() = 0;
 
+		bool hasMoved;
+
+		Piece();
 		void loadTexture(const std::string &path);
 
 		sf::Sprite sprite;
