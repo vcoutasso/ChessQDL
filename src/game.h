@@ -20,6 +20,8 @@ namespace xqdl {
 
 		void createWindow();
 
+		void initTiles();
+
 		int startGame();
 
 		void drawBoard();

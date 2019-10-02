@@ -8,6 +8,7 @@ Tile::Tile(bool white, int length, sf::Vector2f pos) {
 	shape = sf::RectangleShape(sf::Vector2f(length, length));
 	shape.setFillColor(white ? xqdl::whiteTile : xqdl::blackTile);
 	shape.setPosition(pos);
+	length = 80;
 }
 
 void Tile::setPiece(Piece *piece) {

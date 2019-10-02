@@ -6,6 +6,8 @@
 
 namespace xqdl {
 
+	const auto tileSize = 80;
+
 	class Tile {
 	private:
 

@@ -10,13 +10,14 @@ namespace xqdl {
 
 	class Board {
 	private:
-		std::string FEN;
 		U64 bitBoards[8];
 
 		void fenToBitboard();
 
 	public:
 		Board();
+
+		std::string FEN;
 
 		Board(std::string fen);
 

@@ -1,8 +1,5 @@
 #include "board.h"
 
-#include <utility>
-#include "tile.h"
-
 using namespace xqdl;
 
 Board::Board() {
@@ -19,3 +16,4 @@ Board::Board(std::string fen) {
 void Board::fenToBitboard() {
 
 }
+

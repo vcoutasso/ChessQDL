@@ -1,4 +1,5 @@
 #include "game.h"
+#include "board.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -8,62 +9,61 @@ using namespace xqdl;
 
 Game::Game() {
 	createWindow();
-
 	font.loadFromFile("resources/fonts/arial.ttf");
 
+	initTiles();
+	mainMenu();
+}
+
+void Game::initTiles() {
 	sf::Vector2u wsize = window.getSize();
 	bool isWhite = true;
-	int length = 80;
-	int offsetX = ((int) wsize.x - 8 * length) / 2;
-	int offsetY = ((int) wsize.y - 8 * length) / 2;
+	int offsetX = ((int) wsize.x - 8 * xqdl::tileSize) / 2;
+	int offsetY = ((int) wsize.y - 8 * xqdl::tileSize) / 2;
 
-	// TODO: Fix tiles order! tiles[0] should be a1 (i think)
 
 	for (int row = 0; row < 8; ++row) {
 		for (int col = 0; col < 8; ++col) {
-			tiles[row * 8 + col] = Tile(isWhite, length, sf::Vector2f(offsetX + col * length, offsetY + (7 - row) * length));
+			tiles[row * 8 + col] = Tile(isWhite, xqdl::tileSize, sf::Vector2f(offsetX + col * xqdl::tileSize, offsetY + (7 - row) * xqdl::tileSize));
 			isWhite = !isWhite;
 		}
 		isWhite = !isWhite;
 	}
 
-	// TODO: Delete this and make something decent.
+	std::string pieces = board.FEN.substr(0, board.FEN.find_first_of(' '));
 
-	tiles[0].setPiece(new Rook(false));
-	tiles[1].setPiece(new Knight(false));
-	tiles[2].setPiece(new Bishop(false));
-	tiles[3].setPiece(new Queen(false));
-	tiles[4].setPiece(new King(false));
-	tiles[5].setPiece(new Bishop(false));
-	tiles[6].setPiece(new Knight(false));
-	tiles[7].setPiece(new Rook(false));
-	tiles[8].setPiece(new Pawn(false));
-	tiles[9].setPiece(new Pawn(false));
-	tiles[10].setPiece(new Pawn(false));
-	tiles[11].setPiece(new Pawn(false));
-	tiles[12].setPiece(new Pawn(false));
-	tiles[13].setPiece(new Pawn(false));
-	tiles[14].setPiece(new Pawn(false));
-	tiles[15].setPiece(new Pawn(false));
+	int aux = 0;
 
-	tiles[48].setPiece(new Pawn(true));
-	tiles[49].setPiece(new Pawn(true));
-	tiles[50].setPiece(new Pawn(true));
-	tiles[51].setPiece(new Pawn(true));
-	tiles[52].setPiece(new Pawn(true));
-	tiles[53].setPiece(new Pawn(true));
-	tiles[54].setPiece(new Pawn(true));
-	tiles[55].setPiece(new Pawn(true));
-	tiles[56].setPiece(new Rook(true));
-	tiles[57].setPiece(new Knight(true));
-	tiles[58].setPiece(new Bishop(true));
-	tiles[59].setPiece(new Queen(true));
-	tiles[60].setPiece(new King(true));
-	tiles[61].setPiece(new Bishop(true));
-	tiles[62].setPiece(new Knight(true));
-	tiles[63].setPiece(new Rook(true));
+	for (int i = 0; i < pieces.length(); ++i) {
+		char ch = pieces.at(i);
 
-	mainMenu();
+		if (ch == '/')
+			continue;
+
+		else if (ch >= '1' and ch <= '9') {
+			aux += ch - '0';
+			continue;
+		}
+
+		// Define piece color
+		else isWhite = !(ch < 'a' || ch > 'z');
+
+		if (ch == 'p' || ch == 'P')
+			tiles[aux].setPiece(new Pawn(isWhite));
+		if (ch == 'n' || ch == 'N')
+			tiles[aux].setPiece(new Knight(isWhite));
+		if (ch == 'b' || ch == 'B')
+			tiles[aux].setPiece(new Bishop(isWhite));
+		if (ch == 'r' || ch == 'R')
+			tiles[aux].setPiece(new Rook(isWhite));
+		if (ch == 'q' || ch == 'Q')
+			tiles[aux].setPiece(new Queen(isWhite));
+		if (ch == 'k' || ch == 'K')
+			tiles[aux].setPiece(new King(isWhite));
+
+		++aux;
+	}
+
 }
 
 void Game::createWindow() {
@@ -169,6 +169,7 @@ void Game::drawBoard() {
 
 	drawPieces();
 }
+
 
 void Game::drawPieces() {
 
