@@ -11,7 +11,6 @@ Game::Game() {
 	createWindow();
 	font.loadFromFile("resources/fonts/arial.ttf");
 
-	initTiles();
 	mainMenu();
 }
 
@@ -76,6 +75,8 @@ void Game::createWindow() {
 
 void Game::mainMenu() {
 
+	initTiles();
+
 	while (window.isOpen()) {
 		sf::Event event{};
 		while (window.pollEvent(event)) {
@@ -89,8 +90,6 @@ void Game::mainMenu() {
 }
 
 int Game::startGame() {
-
-	// INIT TILES
 
 
 	while (window.isOpen()) {
