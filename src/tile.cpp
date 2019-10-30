@@ -22,8 +22,8 @@ void Tile::setPiece(Piece *piece) {
 									 shape.getPosition().y + shape.getSize().y / 2);
 }
 
-bool Tile::isOccupied() {
-	return currentPiece != nullptr;
+bool Tile::isEmpty() {
+	return currentPiece == nullptr;
 }
 
 bool Tile::isWhite() {

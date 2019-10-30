@@ -2,6 +2,7 @@
 #define CHESSQDL_BOARD_H
 
 #include <iostream>
+#include <string>
 #include "tile.h"
 
 typedef unsigned long long U64;
@@ -24,7 +25,7 @@ namespace xqdl {
 		enum class enumPiece {
 			nWhite,        // any white piece
 			nBlack,        // any black piece
-			nPawn,        // any pawn
+			nPawn,         // any pawn
 			nKnight,
 			nBishop,
 			nRook,

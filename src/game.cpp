@@ -14,6 +14,7 @@ Game::Game() {
 	mainMenu();
 }
 
+//
 void Game::initTiles() {
 	sf::Vector2u wsize = window.getSize();
 	bool isWhite = true;
@@ -44,20 +45,20 @@ void Game::initTiles() {
 			continue;
 		}
 
-		// Define piece color
+			// Define piece color
 		else isWhite = !(ch < 'a' || ch > 'z');
 
 		if (ch == 'p' || ch == 'P')
 			tiles[aux].setPiece(new Pawn(isWhite));
-		if (ch == 'n' || ch == 'N')
+		else if (ch == 'n' || ch == 'N')
 			tiles[aux].setPiece(new Knight(isWhite));
-		if (ch == 'b' || ch == 'B')
+		else if (ch == 'b' || ch == 'B')
 			tiles[aux].setPiece(new Bishop(isWhite));
-		if (ch == 'r' || ch == 'R')
+		else if (ch == 'r' || ch == 'R')
 			tiles[aux].setPiece(new Rook(isWhite));
-		if (ch == 'q' || ch == 'Q')
+		else if (ch == 'q' || ch == 'Q')
 			tiles[aux].setPiece(new Queen(isWhite));
-		if (ch == 'k' || ch == 'K')
+		else if (ch == 'k' || ch == 'K')
 			tiles[aux].setPiece(new King(isWhite));
 
 		++aux;

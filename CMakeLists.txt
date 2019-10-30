@@ -3,6 +3,7 @@ project(Chessqdl)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
 add_executable(Chessqdl src/main.cpp src/game.cpp src/game.h src/board.cpp src/board.h src/tile.cpp src/tile.h src/piece.cpp src/piece.h)
 
 find_package(SFML 2.5.1 REQUIRED graphics network audio window system)

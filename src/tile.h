@@ -22,7 +22,7 @@ namespace xqdl {
 
 		bool isWhite();
 
-		bool isOccupied();
+		bool isEmpty();
 
 		void setPiece(Piece *piece);
 
