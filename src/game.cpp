@@ -92,15 +92,47 @@ int Game::startGame() {
 
 	initTiles();
 
+	drawBoard();
+
 	while (window.isOpen()) {
 		sf::Event event{};
 
 		while (window.pollEvent(event)) {
+			switch (event.type) {
+				case (sf::Event::Closed):
+					return -1;
 
-			drawBoard();
+				case (sf::Event::MouseButtonPressed):
+					if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+						int i;
 
-			if (event.type == sf::Event::Closed)
-				return -1;
+						for (i = 0; i < 64; i++) {
+							if (tiles[i].shape.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+								std::cout << "From Tile " << i;
+								break;
+							}
+						}
+
+						while (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+							continue;
+						}
+
+						for (i = 0; i < 64; i++) {
+							if (tiles[i].shape.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+								std::cout << "From Tile " << i;
+								break;
+							}
+						}
+
+
+					}
+					break;
+
+				default:
+					break;
+
+
+			}
 
 		}
 		window.display();
