@@ -28,6 +28,8 @@ namespace xqdl {
 
 		void drawPieces();
 
+		void movePiece(sf::Event&);
+
 
 	public:
 		Game();

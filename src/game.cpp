@@ -92,11 +92,11 @@ int Game::startGame() {
 
 	initTiles();
 
-	drawBoard();
 
 	while (window.isOpen()) {
 		sf::Event event{};
 
+		drawBoard();
 		while (window.pollEvent(event)) {
 			switch (event.type) {
 				case (sf::Event::Closed):
@@ -104,34 +104,12 @@ int Game::startGame() {
 
 				case (sf::Event::MouseButtonPressed):
 					if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-						int i;
-
-						for (i = 0; i < 64; i++) {
-							if (tiles[i].shape.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
-								std::cout << "From Tile " << i;
-								break;
-							}
-						}
-
-						while (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-							continue;
-						}
-
-						for (i = 0; i < 64; i++) {
-							if (tiles[i].shape.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
-								std::cout << "From Tile " << i;
-								break;
-							}
-						}
-
-
+						movePiece(event);
 					}
 					break;
 
 				default:
 					break;
-
-
 			}
 
 		}
@@ -212,4 +190,43 @@ void Game::drawPieces() {
 	}
 
 	window.display();
+}
+
+
+void Game::movePiece(sf::Event &event) {
+	int src, dest;
+
+	for (src = 0; src < 64; src++) {
+		if (tiles[src].shape.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+			break;
+		}
+	}
+
+	if (tiles[src].currentPiece != nullptr) {
+
+		// Wait for next sf::Event::MouseButtonPressed event to indicate where the piece will be moved to.
+		while (window.waitEvent(event)) {
+			if (event.type == sf::Event::MouseButtonPressed)
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+					break;
+		}
+
+		for (dest = 0; dest < 64; dest++) {
+			if (tiles[dest].shape.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
+				break;
+		}
+
+		std::cout << "From Tile " << src << " to Tile " << dest << std::endl;
+		std::cout.flush();
+
+		tiles[dest].currentPiece = tiles[src].currentPiece;
+		tiles[src].currentPiece = nullptr;
+
+		tiles[dest].currentPiece->sprite.setPosition(tiles[dest].shape.getPosition().x + tiles[dest].shape.getSize().x / 2,
+													 tiles[dest].shape.getPosition().y + tiles[dest].shape.getSize().y / 2);
+
+		drawBoard();
+	}
+	else
+		std::cout << "No piece to move!" << std::endl; std::cout.flush();
 }
