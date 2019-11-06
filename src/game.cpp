@@ -103,7 +103,7 @@ int Game::startGame() {
 					return -1;
 
 				case (sf::Event::MouseButtonPressed):
-					if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+					if (event.mouseButton.button == sf::Mouse::Button::Left) {
 						movePiece(event);
 					}
 					break;
@@ -207,7 +207,7 @@ void Game::movePiece(sf::Event &event) {
 		// Wait for next sf::Event::MouseButtonPressed event to indicate where the piece will be moved to.
 		while (window.waitEvent(event)) {
 			if (event.type == sf::Event::MouseButtonPressed)
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+				if (event.mouseButton.button == sf::Mouse::Button::Left)
 					break;
 		}
 
@@ -216,14 +216,18 @@ void Game::movePiece(sf::Event &event) {
 				break;
 		}
 
-		std::cout << "From Tile " << src << " to Tile " << dest << std::endl;
-		std::cout.flush();
+		// Animation
+		sf::Vector2f currentPos = tiles[src].currentPiece->sprite.getPosition();
+		sf::Vector2f newPos = sf::Vector2f(tiles[dest].shape.getPosition().x + tiles[dest].shape.getSize().x / 2, tiles[dest].shape.getPosition().y + tiles[dest].shape.getSize().y / 2);
+		sf::Vector2f p = newPos - currentPos;
 
-		tiles[dest].currentPiece = tiles[src].currentPiece;
+		for (int i = 0; i < 4; i++) {
+			tiles[src].currentPiece->sprite.move(sf::Vector2f(p.x/5, p.y/5));
+			drawBoard();
+		}
+
+		tiles[dest].setPiece(tiles[src].currentPiece);
 		tiles[src].currentPiece = nullptr;
-
-		tiles[dest].currentPiece->sprite.setPosition(tiles[dest].shape.getPosition().x + tiles[dest].shape.getSize().x / 2,
-													 tiles[dest].shape.getPosition().y + tiles[dest].shape.getSize().y / 2);
 
 		drawBoard();
 	}
