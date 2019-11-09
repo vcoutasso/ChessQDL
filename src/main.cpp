@@ -1,10 +1,15 @@
 #include "game.h"
+#include "Engine/bitboard.h"
 
-using namespace xqdl;
+using namespace chessqdl;
 
 int main() {
-	Game game;
-	game.mainMenu();
+	//Game game;
+	//game.mainMenu();
+
+	Bitboard board;
+
+	board.printBoard();
 
 	return 0;
 }

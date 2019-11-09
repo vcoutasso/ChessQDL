@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 
-namespace xqdl {
+namespace chessqdl {
 
 	enum class enumColor {
 		White,

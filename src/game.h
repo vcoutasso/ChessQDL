@@ -5,7 +5,7 @@
 #include "tile.h"
 #include "board.h"
 
-namespace xqdl {
+namespace chessqdl {
 
 	const auto whiteTile = sf::Color(255, 206, 158);
 	const auto blackTile = sf::Color(209, 139, 71);

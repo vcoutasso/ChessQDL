@@ -1,6 +1,6 @@
 #include "board.h"
 
-using namespace xqdl;
+using namespace chessqdl;
 
 Board::Board() {
 	// set initial board state

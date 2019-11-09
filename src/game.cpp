@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-using namespace xqdl;
+using namespace chessqdl;
 
 Game::Game() {
 	createWindow();
@@ -18,13 +18,13 @@ Game::Game() {
 void Game::initTiles() {
 	sf::Vector2u wsize = window.getSize();
 	bool isWhite = true;
-	int offsetX = ((int) wsize.x - 8 * xqdl::tileSize) / 2;
-	int offsetY = ((int) wsize.y - 8 * xqdl::tileSize) / 2;
+	int offsetX = ((int) wsize.x - 8 * chessqdl::tileSize) / 2;
+	int offsetY = ((int) wsize.y - 8 * chessqdl::tileSize) / 2;
 
 
 	for (int row = 0; row < 8; ++row) {
 		for (int col = 0; col < 8; ++col) {
-			tiles[row * 8 + col] = Tile(isWhite, xqdl::tileSize, sf::Vector2f(offsetX + col * xqdl::tileSize, offsetY + (7 - row) * xqdl::tileSize));
+			tiles[row * 8 + col] = Tile(isWhite, chessqdl::tileSize, sf::Vector2f(offsetX + col * chessqdl::tileSize, offsetY + (7 - row) * chessqdl::tileSize));
 			isWhite = !isWhite;
 		}
 		isWhite = !isWhite;

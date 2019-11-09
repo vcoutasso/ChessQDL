@@ -5,13 +5,13 @@
 #include <string>
 #include "tile.h"
 
-typedef unsigned long long U64;
+//typedef unsigned long long U64;
 
-namespace xqdl {
+namespace chessqdl {
 
 	class Board {
 	private:
-		U64 bitBoards[8];
+		//U64 bitBoards[8];
 
 		void fenToBitboard();
 

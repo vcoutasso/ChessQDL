@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "piece.h"
 
-namespace xqdl {
+namespace chessqdl {
 
 	const auto tileSize = 80;
 

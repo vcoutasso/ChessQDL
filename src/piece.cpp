@@ -1,7 +1,7 @@
 #include "piece.h"
 #include <iostream>
 
-using namespace xqdl;
+using namespace chessqdl;
 
 Piece::Piece() {
 	hasMoved = false;

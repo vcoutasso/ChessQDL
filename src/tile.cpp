@@ -1,12 +1,12 @@
 #include "tile.h"
 #include "game.h"
 
-using namespace xqdl;
+using namespace chessqdl;
 
 Tile::Tile(bool white, int length, sf::Vector2f pos) {
 	currentPiece = nullptr;
 	shape = sf::RectangleShape(sf::Vector2f(length, length));
-	shape.setFillColor(white ? xqdl::whiteTile : xqdl::blackTile);
+	shape.setFillColor(white ? chessqdl::whiteTile : chessqdl::blackTile);
 	shape.setPosition(pos);
 	length = 80;
 }
@@ -27,5 +27,5 @@ bool Tile::isEmpty() {
 }
 
 bool Tile::isWhite() {
-	return shape.getFillColor() == xqdl::whiteTile;
+	return shape.getFillColor() == chessqdl::whiteTile;
 }

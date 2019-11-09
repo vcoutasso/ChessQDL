@@ -12,6 +12,9 @@ namespace chessqdl {
 		U64 bitBoards[8];
 
 	public:
+		/**
+		 * @brief Default constructor. Initializes bitBoards according to a default initial chess board.
+		 */
 		Bitboard();
 
 		enum pieceColor {
@@ -72,6 +75,11 @@ namespace chessqdl {
 		 * @return a bitboard containing the king of a given color piece
 		 */
 		U64 getKing(pieceColor color);
+
+		/**
+		 * @brief Prints current state of the board to stdout. Mainly for debugging purposes.
+		 */
+		void printBoard();
 	};
 
 }
