@@ -76,6 +76,20 @@ U64 Bitboard::getKing(Bitboard::pieceColor color){
 }
 
 /**
+ * @details This method returns a bitboard containing all pieces that match the parameter color .
+ */
+U64 Bitboard::getPieces(Bitboard::pieceColor color) {
+	return bitBoards[color];
+}
+
+/**
+ * @details This method performs and AND operation between all white and black pieces, resulting in a bitboard that contains all the pieces on the board.
+ */
+U64 Bitboard::getAllPieces() {
+	return bitBoards[pieceColor::nBlack] & bitBoards[pieceColor::nWhite];
+}
+
+/**
  * @details Converts the board from bitboards to a readable string and prints it to stdout. It does so very inefficiently, but since its main purpose is to help debugging, it shouldn't be a big deal for now.
  */
 void Bitboard::printBoard() {

@@ -77,6 +77,19 @@ namespace chessqdl {
 		U64 getKing(pieceColor color);
 
 		/**
+		 * @brief Returns a bitboard containing all pieces of a given color
+		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @return a bitboard containing all pieces of a given color piece
+		 */
+		U64 getPieces(pieceColor color);
+
+		/**
+		 * @brief Returns a bitboard containing all board pieces
+		 * @return a bitboard containing all board pieces
+		 */
+		U64 getAllPieces();
+
+		/**
 		 * @brief Prints current state of the board to stdout. Mainly for debugging purposes.
 		 */
 		void printBoard();
