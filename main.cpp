@@ -1,5 +1,5 @@
-#include "game.h"
-#include "Engine/bitboard.h"
+#include "src/GUI/game.h"
+#include "src/Engine/bitboard.h"
 
 using namespace chessqdl;
 

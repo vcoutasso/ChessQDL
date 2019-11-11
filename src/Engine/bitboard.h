@@ -88,7 +88,6 @@ namespace chessqdl {
 		 */
 		void printBoard();
 
-
 	};
 
 }

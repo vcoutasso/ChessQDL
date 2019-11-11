@@ -26,12 +26,12 @@ Bitboard::Bitboard() {
 	bitBoards[pieceColor::nBlack] = 0xffffL << 48;
 	bitBoards[pieceColor::nWhite] = 0xffffL;
 
-	bitBoards[pieceType::nPawn] = (0xffL << 48) + (0xffL << 8);
-	bitBoards[pieceType::nKnight] = 0x42L + (0x42L << 56);
-	bitBoards[pieceType::nBishop] = 0x24L + (0x24L << 56);
-	bitBoards[pieceType::nRook] = 0x81L + (0x81L << 56);
-	bitBoards[pieceType::nQueen] = 0x8L + (0x8L << 56);
-	bitBoards[pieceType::nKing] = 0x10L + (0x10L << 56);
+	bitBoards[pieceType::nPawn] = (0xffL << 48) | (0xffL << 8);
+	bitBoards[pieceType::nKnight] = 0x42L | (0x42L << 56);
+	bitBoards[pieceType::nBishop] = 0x24L | (0x24L << 56);
+	bitBoards[pieceType::nRook] = 0x81L | (0x81L << 56);
+	bitBoards[pieceType::nQueen] = 0x8L | (0x8L << 56);
+	bitBoards[pieceType::nKing] = 0x10L | (0x10L << 56);
 }
 
 /**

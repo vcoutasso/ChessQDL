@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.14)
 project(Chessqdl)
 
-#add_subdirectory(src)
-#add_subdirectory(test)
-
 set(CMAKE_CXX_STANDARD 17)
-
-
-add_executable(Chessqdl src/main.cpp src/game.cpp src/game.h src/board.cpp src/board.h src/tile.cpp src/tile.h src/piece.cpp src/piece.h src/Engine/bitboard.cpp src/Engine/bitboard.h src/Engine/chessqdl.h src/Engine/chessqdl.cpp)
 
 find_package(SFML 2.5.1 REQUIRED graphics network audio window system)
 
-target_link_libraries(Chessqdl sfml-graphics sfml-audio sfml-window)
+set(SOURCE_FILES main.cpp)
+add_executable(${CMAKE_PROJECT_NAME}_run ${SOURCE_FILES})
+
+include_directories(src)
+
+add_subdirectory(src)
+add_subdirectory(tests)
+
+target_link_libraries(${CMAKE_PROJECT_NAME}_run ${CMAKE_PROJECT_NAME}_lib sfml-graphics sfml-audio sfml-window)
 
