@@ -3,6 +3,16 @@
 using namespace chessqdl;
 
 /**
+ * @details shifts bitboard northwest. E.g
+ * 0 0 0	1 0 0
+ * 0 1 0 -> 0 0 0
+ * 0 0 0	0 0 0
+ */
+U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
+	return bitboard << 9;
+}
+
+/**
  * @details shifts bitboard north. E.g
  * 0 0 0	0 1 0
  * 0 1 0 -> 0 0 0
@@ -39,7 +49,7 @@ U64 MoveGenerator::shiftEast(U64 bitboard) {
  * 0 0 0	0 0 1
  */
 U64 MoveGenerator::shiftSouthEast(U64 bitboard) {
-	return bitboard >> 7;
+	return bitboard >> 9;
 }
 
 /**
@@ -59,7 +69,7 @@ U64 MoveGenerator::shiftSouth(U64 bitboard) {
  * 0 0 0	1 0 0
  */
 U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
-	return bitboard >> 9;
+	return bitboard >> 7;
 }
 
 /**
@@ -70,14 +80,4 @@ U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
  */
 U64 MoveGenerator::shiftWest(U64 bitboard) {
 	return bitboard << 1;
-}
-
-/**
- * @details shifts bitboard northwest. E.g
- * 0 0 0	1 0 0
- * 0 1 0 -> 0 0 0
- * 0 0 0	0 0 0
- */
-U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
-	return bitboard << 9;
 }
