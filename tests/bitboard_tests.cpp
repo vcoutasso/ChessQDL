@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "../src/Engine/bitboard.h"
 
-TEST(Bitboard, InitStandardChessBoard) {
+TEST(Bitboard, Bitboard_InitStandardChessBoard_Test) {
 	chessqdl::Bitboard bitboard;
 
 	EXPECT_EQ(bitboard.getPawns(chessqdl::pieceColor::nWhite), 0xff00);
