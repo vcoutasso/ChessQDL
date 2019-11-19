@@ -50,3 +50,10 @@ endif ()
 
 
 target_link_libraries(${CMAKE_PROJECT_NAME}_run ${CMAKE_PROJECT_NAME}_lib sfml-graphics sfml-audio sfml-window)
+
+if (CMAKE_BUILD_TYPE MATCHES Release)
+	add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_run
+			POST_BUILD
+			COMMAND strip -s ${CMAKE_PROJECT_NAME}_run)
+endif()
+

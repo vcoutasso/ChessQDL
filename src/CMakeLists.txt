@@ -8,6 +8,7 @@ set(SOURCE_FILES Engine/bitboard.h Engine/chessqdl.h Engine/movegen.h
 		GUI/board.h GUI/game.h GUI/piece.h GUI/tile.h
 )
 
+
 # The library contains header and source files.
 add_library(${CMAKE_PROJECT_NAME}_lib STATIC
 		${SOURCE_FILES}
@@ -15,4 +16,8 @@ add_library(${CMAKE_PROJECT_NAME}_lib STATIC
 		)
 
 
-
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+	target_compile_options(${CMAKE_PROJECT_NAME}_lib PUBLIC -Wall -Wextra -Wunreachable-code -g -O0)
+else()
+	target_compile_options(${CMAKE_PROJECT_NAME}_lib PUBLIC -O2)
+endif()
