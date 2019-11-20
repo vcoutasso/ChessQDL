@@ -11,14 +11,19 @@ namespace chessqdl {
 	class Bitboard {
 
 	private:
-		U64 bitBoards[8];
+		U64 bitBoards[9];
 
 	public:
+
 		/**
 		 * @brief Default constructor. Initializes bitBoards according to a default initial chess board.
 		 */
 		Bitboard();
 
+		/**
+		 * @brief FEN constructor. Initializes bitBoards according to the given FEN string.
+		 */
+		Bitboard(std::string fen);
 
 		/**
 		 * @brief Returns a bitboard containing all pawns of a given color piece
@@ -81,6 +86,13 @@ namespace chessqdl {
 		 * @return a bitboard containing all board pieces
 		 */
 		U64 getAllPieces();
+
+
+		/**
+		 * @brief Returns the bitBoard attribute of the class
+		 * @return an array containing all bitboards
+		 */
+		U64 *getBitBoards();
 
 
 		/**

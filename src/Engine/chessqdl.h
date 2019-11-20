@@ -8,11 +8,12 @@ namespace chessqdl {
 
 	enum pieceColor {
 		nWhite,			// all white pieces
-		nBlack			// all black pieces
+		nBlack,			// all black pieces
+		nColor			// all pieces
 	};
 
 	enum pieceType {
-		nPawn=2,		// all pawns
+		nPawn=3,		// all pawns
 		nKnight,		// all knights
 		nBishop,		// all bishops
 		nRook,			// all rooks
