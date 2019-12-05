@@ -1,12 +1,12 @@
 project(${CMAKE_PROJECT_NAME}_lib)
 
-set(HEADER_FILES Engine/bitboard.cpp Engine/chessqdl.cpp Engine/movegen.cpp
+set(SOURCE_FILES Engine/bitboard.cpp Engine/chessqdl.cpp Engine/movegen.cpp
 		GUI/board.cpp GUI/game.cpp GUI/piece.cpp GUI/tile.cpp
-)
+        Engine/engine.cpp)
 
-set(SOURCE_FILES Engine/bitboard.h Engine/chessqdl.h Engine/movegen.h
+set(HEADER_FILES Engine/bitboard.h Engine/chessqdl.h Engine/movegen.h
 		GUI/board.h GUI/game.h GUI/piece.h GUI/tile.h
-)
+        Engine/engine.h)
 
 
 # The library contains header and source files.

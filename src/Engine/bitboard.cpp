@@ -36,7 +36,7 @@ Bitboard::Bitboard() {
 	bitBoards[pieceType::nKing] = 0x10L | (0x10L << 56);
 }
 
-Bitboard::Bitboard(std::string fen) {
+Bitboard::Bitboard(std::string &fen) {
 	// Just to make sure that all bitboards start with value 0x0;
 	for (auto& b : bitBoards)
 		b.reset();
@@ -229,4 +229,6 @@ void Bitboard::printBoard() {
 			std::cout << std::endl;
 		std::cout << board[i];
 	}
+
+    std::cout << std::endl;
 }

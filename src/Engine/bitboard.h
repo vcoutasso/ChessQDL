@@ -23,7 +23,7 @@ namespace chessqdl {
 		/**
 		 * @brief FEN constructor. Initializes bitBoards according to the given FEN string.
 		 */
-		Bitboard(std::string fen);
+		explicit Bitboard(std::string &fen);
 
 		/**
 		 * @brief Returns a bitboard containing all pawns of a given color piece

@@ -1,5 +1,5 @@
 #include "src/GUI/game.h"
-#include "src/Engine/bitboard.h"
+#include "src/Engine/engine.h"
 
 using namespace chessqdl;
 
@@ -8,9 +8,9 @@ int main() {
 	/*Game game;
 	game.mainMenu();*/
 
-	Bitboard board;
+	Engine engine;
 
-	board.printBoard();
+	engine.start();
 
 	return 0;
 }
