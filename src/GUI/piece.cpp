@@ -19,9 +19,9 @@ void Piece::loadTexture(const std::string &path) {
 
 Pawn::Pawn(bool white) {
 	if (white == 1)
-		loadTexture("resources/img/wPawn.png");
+		loadTexture("../resources/img/wPawn.png");
 	else
-		loadTexture("resources/img/bPawn.png");
+		loadTexture("../resources/img/bPawn.png");
 }
 
 int Pawn::move() {
@@ -30,9 +30,9 @@ int Pawn::move() {
 
 Knight::Knight(bool white) {
 	if (white == 1)
-		loadTexture("resources/img/wKnight.png");
+		loadTexture("../resources/img/wKnight.png");
 	else
-		loadTexture("resources/img/bKnight.png");
+		loadTexture("../resources/img/bKnight.png");
 }
 
 int Knight::move() {
@@ -41,9 +41,9 @@ int Knight::move() {
 
 Bishop::Bishop(bool white) {
 	if (white == 1)
-		loadTexture("resources/img/wBishop.png");
+		loadTexture("../resources/img/wBishop.png");
 	else
-		loadTexture("resources/img/bBishop.png");
+		loadTexture("../resources/img/bBishop.png");
 }
 
 int Bishop::move() {
@@ -52,9 +52,9 @@ int Bishop::move() {
 
 Rook::Rook(bool white) {
 	if (white == 1)
-		loadTexture("resources/img/wRook.png");
+		loadTexture("../resources/img/wRook.png");
 	else
-		loadTexture("resources/img/bRook.png");
+		loadTexture("../resources/img/bRook.png");
 }
 
 int Rook::move() {
@@ -63,9 +63,9 @@ int Rook::move() {
 
 Queen::Queen(bool white) {
 	if (white == 1)
-		loadTexture("resources/img/wQueen.png");
+		loadTexture("../resources/img/wQueen.png");
 	else
-		loadTexture("resources/img/bQueen.png");
+		loadTexture("../resources/img/bQueen.png");
 }
 
 int Queen::move() {
@@ -75,9 +75,9 @@ int Queen::move() {
 
 King::King(bool white) {
 	if (white == 1)
-		loadTexture("resources/img/wKing.png");
+		loadTexture("../resources/img/wKing.png");
 	else
-		loadTexture("resources/img/bKing.png");
+		loadTexture("../resources/img/bKing.png");
 }
 
 int King::move() {

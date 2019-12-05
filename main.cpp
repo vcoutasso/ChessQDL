@@ -4,8 +4,9 @@
 using namespace chessqdl;
 
 int main() {
-	//Game game;
-	//game.mainMenu();
+
+	/*Game game;
+	game.mainMenu();*/
 
 	Bitboard board;
 
