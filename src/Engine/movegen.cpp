@@ -88,7 +88,7 @@ U64 MoveGenerator::shiftWest(U64 bitboard) {
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  * @todo Currently its only possible to move one file up. Implement the possibility to move two files up on the first move.
  */
-U64 MoveGenerator::getPawnMoves(const U64 &bitboard, pieceColor color) {
+U64 MoveGenerator::getPawnMoves(const U64 *bitboard, pieceColor color) {
 	if (color == pieceColor::nWhite) {
 		U64 pawns = bitboard[pieceType::nPawn] & bitboard[pieceColor::nWhite];		// every white pawn on the board
 
@@ -96,7 +96,7 @@ U64 MoveGenerator::getPawnMoves(const U64 &bitboard, pieceColor color) {
 		attacks &= bitboard[pieceColor::nBlack];									// real possible attacks (it's only possible to attack if there is a enemy piece)
 
 		U64 moves = shiftNorth(pawns);
-		//moves &= !bitboard[pieceColor::nColor];										// can't move if there is a piece blocking the way
+		//moves &= ~bitboard[pieceColor::nColor];									// can't move if there is a piece blocking the way
 
 		return attacks | moves;														// pseudo-legal moves (capture and move)
 	}
@@ -107,7 +107,7 @@ U64 MoveGenerator::getPawnMoves(const U64 &bitboard, pieceColor color) {
 		attacks &= bitboard[pieceColor::nWhite];
 
 		U64 moves = shiftSouth(pawns);
-		//moves &= !bitboard[pieceColor::nColor];
+		//moves &= ~bitboard[pieceColor::nColor];
 
 		return attacks | moves;
 	}
@@ -119,11 +119,11 @@ U64 MoveGenerator::getPawnMoves(const U64 &bitboard, pieceColor color) {
  * @details Returns a bitboard with all pseudo-legal moves for a given king. "Moves" the king in every direction and checks for collisions. Return the moves that do not collide with pieces of the same color.
  * @todo Implement castle as a pseudo-legal move?
  */
-U64 MoveGenerator::getKingMoves(const U64 &bitboard, pieceColor color) {
+U64 MoveGenerator::getKingMoves(const U64 *bitboard, pieceColor color) {
 	U64 king = bitboard[pieceType::nKing] & bitboard[color];
 
 	U64 moves = shiftNorth(king) | shiftNorthEast(king) | shiftEast(king) | shiftSouthEast(king) | shiftSouth(king) | shiftSouthWest(king) | shiftWest(king) | shiftNorthWest(king);
-	U64 validSquares = !bitboard[color];
+	U64 validSquares = ~bitboard[color];
 
 	return moves & validSquares;
 }
@@ -133,23 +133,27 @@ U64 MoveGenerator::getKingMoves(const U64 &bitboard, pieceColor color) {
  * @details Returns a bitboard with all pseudo-legal moves for knights of a given color.
  * Every possible theoretical move is accounted for, but only the ones that do not collide with allied pieces are returned.
  */
-U64 MoveGenerator::getKnightMoves(const U64 &bitboard, chessqdl::pieceColor color) {
+U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::pieceColor color) {
 	U64 knights = bitboard[pieceType::nKnight] & bitboard[color];
 
 	U64 WWN = shiftNorthWest(shiftWest(knights));			// west west north
-	U64 WNN = shiftNorth(shiftNorthWest(knights));			// west north north
-	U64 ENN = shiftNorthWest(shiftNorthEast(knights));		// east north north
+	U64 WNN = shiftNorthWest(shiftNorth(knights));			// west north north
+	U64 ENN = shiftNorthEast(shiftNorth(knights));  		// east north north
 	U64 EEN = shiftNorthEast(shiftEast(knights));			// east east north
 
 	U64 EES = shiftSouthEast(shiftEast(knights));			// east east south
-	U64 ESS = shiftSouth(shiftSouthEast(knights));			// east south south
-	U64 WSS = shiftSouthEast(shiftSouthWest(knights));		// west south south
+	U64 ESS = shiftSouthEast(shiftSouth(knights));			// east south south
+	U64 WSS = shiftSouthWest(shiftSouth(knights));		    // west south south
 	U64 WWS = shiftSouthWest(shiftWest(knights));			// west west south
 
 	U64 moves =  WWN | WNN | ENN | EEN | EES | ESS | WSS | WWS;
-	U64 notAlly = !bitboard[color];
 
-	return moves & notAlly;								// moves and every square that doesn't contain an piece of the same color
+	if (color == pieceColor::nColor)
+	    return getKnightMoves(bitboard, pieceColor::nBlack) | getKnightMoves(bitboard, pieceColor::nWhite);
+
+    U64 notAlly = ~bitboard[color];
+
+    return moves & notAlly;								// moves and every square that doesn't contain an piece of the same color
 }
 
 
