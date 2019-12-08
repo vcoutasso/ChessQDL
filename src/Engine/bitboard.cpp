@@ -41,16 +41,16 @@ Bitboard::Bitboard(std::string fen) {
 	for (auto& b : bitBoards)
 		b.reset();
 
-	int pos = 0;
+	int pos = 56;
 
 	for (unsigned long int i = 0; i < fen.find_first_of(' '); i++) {
 		switch (tolower(fen[i])) {
 			case '/':			// do not increment counter because '/' does not represent any position
-				pos--;
+				pos -= 17;
 				break;
 			case 'p':
 				bitBoards[nPawn].set(pos);
-				if (fen[i] == 'p')
+				if (fen[i] == 'P')
 					bitBoards[nWhite].set(pos);
 				else
 					bitBoards[nBlack].set(pos);
@@ -58,7 +58,7 @@ Bitboard::Bitboard(std::string fen) {
 
 			case 'n':
 				bitBoards[nKnight].set(pos);
-				if (fen[i] == 'n')
+				if (fen[i] == 'N')
 					bitBoards[nWhite].set(pos);
 				else
 					bitBoards[nBlack].set(pos);
@@ -66,7 +66,7 @@ Bitboard::Bitboard(std::string fen) {
 
 			case 'b':
 				bitBoards[nBishop].set(pos);
-				if (fen[i] == 'b')
+				if (fen[i] == 'B')
 					bitBoards[nWhite].set(pos);
 				else
 					bitBoards[nBlack].set(pos);
@@ -74,7 +74,7 @@ Bitboard::Bitboard(std::string fen) {
 
 			case 'r':
 				bitBoards[nRook].set(pos);
-				if (fen[i] == 'r')
+				if (fen[i] == 'R')
 					bitBoards[nWhite].set(pos);
 				else
 					bitBoards[nBlack].set(pos);
@@ -82,7 +82,7 @@ Bitboard::Bitboard(std::string fen) {
 
 			case 'q':
 				bitBoards[nQueen].set(pos);
-				if (fen[i] == 'q')
+				if (fen[i] == 'Q')
 					bitBoards[nWhite].set(pos);
 				else
 					bitBoards[nBlack].set(pos);
@@ -90,7 +90,7 @@ Bitboard::Bitboard(std::string fen) {
 
 			case 'k':
 				bitBoards[nKing].set(pos);
-				if (fen[i] == 'k')
+				if (fen[i] == 'K')
 					bitBoards[nWhite].set(pos);
 				else
 					bitBoards[nBlack].set(pos);
@@ -217,18 +217,17 @@ void Bitboard::printBoard() {
 			board[i] = 'k';
 	}
 
-	aux = bitBoards[nBlack].to_string();
+	// White pieces are designated using upper-case letters
+	aux = bitBoards[nWhite].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = board[i] - 32;
 	}
 
-	std::reverse(board.begin(), board.end());
-	for (i = 0; i < board.size(); i++) {
-		if (!(i % 8) && i != 0)
-			std::cout << std::endl;
-		std::cout << board[i];
+	std::string rank;
+	for (i = 0; i < 64; i += 8) {
+		rank = board.substr(i, 8);
+		std::reverse(rank.begin(), rank.end());
+		std::cout << rank << std::endl;
 	}
-
-    std::cout << std::endl;
 }

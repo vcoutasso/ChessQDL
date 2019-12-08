@@ -2,25 +2,47 @@
 #include "../src/Engine/bitboard.h"
 
 TEST(Bitboard, InitStandardChessBoard_Test) {
-	chessqdl::Bitboard bitboard;
+	chessqdl::Bitboard board;
 
-	EXPECT_EQ(bitboard.getPawns(chessqdl::enumColor::nWhite), 0xff00);
-	EXPECT_EQ(bitboard.getPawns(chessqdl::enumColor::nBlack), 0xff000000000000);
+	EXPECT_EQ(board.getPawns(chessqdl::enumColor::nWhite), 0xffL << 8);
+	EXPECT_EQ(board.getPawns(chessqdl::enumColor::nBlack), 0xffL << 48);
 
-	EXPECT_EQ(bitboard.getKnights(chessqdl::enumColor::nWhite), 0x42);
-	EXPECT_EQ(bitboard.getKnights(chessqdl::enumColor::nBlack), 0x4200000000000000);
+	EXPECT_EQ(board.getKnights(chessqdl::enumColor::nWhite), 0x42);
+	EXPECT_EQ(board.getKnights(chessqdl::enumColor::nBlack), 0x42L << 56);
 
-	EXPECT_EQ(bitboard.getBishops(chessqdl::enumColor::nWhite), 0x24);
-	EXPECT_EQ(bitboard.getBishops(chessqdl::enumColor::nBlack), 0x2400000000000000);
+	EXPECT_EQ(board.getBishops(chessqdl::enumColor::nWhite), 0x24);
+	EXPECT_EQ(board.getBishops(chessqdl::enumColor::nBlack), 0x24L << 56);
 
-	EXPECT_EQ(bitboard.getRooks(chessqdl::enumColor::nWhite), 0x81);
-	EXPECT_EQ(bitboard.getRooks(chessqdl::enumColor::nBlack), 0x8100000000000000);
+	EXPECT_EQ(board.getRooks(chessqdl::enumColor::nWhite), 0x81);
+	EXPECT_EQ(board.getRooks(chessqdl::enumColor::nBlack), 0x81L << 56);
 
-	EXPECT_EQ(bitboard.getQueens(chessqdl::enumColor::nWhite), 0x08);
-	EXPECT_EQ(bitboard.getQueens(chessqdl::enumColor::nBlack), 0x0800000000000000);
+	EXPECT_EQ(board.getQueens(chessqdl::enumColor::nWhite), 0x08);
+	EXPECT_EQ(board.getQueens(chessqdl::enumColor::nBlack), 0x08L << 56);
 
-	EXPECT_EQ(bitboard.getKing(chessqdl::enumColor::nWhite), 0x10);
-	EXPECT_EQ(bitboard.getKing(chessqdl::enumColor::nBlack), 0x1000000000000000);
+	EXPECT_EQ(board.getKing(chessqdl::enumColor::nWhite), 0x10);
+	EXPECT_EQ(board.getKing(chessqdl::enumColor::nBlack), 0x10L << 56);
+}
+
+TEST(Bitboard, EvansGambitConstructor_Test) {
+	chessqdl::Bitboard board("r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq b3 1 4");
+
+	EXPECT_EQ(board.getPawns(chessqdl::enumColor::nWhite), 0x1200edL << 8);
+	EXPECT_EQ(board.getPawns(chessqdl::enumColor::nBlack), 0xef0010L << 32);
+
+	EXPECT_EQ(board.getKnights(chessqdl::enumColor::nWhite), 0x200002);
+	EXPECT_EQ(board.getKnights(chessqdl::enumColor::nBlack), 0x400004L << 40);
+
+	EXPECT_EQ(board.getBishops(chessqdl::enumColor::nWhite), 0x4000004);
+	EXPECT_EQ(board.getBishops(chessqdl::enumColor::nBlack), 0x4000004L << 32);
+
+	EXPECT_EQ(board.getRooks(chessqdl::enumColor::nWhite), 0x81);
+	EXPECT_EQ(board.getRooks(chessqdl::enumColor::nBlack), 0x81L << 56);
+
+	EXPECT_EQ(board.getQueens(chessqdl::enumColor::nWhite), 0x08);
+	EXPECT_EQ(board.getQueens(chessqdl::enumColor::nBlack), 0x08L << 56);
+
+	EXPECT_EQ(board.getKing(chessqdl::enumColor::nWhite), 0x10);
+	EXPECT_EQ(board.getKing(chessqdl::enumColor::nBlack), 0x10L << 56);
 }
 
 TEST(Bitboard, FENConstructor_Test) {

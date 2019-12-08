@@ -7,7 +7,7 @@ Engine::Engine() {
     bitboard = Bitboard();
 }
 
-Engine::Engine(std::string &fen) {
+Engine::Engine(std::string fen) {
     bitboard = Bitboard(fen);
 }
 

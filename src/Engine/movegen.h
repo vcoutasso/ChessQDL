@@ -175,10 +175,31 @@ namespace chessqdl {
 		 */
 		U64 getKnightMoves(const U64 *bitboard, enumColor color);
 
+
+		/**
+		 * @brief Get pseudo-legal moves for a given color set of bishops
+		 * @param bitboard - reference to bitboards representing the current board status
+		 * @param color - color of desired piece
+		 * @return Bitboard with pseudo-legal moves for bishops of a given color.
+		 */
 		U64 getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece);
 
+
+		/**
+		 * @brief Get pseudo-legal moves for a given color set of rooks
+		 * @param bitboard - reference to bitboards representing the current board status
+		 * @param color - color of desired piece
+		 * @return Bitboard with pseudo-legal moves for rooks of a given color.
+		 */
 		U64 getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece);
 
+
+		/**
+		 * @brief Get pseudo-legal moves for a given color set of queens
+		 * @param bitboard - reference to bitboards representing the current board status
+		 * @param color - color of desired piece
+		 * @return Bitboard with pseudo-legal moves for queens of a given color.
+		 */
 		U64 getQueenMoves(const U64 *bitboard, enumColor color);
 
 

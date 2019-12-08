@@ -223,7 +223,7 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 		attacks &= bitboard[nBlack];                                    // real possible attacks (it's only possible to attack if there is a enemy piece)
 
 		U64 moves = shiftNorth(pawns);
-		//moves &= ~bitboard[nColor];									// can't move if there is a piece blocking the way
+		moves &= ~bitboard[nColor];                                    // can't move if there is a piece blocking the way
 
 		return attacks | moves;														// pseudo-legal moves (capture and move)
 	} else if (color == nBlack) {
@@ -233,7 +233,7 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 		attacks &= bitboard[nWhite];
 
 		U64 moves = shiftSouth(pawns);
-		//moves &= ~bitboard[nColor];
+		moves &= ~bitboard[nColor];
 
 		return attacks | moves;
 	}
@@ -283,6 +283,9 @@ U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::enumColor color
     return moves & notAlly;								// moves and every square that doesn't contain an piece of the same color
 }
 
+/**
+ * @details Gets occluded fills for every direction for the possible moves (excludes blockers). For the attacks, the occluded fills need to be shifted one further.
+ */
 U64 MoveGenerator::getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece) {
 	U64 bishops = bitboard[piece] & bitboard[color];
 	U64 empty = ~bitboard[nColor];
@@ -308,6 +311,10 @@ U64 MoveGenerator::getBishopMoves(const U64 *bitboard, enumColor color, enumPiec
 	return moves | attacks;
 }
 
+
+/**
+ * @details Gets occluded fills for every direction for the possible moves (excludes blockers). For the attacks, the occluded fills need to be shifted one further.
+ */
 U64 MoveGenerator::getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece) {
 	U64 rooks = bitboard[piece] & bitboard[color];
 	U64 empty = ~bitboard[nColor];
@@ -333,6 +340,10 @@ U64 MoveGenerator::getRookMoves(const U64 *bitboard, enumColor color, enumPiece 
 	return moves | attacks;
 }
 
+
+/**
+ * @details Makes use of the implementation of bishop and rooks move generation.
+ */
 U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
 	if (color == nColor)
 		return getBishopMoves(bitboard, nWhite, nQueen) | getBishopMoves(bitboard, nBlack, nQueen) |
