@@ -6,13 +6,30 @@
 
 namespace chessqdl {
 
+	/**
+	 * @brief Analogous to uint64, but bitset is used to take advantage of its methods.
+	 */
+	typedef std::bitset<64> U64;
+
+	/**
+	 * @brief Constants representing the board with all bits set except for A or H file
+	 */
+	const U64 notAFile = 0xfefefefefefefefe;
+	const U64 notHFile = 0x7f7f7f7f7f7f7f7f;
+
+	/**
+	 * @brief Bitboard array indexing by color
+	 */
 	enum enumColor {
 		nWhite,			// all white pieces
 		nBlack,			// all black pieces
 		nColor			// all pieces
 	};
 
-	enum enumType {
+	/**
+	 * @brief Bitboard array indexing by piece
+	 */
+	enum enumPiece {
 		nPawn=3,		// all pawns
 		nKnight,		// all knights
 		nBishop,		// all bishops
@@ -46,7 +63,6 @@ namespace chessqdl {
 	 *				-9    -8    -7
 	 *		soWe         sout         soEa
 	 */
-
 	enum enumDirections {
 		noWe = 7,
 		nort = 8,

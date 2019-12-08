@@ -4,13 +4,14 @@
 #include <bitset>
 #include "const.h"
 
-typedef std::bitset<64> U64;
-
 namespace chessqdl {
 
 	class Bitboard {
 
 	private:
+		/**
+		 * @brief Array containing all bitboards. Indexing follows numColor and enumPiece
+		 */
 		U64 bitBoards[9];
 
 	public:
@@ -27,7 +28,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing all pawns of a given color piece
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all pawns of a given color piece
 		 */
 		U64 getPawns(enumColor color);
@@ -35,7 +36,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing all knights of a given color piece
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all knights of a given color piece
 		 */
 		U64 getKnights(enumColor color);
@@ -43,7 +44,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing all bishops of a given color piece
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all bishops of a given color piece
 		 */
 		U64 getBishops(enumColor color);
@@ -51,7 +52,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing all rooks of a given color piece
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all rooks of a given color piece
 		 */
 		U64 getRooks(enumColor color);
@@ -59,7 +60,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing all queens of a given color piece
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all queens of a given color piece
 		 */
 		U64 getQueens(enumColor color);
@@ -67,7 +68,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing the king of a given color piece
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing the king of a given color piece
 		 */
 		U64 getKing(enumColor color);
@@ -75,7 +76,7 @@ namespace chessqdl {
 
 		/**
 		 * @brief Returns a bitboard containing all pieces of a given color
-		 * @param color - the color of desired pieces (nWhite or nBlack)
+		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all pieces of a given color piece
 		 */
 		U64 getPieces(enumColor color);

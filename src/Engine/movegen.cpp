@@ -4,6 +4,7 @@
 
 using namespace chessqdl;
 
+
 /**
  * @details shifts bitboard northwest. E.g
  * 0 0 0	1 0 0
@@ -11,8 +12,9 @@ using namespace chessqdl;
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
-	return bitboard << noWe & notHFile;
+	return (bitboard << noWe) & notHFile;
 }
+
 
 /**
  * @details shifts bitboard north. E.g
@@ -24,6 +26,7 @@ U64 MoveGenerator::shiftNorth(U64 bitboard) {
 	return bitboard << nort;
 }
 
+
 /**
  * @details shifts bitboard northeast. E.g
  * 0 0 0	0 0 1
@@ -31,8 +34,9 @@ U64 MoveGenerator::shiftNorth(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftNorthEast(U64 bitboard) {
-	return bitboard << noEa & notAFile;
+	return (bitboard << noEa) & notAFile;
 }
+
 
 /**
  * @details shifts bitboard east. E.g
@@ -41,8 +45,9 @@ U64 MoveGenerator::shiftNorthEast(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftEast(U64 bitboard) {
-	return bitboard << east & notAFile;
+	return (bitboard << east) & notAFile;
 }
+
 
 /**
  * @details shifts bitboard southeast. E.g
@@ -51,8 +56,9 @@ U64 MoveGenerator::shiftEast(U64 bitboard) {
  * 0 0 0	0 0 1
  */
 U64 MoveGenerator::shiftSouthEast(U64 bitboard) {
-	return bitboard >> -soEa & notAFile;
+	return (bitboard >> -soEa) & notAFile;
 }
+
 
 /**
  * @details shifts bitboard south. E.g
@@ -64,6 +70,7 @@ U64 MoveGenerator::shiftSouth(U64 bitboard) {
 	return bitboard >> -sout;
 }
 
+
 /**
  * @details shifts bitboard south. E.g
  * 0 0 0	0 0 0
@@ -71,8 +78,9 @@ U64 MoveGenerator::shiftSouth(U64 bitboard) {
  * 0 0 0	1 0 0
  */
 U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
-	return bitboard >> -soWe & notHFile;
+	return (bitboard >> -soWe) & notHFile;
 }
+
 
 /**
  * @details shifts bitboard west. E.g
@@ -81,45 +89,165 @@ U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftWest(U64 bitboard) {
-	return bitboard >> -west & notHFile;
+	return (bitboard >> -west) & notHFile;
 }
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::soutOccl(U64 gen, U64 pro) {
+	gen |= pro & (gen >> 8);
+	pro &= (pro >> 8);
+	gen |= pro & (gen >> 16);
+	pro &= (pro >> 16);
+	gen |= pro & (gen >> 32);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::nortOccl(U64 gen, U64 pro) {
+	gen |= pro & (gen << 8);
+	pro &= (pro << 8);
+	gen |= pro & (gen << 16);
+	pro &= (pro << 16);
+	gen |= pro & (gen << 32);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::eastOccl(U64 gen, U64 pro) {
+	pro &= notAFile;
+	gen |= pro & (gen << 1);
+	pro &= (pro << 1);
+	gen |= pro & (gen << 2);
+	pro &= (pro << 2);
+	gen |= pro & (gen << 4);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::noEaOccl(U64 gen, U64 pro) {
+	pro &= notAFile;
+	gen |= pro & (gen << 9);
+	pro &= (pro << 9);
+	gen |= pro & (gen << 18);
+	pro &= (pro << 18);
+	gen |= pro & (gen << 36);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::soEaOccl(U64 gen, U64 pro) {
+	pro &= notAFile;
+	gen |= pro & (gen >> 7);
+	pro &= (pro >> 7);
+	gen |= pro & (gen >> 14);
+	pro &= (pro >> 14);
+	gen |= pro & (gen >> 28);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::westOccl(U64 gen, U64 pro) {
+	pro &= notHFile;
+	gen |= pro & (gen >> 1);
+	pro &= (pro >> 1);
+	gen |= pro & (gen >> 2);
+	pro &= (pro >> 2);
+	gen |= pro & (gen >> 4);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::soWeOccl(U64 gen, U64 pro) {
+	pro &= notHFile;
+	gen |= pro & (gen >> 9);
+	pro &= (pro >> 9);
+	gen |= pro & (gen >> 18);
+	pro &= (pro >> 18);
+	gen |= pro & (gen >> 36);
+	return gen;
+}
+
+
+/**
+ * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
+ * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
+ */
+U64 MoveGenerator::noWeOccl(U64 gen, U64 pro) {
+	pro &= notHFile;
+	gen |= pro & (gen << 7);
+	pro &= (pro << 7);
+	gen |= pro & (gen << 14);
+	pro &= (pro << 14);
+	gen |= pro & (gen << 28);
+	return gen;
+}
+
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  * @todo Currently its only possible to move one file up. Implement the possibility to move two files up on the first move.
  */
 U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
-	if (color == enumColor::nWhite) {
-		U64 pawns = bitboard[enumType::nPawn] & bitboard[enumColor::nWhite];        // every white pawn on the board
+	if (color == nWhite) {
+		U64 pawns = bitboard[nPawn] & bitboard[nWhite];        // every white pawn on the board
 
 		U64 attacks = shiftNorthEast(pawns) | shiftNorthWest(pawns);				// theoretical possible attacks
-		attacks &= bitboard[enumColor::nBlack];                                    // real possible attacks (it's only possible to attack if there is a enemy piece)
+		attacks &= bitboard[nBlack];                                    // real possible attacks (it's only possible to attack if there is a enemy piece)
 
 		U64 moves = shiftNorth(pawns);
-		//moves &= ~bitboard[enumColor::nColor];									// can't move if there is a piece blocking the way
+		//moves &= ~bitboard[nColor];									// can't move if there is a piece blocking the way
 
 		return attacks | moves;														// pseudo-legal moves (capture and move)
-	} else if (color == enumColor::nBlack) {
-		U64 pawns = bitboard[enumType::nPawn] & bitboard[enumColor::nBlack];
+	} else if (color == nBlack) {
+		U64 pawns = bitboard[nPawn] & bitboard[nBlack];
 
 		U64 attacks = shiftSouthWest(pawns) | shiftSouthEast(pawns);
-		attacks &= bitboard[enumColor::nWhite];
+		attacks &= bitboard[nWhite];
 
 		U64 moves = shiftSouth(pawns);
-		//moves &= ~bitboard[enumColor::nColor];
+		//moves &= ~bitboard[nColor];
 
 		return attacks | moves;
 	}
 	else
-		return getPawnMoves(bitboard, enumColor::nBlack) | getPawnMoves(bitboard, enumColor::nWhite);
+		return getPawnMoves(bitboard, nBlack) | getPawnMoves(bitboard, nWhite);
 }
+
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given king. "Moves" the king in every direction and checks for collisions. Return the moves that do not collide with pieces of the same color.
  * @todo Implement castle as a pseudo-legal move?
  */
 U64 MoveGenerator::getKingMoves(const U64 *bitboard, enumColor color) {
-	U64 king = bitboard[enumType::nKing] & bitboard[color];
+	U64 king = bitboard[nKing] & bitboard[color];
 
 	U64 moves = shiftNorth(king) | shiftNorthEast(king) | shiftEast(king) | shiftSouthEast(king) | shiftSouth(king) | shiftSouthWest(king) | shiftWest(king) | shiftNorthWest(king);
 	U64 validSquares = ~bitboard[color];
@@ -133,7 +261,10 @@ U64 MoveGenerator::getKingMoves(const U64 *bitboard, enumColor color) {
  * Every possible theoretical move is accounted for, but only the ones that do not collide with allied pieces are returned.
  */
 U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::enumColor color) {
-	U64 knights = bitboard[enumType::nKnight] & bitboard[color];
+	U64 knights = bitboard[nKnight] & bitboard[color];
+
+	if (color == nColor)
+		return getKnightMoves(bitboard, nBlack) | getKnightMoves(bitboard, nWhite);
 
 	U64 WWN = shiftNorthWest(shiftWest(knights));			// west west north
 	U64 WNN = shiftNorthWest(shiftNorth(knights));			// west north north
@@ -147,12 +278,65 @@ U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::enumColor color
 
 	U64 moves =  WWN | WNN | ENN | EEN | EES | ESS | WSS | WWS;
 
-	if (color == enumColor::nColor)
-		return getKnightMoves(bitboard, enumColor::nBlack) | getKnightMoves(bitboard, enumColor::nWhite);
-
     U64 notAlly = ~bitboard[color];
 
     return moves & notAlly;								// moves and every square that doesn't contain an piece of the same color
 }
 
+U64 MoveGenerator::getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece) {
+	U64 bishops = bitboard[piece] & bitboard[color];
+	U64 empty = ~bitboard[nColor];
 
+	if (color == nColor)
+		return getBishopMoves(bitboard, nWhite, piece) | getBishopMoves(bitboard, nBlack, piece);
+
+	U64 noEaOcc = noEaOccl(bishops, empty);
+	U64 soEaOcc = soEaOccl(bishops, empty);
+	U64 noWeOcc = noWeOccl(bishops, empty);
+	U64 soWeOcc = soWeOccl(bishops, empty);
+
+	U64 noEaAttacks = shiftNorthEast(noEaOcc);
+	U64 soEaAttacks = shiftSouthEast(soEaOcc);
+	U64 noWeAttacks = shiftNorthWest(noWeOcc);
+	U64 soWeAttacks = shiftSouthWest(soWeOcc);
+
+	U64 attacks = noEaAttacks | soEaAttacks | noWeAttacks | soWeAttacks;
+	attacks &= ~bitboard[color]; // Attacks are only valid if the piece is an enemy piece
+	U64 moves = noEaOcc | soEaOcc | noWeOcc | soWeOcc;
+	moves &= ~bitboard[piece]; // "Moving" without leaving the square is invalid
+
+	return moves | attacks;
+}
+
+U64 MoveGenerator::getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece) {
+	U64 rooks = bitboard[piece] & bitboard[color];
+	U64 empty = ~bitboard[nColor];
+
+	if (color == nColor)
+		return getRookMoves(bitboard, nWhite, piece) | getRookMoves(bitboard, nBlack, piece);
+
+	U64 soutOcc = soutOccl(rooks, empty);
+	U64 nortOcc = nortOccl(rooks, empty);
+	U64 eastOcc = eastOccl(rooks, empty);
+	U64 westOcc = westOccl(rooks, empty);
+
+	U64 soutAttacks = shiftSouth(soutOcc);
+	U64 nortAttacks = shiftNorth(nortOcc);
+	U64 eastAttacks = shiftEast(eastOcc);
+	U64 westAttacks = shiftWest(westOcc);
+
+	U64 attacks = soutAttacks | nortAttacks | eastAttacks | westAttacks;
+	attacks &= ~bitboard[color]; // Attacks are only valid if the piece is an enemy piece
+	U64 moves = soutOcc | nortOcc | eastOcc | westOcc;
+	moves &= ~bitboard[piece]; // "Moving" without leaving the square is invalid
+
+	return moves | attacks;
+}
+
+U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
+	if (color == nColor)
+		return getBishopMoves(bitboard, nWhite, nQueen) | getBishopMoves(bitboard, nBlack, nQueen) |
+			   getRookMoves(bitboard, nWhite, nQueen) | getRookMoves(bitboard, nBlack, nQueen);
+
+	return getBishopMoves(bitboard, color, nQueen) | getRookMoves(bitboard, color, nQueen);
+}
