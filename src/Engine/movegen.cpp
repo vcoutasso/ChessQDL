@@ -11,7 +11,7 @@ using namespace chessqdl;
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
-	return bitboard << 7 & notHFile;
+	return bitboard << noWe & notHFile;
 }
 
 /**
@@ -21,7 +21,7 @@ U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftNorth(U64 bitboard) {
-	return bitboard << 8;
+	return bitboard << nort;
 }
 
 /**
@@ -31,7 +31,7 @@ U64 MoveGenerator::shiftNorth(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftNorthEast(U64 bitboard) {
-	return bitboard << 9 & notAFile;
+	return bitboard << noEa & notAFile;
 }
 
 /**
@@ -41,7 +41,7 @@ U64 MoveGenerator::shiftNorthEast(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftEast(U64 bitboard) {
-	return bitboard << 1 & notAFile;
+	return bitboard << east & notAFile;
 }
 
 /**
@@ -51,7 +51,7 @@ U64 MoveGenerator::shiftEast(U64 bitboard) {
  * 0 0 0	0 0 1
  */
 U64 MoveGenerator::shiftSouthEast(U64 bitboard) {
-	return bitboard >> 7 & notAFile;
+	return bitboard >> -soEa & notAFile;
 }
 
 /**
@@ -61,7 +61,7 @@ U64 MoveGenerator::shiftSouthEast(U64 bitboard) {
  * 0 0 0	0 1 0
  */
 U64 MoveGenerator::shiftSouth(U64 bitboard) {
-	return bitboard >> 8;
+	return bitboard >> -sout;
 }
 
 /**
@@ -71,7 +71,7 @@ U64 MoveGenerator::shiftSouth(U64 bitboard) {
  * 0 0 0	1 0 0
  */
 U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
-	return bitboard >> 9 & notHFile;
+	return bitboard >> -soWe & notHFile;
 }
 
 /**
@@ -81,46 +81,45 @@ U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
  * 0 0 0	0 0 0
  */
 U64 MoveGenerator::shiftWest(U64 bitboard) {
-	return bitboard >> 1 & notHFile;
+	return bitboard >> -west & notHFile;
 }
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  * @todo Currently its only possible to move one file up. Implement the possibility to move two files up on the first move.
  */
-U64 MoveGenerator::getPawnMoves(const U64 *bitboard, pieceColor color) {
-	if (color == pieceColor::nWhite) {
-		U64 pawns = bitboard[pieceType::nPawn] & bitboard[pieceColor::nWhite];		// every white pawn on the board
+U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
+	if (color == enumColor::nWhite) {
+		U64 pawns = bitboard[enumType::nPawn] & bitboard[enumColor::nWhite];        // every white pawn on the board
 
 		U64 attacks = shiftNorthEast(pawns) | shiftNorthWest(pawns);				// theoretical possible attacks
-		attacks &= bitboard[pieceColor::nBlack];									// real possible attacks (it's only possible to attack if there is a enemy piece)
+		attacks &= bitboard[enumColor::nBlack];                                    // real possible attacks (it's only possible to attack if there is a enemy piece)
 
 		U64 moves = shiftNorth(pawns);
-		//moves &= ~bitboard[pieceColor::nColor];									// can't move if there is a piece blocking the way
+		//moves &= ~bitboard[enumColor::nColor];									// can't move if there is a piece blocking the way
 
 		return attacks | moves;														// pseudo-legal moves (capture and move)
-	}
-	else if (color == pieceColor::nBlack){
-		U64 pawns = bitboard[pieceType::nPawn] & bitboard[pieceColor::nBlack];
+	} else if (color == enumColor::nBlack) {
+		U64 pawns = bitboard[enumType::nPawn] & bitboard[enumColor::nBlack];
 
 		U64 attacks = shiftSouthWest(pawns) | shiftSouthEast(pawns);
-		attacks &= bitboard[pieceColor::nWhite];
+		attacks &= bitboard[enumColor::nWhite];
 
 		U64 moves = shiftSouth(pawns);
-		//moves &= ~bitboard[pieceColor::nColor];
+		//moves &= ~bitboard[enumColor::nColor];
 
 		return attacks | moves;
 	}
 	else
-		return getPawnMoves(bitboard, pieceColor::nBlack) | getPawnMoves(bitboard, pieceColor::nWhite);
+		return getPawnMoves(bitboard, enumColor::nBlack) | getPawnMoves(bitboard, enumColor::nWhite);
 }
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given king. "Moves" the king in every direction and checks for collisions. Return the moves that do not collide with pieces of the same color.
  * @todo Implement castle as a pseudo-legal move?
  */
-U64 MoveGenerator::getKingMoves(const U64 *bitboard, pieceColor color) {
-	U64 king = bitboard[pieceType::nKing] & bitboard[color];
+U64 MoveGenerator::getKingMoves(const U64 *bitboard, enumColor color) {
+	U64 king = bitboard[enumType::nKing] & bitboard[color];
 
 	U64 moves = shiftNorth(king) | shiftNorthEast(king) | shiftEast(king) | shiftSouthEast(king) | shiftSouth(king) | shiftSouthWest(king) | shiftWest(king) | shiftNorthWest(king);
 	U64 validSquares = ~bitboard[color];
@@ -133,8 +132,8 @@ U64 MoveGenerator::getKingMoves(const U64 *bitboard, pieceColor color) {
  * @details Returns a bitboard with all pseudo-legal moves for knights of a given color.
  * Every possible theoretical move is accounted for, but only the ones that do not collide with allied pieces are returned.
  */
-U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::pieceColor color) {
-	U64 knights = bitboard[pieceType::nKnight] & bitboard[color];
+U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::enumColor color) {
+	U64 knights = bitboard[enumType::nKnight] & bitboard[color];
 
 	U64 WWN = shiftNorthWest(shiftWest(knights));			// west west north
 	U64 WNN = shiftNorthWest(shiftNorth(knights));			// west north north
@@ -148,8 +147,8 @@ U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::pieceColor colo
 
 	U64 moves =  WWN | WNN | ENN | EEN | EES | ESS | WSS | WWS;
 
-	if (color == pieceColor::nColor)
-	    return getKnightMoves(bitboard, pieceColor::nBlack) | getKnightMoves(bitboard, pieceColor::nWhite);
+	if (color == enumColor::nColor)
+		return getKnightMoves(bitboard, enumColor::nBlack) | getKnightMoves(bitboard, enumColor::nWhite);
 
     U64 notAlly = ~bitboard[color];
 

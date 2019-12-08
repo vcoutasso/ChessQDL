@@ -5,7 +5,7 @@
 
 namespace chessqdl {
 
-	enum class enumColor {
+	enum class enumPieceColor {
 		White,
 		Black
 	};

@@ -9,7 +9,7 @@ namespace chessqdl {
 
 	private:
 
-		/* Constants representing the board with all bits set except for one file */
+		/* Constants representing the board with all bits set except for A or H file */
 		const U64 notAFile = 0xfefefefefefefefe;
 		const U64 notHFile = 0x7f7f7f7f7f7f7f7f;
 
@@ -89,7 +89,7 @@ namespace chessqdl {
 		 * @param color - color of desired piece
 		 * @return Bitboard with pseudo-legal moves for pawns.
 		 */
-		U64 getPawnMoves(const U64 *bitboard, pieceColor color);
+		U64 getPawnMoves(const U64 *bitboard, enumColor color);
 
 
 		/**
@@ -98,7 +98,7 @@ namespace chessqdl {
 		 * @param color - color of desired piece
 		 * @return Bitboard with pseudo-legal moves for king.
 		 */
-		U64 getKingMoves(const U64 *bitboard, pieceColor color);
+		U64 getKingMoves(const U64 *bitboard, enumColor color);
 
 
 		/**
@@ -107,7 +107,7 @@ namespace chessqdl {
 		 * @param color - color of desired piece
 		 * @return Bitboard with pseudo-legal moves for knights of a given color.
 		 */
-		U64 getKnightMoves(const U64 *bitboard, pieceColor color);
+		U64 getKnightMoves(const U64 *bitboard, enumColor color);
 
 
 	};

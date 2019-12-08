@@ -2,7 +2,7 @@
 #define CHESSQDL_BITBOARD_H
 
 #include <bitset>
-#include "chessqdl.h"
+#include "const.h"
 
 typedef std::bitset<64> U64;
 
@@ -23,14 +23,14 @@ namespace chessqdl {
 		/**
 		 * @brief FEN constructor. Initializes bitBoards according to the given FEN string.
 		 */
-		explicit Bitboard(std::string &fen);
+		explicit Bitboard(std::string fen);
 
 		/**
 		 * @brief Returns a bitboard containing all pawns of a given color piece
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all pawns of a given color piece
 		 */
-		U64 getPawns(pieceColor color);
+		U64 getPawns(enumColor color);
 
 
 		/**
@@ -38,7 +38,7 @@ namespace chessqdl {
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all knights of a given color piece
 		 */
-		U64 getKnights(pieceColor color);
+		U64 getKnights(enumColor color);
 
 
 		/**
@@ -46,7 +46,7 @@ namespace chessqdl {
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all bishops of a given color piece
 		 */
-		U64 getBishops(pieceColor color);
+		U64 getBishops(enumColor color);
 
 
 		/**
@@ -54,7 +54,7 @@ namespace chessqdl {
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all rooks of a given color piece
 		 */
-		U64 getRooks(pieceColor color);
+		U64 getRooks(enumColor color);
 
 
 		/**
@@ -62,7 +62,7 @@ namespace chessqdl {
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all queens of a given color piece
 		 */
-		U64 getQueens(pieceColor color);
+		U64 getQueens(enumColor color);
 
 
 		/**
@@ -70,7 +70,7 @@ namespace chessqdl {
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing the king of a given color piece
 		 */
-		U64 getKing(pieceColor color);
+		U64 getKing(enumColor color);
 
 
 		/**
@@ -78,7 +78,7 @@ namespace chessqdl {
 		 * @param color - the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all pieces of a given color piece
 		 */
-		U64 getPieces(pieceColor color);
+		U64 getPieces(enumColor color);
 
 
 		/**

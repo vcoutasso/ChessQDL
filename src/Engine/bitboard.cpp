@@ -1,5 +1,5 @@
 #include "bitboard.h"
-#include "chessqdl.h"
+#include "const.h"
 
 #include <string>
 #include <iostream>
@@ -24,19 +24,19 @@ using namespace chessqdl;
  * note that upper case letters represent white pieces while lower case letters are black pieces.
  */
 Bitboard::Bitboard() {
-	bitBoards[pieceColor::nBlack] = 0xffffL << 48;
-	bitBoards[pieceColor::nWhite] = 0xffffL;
-	bitBoards[pieceColor::nColor] = bitBoards[pieceColor::nWhite] | bitBoards[pieceColor::nBlack];
+	bitBoards[enumColor::nBlack] = 0xffffL << 48;
+	bitBoards[enumColor::nWhite] = 0xffffL;
+	bitBoards[enumColor::nColor] = bitBoards[enumColor::nWhite] | bitBoards[enumColor::nBlack];
 
-	bitBoards[pieceType::nPawn] = (0xffL << 48) | (0xffL << 8);
-	bitBoards[pieceType::nKnight] = 0x42L | (0x42L << 56);
-	bitBoards[pieceType::nBishop] = 0x24L | (0x24L << 56);
-	bitBoards[pieceType::nRook] = 0x81L | (0x81L << 56);
-	bitBoards[pieceType::nQueen] = 0x8L | (0x8L << 56);
-	bitBoards[pieceType::nKing] = 0x10L | (0x10L << 56);
+	bitBoards[enumType::nPawn] = (0xffL << 48) | (0xffL << 8);
+	bitBoards[enumType::nKnight] = 0x42L | (0x42L << 56);
+	bitBoards[enumType::nBishop] = 0x24L | (0x24L << 56);
+	bitBoards[enumType::nRook] = 0x81L | (0x81L << 56);
+	bitBoards[enumType::nQueen] = 0x8L | (0x8L << 56);
+	bitBoards[enumType::nKing] = 0x10L | (0x10L << 56);
 }
 
-Bitboard::Bitboard(std::string &fen) {
+Bitboard::Bitboard(std::string fen) {
 	// Just to make sure that all bitboards start with value 0x0;
 	for (auto& b : bitBoards)
 		b.reset();
@@ -49,51 +49,51 @@ Bitboard::Bitboard(std::string &fen) {
 				pos--;
 				break;
 			case 'p':
-				bitBoards[pieceType::nPawn].set(pos);
+				bitBoards[enumType::nPawn].set(pos);
 				if (fen[i] == 'p')
-					bitBoards[pieceColor ::nWhite].set(pos);
+					bitBoards[enumColor::nWhite].set(pos);
 				else
-					bitBoards[pieceColor ::nBlack].set(pos);
+					bitBoards[enumColor::nBlack].set(pos);
 				break;
 
 			case 'n':
-				bitBoards[pieceType::nKnight].set(pos);
+				bitBoards[enumType::nKnight].set(pos);
 				if (fen[i] == 'n')
-					bitBoards[pieceColor ::nWhite].set(pos);
+					bitBoards[enumColor::nWhite].set(pos);
 				else
-					bitBoards[pieceColor ::nBlack].set(pos);
+					bitBoards[enumColor::nBlack].set(pos);
 				break;
 
 			case 'b':
-				bitBoards[pieceType::nBishop].set(pos);
+				bitBoards[enumType::nBishop].set(pos);
 				if (fen[i] == 'b')
-					bitBoards[pieceColor ::nWhite].set(pos);
+					bitBoards[enumColor::nWhite].set(pos);
 				else
-					bitBoards[pieceColor ::nBlack].set(pos);
+					bitBoards[enumColor::nBlack].set(pos);
 				break;
 
 			case 'r':
-				bitBoards[pieceType::nRook].set(pos);
+				bitBoards[enumType::nRook].set(pos);
 				if (fen[i] == 'r')
-					bitBoards[pieceColor ::nWhite].set(pos);
+					bitBoards[enumColor::nWhite].set(pos);
 				else
-					bitBoards[pieceColor ::nBlack].set(pos);
+					bitBoards[enumColor::nBlack].set(pos);
 				break;
 
 			case 'q':
-				bitBoards[pieceType::nQueen].set(pos);
+				bitBoards[enumType::nQueen].set(pos);
 				if (fen[i] == 'q')
-					bitBoards[pieceColor ::nWhite].set(pos);
+					bitBoards[enumColor::nWhite].set(pos);
 				else
-					bitBoards[pieceColor ::nBlack].set(pos);
+					bitBoards[enumColor::nBlack].set(pos);
 				break;
 
 			case 'k':
-				bitBoards[pieceType::nKing].set(pos);
+				bitBoards[enumType::nKing].set(pos);
 				if (fen[i] == 'k')
-					bitBoards[pieceColor ::nWhite].set(pos);
+					bitBoards[enumColor::nWhite].set(pos);
 				else
-					bitBoards[pieceColor ::nBlack].set(pos);
+					bitBoards[enumColor::nBlack].set(pos);
 				break;
 
 			// Is digit. Skip next n squares
@@ -106,56 +106,56 @@ Bitboard::Bitboard(std::string &fen) {
 
 	}
 
-	bitBoards[pieceColor::nColor] = bitBoards[pieceColor::nBlack] | bitBoards[pieceColor::nWhite];
+	bitBoards[enumColor::nColor] = bitBoards[enumColor::nBlack] | bitBoards[enumColor::nWhite];
 
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all pawns and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getPawns(pieceColor color) {
+U64 Bitboard::getPawns(enumColor color) {
 	return bitBoards[nPawn] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all knights and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getKnights(pieceColor color){
+U64 Bitboard::getKnights(enumColor color) {
 	return bitBoards[nKnight] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all bishops and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getBishops(pieceColor color){
+U64 Bitboard::getBishops(enumColor color) {
 	return bitBoards[nBishop] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all rooks and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getRooks(pieceColor color) {
+U64 Bitboard::getRooks(enumColor color) {
 	return bitBoards[nRook] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all queens and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getQueens(pieceColor color){
+U64 Bitboard::getQueens(enumColor color) {
 	return bitBoards[nQueen] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all kings and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getKing(pieceColor color){
+U64 Bitboard::getKing(enumColor color) {
 	return bitBoards[nKing] & bitBoards[color];
 }
 
 /**
  * @details This method returns a bitboard containing all pieces that match the parameter color .
  */
-U64 Bitboard::getPieces(pieceColor color) {
+U64 Bitboard::getPieces(enumColor color) {
 	return bitBoards[color];
 }
 
@@ -163,7 +163,7 @@ U64 Bitboard::getPieces(pieceColor color) {
  * @details This method performs and AND operation between all white and black pieces, resulting in a bitboard that contains all the pieces on the board.
  */
 U64 Bitboard::getAllPieces() {
-	return bitBoards[pieceColor::nColor];
+	return bitBoards[enumColor::nColor];
 }
 
 /**
@@ -181,43 +181,43 @@ void Bitboard::printBoard() {
 	std::string aux;
 	long unsigned int i;
 
-	aux = bitBoards[pieceType::nPawn].to_string();
+	aux = bitBoards[enumType::nPawn].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = 'p';
 	}
 
-	aux = bitBoards[pieceType::nKnight].to_string();
+	aux = bitBoards[enumType::nKnight].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = 'n';
 	}
 
-	aux = bitBoards[pieceType::nBishop].to_string();
+	aux = bitBoards[enumType::nBishop].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = 'b';
 	}
 
-	aux = bitBoards[pieceType::nRook].to_string();
+	aux = bitBoards[enumType::nRook].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = 'r';
 	}
 
-	aux = bitBoards[pieceType::nQueen].to_string();
+	aux = bitBoards[enumType::nQueen].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = 'q';
 	}
 
-	aux = bitBoards[pieceType::nKing].to_string();
+	aux = bitBoards[enumType::nKing].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = 'k';
 	}
 
-	aux = bitBoards[pieceColor::nBlack].to_string();
+	aux = bitBoards[enumColor::nBlack].to_string();
 	for (i = 0; i < aux.size(); i++) {
 		if (aux[i] == '1')
 			board[i] = board[i] - 32;

@@ -11,7 +11,6 @@ namespace chessqdl {
 
         void printBoard();
     public:
-
         Engine();
         explicit Engine(std::string &fen);
 
