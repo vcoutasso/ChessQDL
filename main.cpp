@@ -10,7 +10,7 @@ int main() {
 
 	Engine engine;
 
-	engine.start();
+	engine.parser();
 
 	return 0;
 }

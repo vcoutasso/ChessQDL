@@ -3,7 +3,7 @@
 
 #include "bitboard.h"
 
-#include <list>
+#include <vector>
 
 namespace chessqdl {
 
@@ -217,7 +217,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
-		std::list<std::string> getPseudoLegalMoves(const U64 *bitboard, enumColor color);
+		std::vector<std::string> getPseudoLegalMoves(const U64 *bitboard, enumColor color);
 
 	};
 

@@ -235,3 +235,7 @@ void Bitboard::printBoard() {
 }
 
 
+void Bitboard::updateBitBoards() {
+	bitBoards[nColor] = bitBoards[nWhite] | bitBoards[nBlack];
+}
+

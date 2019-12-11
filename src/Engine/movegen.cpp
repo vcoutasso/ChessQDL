@@ -378,19 +378,19 @@ U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
  * @details Iterates through all bitboards (from nPawn to nKing) generating moves for pieces one at a time. If there are 16 pawns on the board, this method will generate pawn moves 16 times, one for each individual pawn.
  * It does so for every type of piece on the board, and then returns a list with strings of all possible moves it has found.
  */
-std::list<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard, enumColor color) {
+std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard, enumColor color) {
 	if (color == nColor) {
-		std::list<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
-		std::list<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
+		std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
+		std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
 
 		// Concatenates both lists (inserts the black list on the end of white list)
-		white.splice(white.end(), black);
+		white.insert(white.end(), black.begin(), black.end());
 
 		return white;
 	}
 
 	std::string from, to;
-	std::list<std::string> moves;
+	std::vector<std::string> moves;
 
 	U64 bitboardCopy[9];
 	for (int k = 0; k < nKing; k++)

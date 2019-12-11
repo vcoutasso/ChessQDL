@@ -11,13 +11,24 @@ namespace chessqdl {
         Bitboard bitboard;
 		MoveGenerator generator;
 
+		enumColor toMove;
+
+		enumColor pieceColor;
+
         void printBoard();
+
     public:
         Engine();
 
-		explicit Engine(std::string fen);
+		Engine(enumColor color);
 
-        void start();
+		Engine(std::string fen, enumColor color);
+
+		void parser();
+
+		void movePiece(std::string mv);
+
+		enumColor getToMove();
 
     };
 

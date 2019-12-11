@@ -103,6 +103,8 @@ namespace chessqdl {
 		void printBoard();
 
 
+		void updateBitBoards();
+
 	};
 
 }
