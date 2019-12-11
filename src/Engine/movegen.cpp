@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include <iostream>
+#include <cmath>
 
 
 using namespace chessqdl;
@@ -228,6 +229,13 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 		U64 moves = shiftNorth(pawns);
 		moves &= ~bitboard[nColor];                                    // can't move if there is a piece blocking the way
 
+		// If pawn is on its initial position, give the possibility to "move twice"
+		pawns = pawns << 48;
+		pawns = pawns >> 56;
+		pawns = pawns << 8;
+
+		moves |= shiftNorth(shiftNorth(pawns));
+
 		return attacks | moves;														// pseudo-legal moves (capture and move)
 	} else if (color == nBlack) {
 		U64 pawns = bitboard[nPawn] & bitboard[nBlack];
@@ -237,6 +245,13 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 
 		U64 moves = shiftSouth(pawns);
 		moves &= ~bitboard[nColor];
+
+		// If pawn is on its initial position, give the possibility to "move twice"
+		pawns = pawns << 8;
+		pawns = pawns >> 56;
+		pawns = pawns << 48;
+
+		moves |= shiftSouth(shiftSouth(pawns));
 
 		return attacks | moves;
 	}
@@ -389,11 +404,14 @@ std::list<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard, e
 
 		U64 pieceMoves;
 
-		int i = 0, j = 0;
+		uint64_t upieces = pieces.to_ullong();
 
+		int i;
 
-		while (pieces.any()) {
-			if (pieces.test(i)) {
+		while (upieces) {
+			uint64_t lsb = upieces & -upieces;
+			upieces ^= lsb;
+			i = log2(lsb);
 				bitboardCopy[k].reset();
 				bitboardCopy[k].set(i);
 
@@ -425,23 +443,17 @@ std::list<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard, e
 
 				from = posToStr(1L << i);
 
-				j = 0;
-				while (pieceMoves.any()) {
-					if (pieceMoves.test(j)) {
-						to = posToStr(1L << j);
+			uint64_t umoves = pieceMoves.to_ullong();
+
+			while (umoves) {
+				lsb = umoves & -umoves;
+				umoves ^= lsb;
+				i = log2(lsb);
+				to = posToStr(1L << i);
 						moves.push_back(from + to);
-						pieceMoves.flip(j);
-					}
-
-					j++;
 				}
-
-				pieces.flip(i);
 			}
-
-			i++;
 		}
-	}
 
 	return moves;
 }
