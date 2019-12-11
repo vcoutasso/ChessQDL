@@ -1,10 +1,18 @@
 #include "engine.h"
+#include "utils.h"
+
 #include <iostream>
 
 using namespace chessqdl;
 
 Engine::Engine() {
     bitboard = Bitboard();
+	generator = MoveGenerator();
+
+	auto moves = generator.getPseudoLegalMoves(bitboard.getBitBoards(), nColor);
+
+	for (auto m : moves)
+		std::cout << m << std::endl;
 }
 
 Engine::Engine(std::string fen) {

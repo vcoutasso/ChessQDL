@@ -1,6 +1,9 @@
 #include "movegen.h"
 #include "bitboard.h"
+#include "utils.h"
+
 #include <iostream>
+
 
 using namespace chessqdl;
 
@@ -350,4 +353,95 @@ U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
 			   getRookMoves(bitboard, nWhite, nQueen) | getRookMoves(bitboard, nBlack, nQueen);
 
 	return getBishopMoves(bitboard, color, nQueen) | getRookMoves(bitboard, color, nQueen);
+}
+
+
+//FIXME: getPseudoLegalMoves spends way too much time trying to find the bits that are set (squares that contain pieces) because it iterates through all bits until there is no more bits set.
+//This means that if only the MSB is set, it will iterate through all other 63 bits until it reaches the last one. This can possibly be very time consuming given that this operation is repeated many many times.
+
+/**
+ * @details Iterates through all bitboards (from nPawn to nKing) generating moves for pieces one at a time. If there are 16 pawns on the board, this method will generate pawn moves 16 times, one for each individual pawn.
+ * It does so for every type of piece on the board, and then returns a list with strings of all possible moves it has found.
+ */
+std::list<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard, enumColor color) {
+	if (color == nColor) {
+		std::list<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
+		std::list<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
+
+		// Concatenates both lists (inserts the black list on the end of white list)
+		white.splice(white.end(), black);
+
+		return white;
+	}
+
+	std::string from, to;
+	std::list<std::string> moves;
+
+	U64 bitboardCopy[9];
+	for (int k = 0; k < nKing; k++)
+		bitboardCopy[k] = bitboard[k];
+
+	for (int k = nPawn; k <= nKing; k++) {
+
+
+		U64 pieces = bitboard[k];
+		pieces &= bitboard[color];
+
+		U64 pieceMoves;
+
+		int i = 0, j = 0;
+
+
+		while (pieces.any()) {
+			if (pieces.test(i)) {
+				bitboardCopy[k].reset();
+				bitboardCopy[k].set(i);
+
+				switch (k) {
+					case nPawn:
+						pieceMoves = getPawnMoves(bitboardCopy, color);
+						break;
+
+					case nKnight:
+						pieceMoves = getKnightMoves(bitboardCopy, color);
+						break;
+
+					case nBishop:
+						pieceMoves = getBishopMoves(bitboardCopy, color, nBishop);
+						break;
+
+					case nRook:
+						pieceMoves = getRookMoves(bitboardCopy, color, nRook);
+						break;
+
+					case nQueen:
+						pieceMoves = getQueenMoves(bitboardCopy, color);
+						break;
+
+					case nKing:
+						pieceMoves = getKingMoves(bitboardCopy, color);
+						break;
+				}
+
+				from = posToStr(1L << i);
+
+				j = 0;
+				while (pieceMoves.any()) {
+					if (pieceMoves.test(j)) {
+						to = posToStr(1L << j);
+						moves.push_back(from + to);
+						pieceMoves.flip(j);
+					}
+
+					j++;
+				}
+
+				pieces.flip(i);
+			}
+
+			i++;
+		}
+	}
+
+	return moves;
 }

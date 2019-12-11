@@ -235,22 +235,3 @@ void Bitboard::printBoard() {
 }
 
 
-/**
- * @details The method only takes into account the LSB of \p position. Thus, if there is more than 1 bit set (or even 0) the return value will not be accurate.
- * Therefore, if NDEBUG is not set and \p position has more than 1 bit set (or 0), the assert statement will evaluate to false and the program execution will terminate
- */
-std::string Bitboard::posToStr(const U64 *position) {
-
-	assert(position->count() == 1);
-
-	unsigned long long lsb = position->to_ullong();
-	lsb &= -lsb;
-	int idx = log2(lsb);
-
-	for (auto &it : mapPositions) {
-		if (it.first == idx)
-			return it.second;
-	}
-
-	return "";
-}

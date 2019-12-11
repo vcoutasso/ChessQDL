@@ -2,11 +2,11 @@ project(${CMAKE_PROJECT_NAME}_lib)
 
 set(SOURCE_FILES Engine/bitboard.cpp Engine/movegen.cpp
 		GUI/board.cpp GUI/game.cpp GUI/piece.cpp GUI/tile.cpp
-        Engine/engine.cpp)
+        Engine/engine.cpp Engine/utils.cpp)
 
 set(HEADER_FILES Engine/bitboard.h Engine/const.h Engine/movegen.h
 		GUI/board.h GUI/game.h GUI/piece.h GUI/tile.h
-        Engine/engine.h)
+        Engine/engine.h Engine/utils.h)
 
 
 # The library contains header and source files.

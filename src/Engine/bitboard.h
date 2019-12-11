@@ -2,6 +2,7 @@
 #define CHESSQDL_BITBOARD_H
 
 #include <bitset>
+
 #include "const.h"
 
 namespace chessqdl {
@@ -101,12 +102,6 @@ namespace chessqdl {
 		 */
 		void printBoard();
 
-		/**
-		 * @brief This methods returns the equivalent position of the set bit to the board. For example 0x01 would return a1, 0x02 a2 and so on.
-		 * @param position  bitboard containing one
-		 * @return Name of the square that represents the least significant bit of \p position
-		 */
-		std::string posToStr(const U64 *position);
 
 	};
 

@@ -3,6 +3,8 @@
 
 #include "bitboard.h"
 
+#include <list>
+
 namespace chessqdl {
 
 	class MoveGenerator {
@@ -151,17 +153,24 @@ namespace chessqdl {
 
 		/**
 		 * @brief Get pseudo-legal moves for a given color set of pawns
-		 * @param bitboard - reference to bitboards representing the current board status
-		 * @param color - color of desired piece
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for pawns.
 		 */
 		U64 getPawnMoves(const U64 *bitboard, enumColor color);
 
+		/**
+		 * @brief Overloaded function for pawn moves generator
+		 * @param pawns  unsigned number with only one bit set representing the pawn of interest
+		 * @return  Pseudo-legal moves for the pawn
+		 */
+		//U64 getPawnMoves(uint64_t pawn, enumColor color);
+
 
 		/**
 		 * @brief Get pseudo-legal moves for a given king
-		 * @param bitboard - reference to bitboards representing the current board status
-		 * @param color - color of desired piece
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for king.
 		 */
 		U64 getKingMoves(const U64 *bitboard, enumColor color);
@@ -169,8 +178,8 @@ namespace chessqdl {
 
 		/**
 		 * @brief Get pseudo-legal moves for a given color set of knights
-		 * @param bitboard - reference to bitboards representing the current board status
-		 * @param color - color of desired piece
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for knights of a given color.
 		 */
 		U64 getKnightMoves(const U64 *bitboard, enumColor color);
@@ -178,8 +187,8 @@ namespace chessqdl {
 
 		/**
 		 * @brief Get pseudo-legal moves for a given color set of bishops
-		 * @param bitboard - reference to bitboards representing the current board status
-		 * @param color - color of desired piece
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for bishops of a given color.
 		 */
 		U64 getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece);
@@ -187,8 +196,8 @@ namespace chessqdl {
 
 		/**
 		 * @brief Get pseudo-legal moves for a given color set of rooks
-		 * @param bitboard - reference to bitboards representing the current board status
-		 * @param color - color of desired piece
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for rooks of a given color.
 		 */
 		U64 getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece);
@@ -196,12 +205,19 @@ namespace chessqdl {
 
 		/**
 		 * @brief Get pseudo-legal moves for a given color set of queens
-		 * @param bitboard - reference to bitboards representing the current board status
-		 * @param color - color of desired piece
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for queens of a given color.
 		 */
 		U64 getQueenMoves(const U64 *bitboard, enumColor color);
 
+		/**
+		 * @brief Get all possible pseudo-legal moves for a given bitboard
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of desired piece
+		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
+		 */
+		std::list<std::string> getPseudoLegalMoves(const U64 *bitboard, enumColor color);
 
 	};
 
