@@ -230,13 +230,16 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 		moves &= ~bitboard[nColor];                                    // can't move if there is a piece blocking the way
 
 		// If pawn is on its initial position, give the possibility to "move twice"
-		pawns = pawns << 48;
-		pawns = pawns >> 56;
-		pawns = pawns << 8;
+		U64 aux = moves;
+		aux = aux << 40;
+		aux = aux >> 56;
+		aux = aux << 16;
 
-		moves |= shiftNorth(shiftNorth(pawns));
+		moves |= shiftNorth(aux);
+		moves &= ~bitboard[nColor];
 
 		return attacks | moves;														// pseudo-legal moves (capture and move)
+
 	} else if (color == nBlack) {
 		U64 pawns = bitboard[nPawn] & bitboard[nBlack];
 
@@ -247,11 +250,14 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 		moves &= ~bitboard[nColor];
 
 		// If pawn is on its initial position, give the possibility to "move twice"
-		pawns = pawns << 8;
-		pawns = pawns >> 56;
-		pawns = pawns << 48;
+		U64 aux = moves;
+		aux = aux << 16;
+		aux = aux >> 56;
+		aux = aux << 40;
 
-		moves |= shiftSouth(shiftSouth(pawns));
+		moves |= shiftSouth(aux);
+		moves &= ~bitboard[nColor];
+
 
 		return attacks | moves;
 	}

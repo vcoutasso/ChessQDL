@@ -38,6 +38,11 @@ Bitboard::Bitboard() {
 	bitBoards[nKing] = 0x10L | (0x10L << 56);
 }
 
+
+/**
+ * @brief Constructor that uses a custom board, represented by the \p fen string.
+ * @param fen  fen string that will be used to generate the bitboards
+ */
 Bitboard::Bitboard(std::string fen) {
 	// Just to make sure that all bitboards start with value 0x0;
 	for (auto& b : bitBoards)
@@ -98,7 +103,7 @@ Bitboard::Bitboard(std::string fen) {
 					bitBoards[nBlack].set(pos);
 				break;
 
-			// Is digit. Skip next n squares
+				// Is digit. Skip next n squares
 			default:
 				pos += fen[i] - '0' - 1; 			// -1 because it will be incremented at the end
 				break;
@@ -235,7 +240,10 @@ void Bitboard::printBoard() {
 }
 
 
-void Bitboard::updateBitBoards() {
+/**
+ * @brief Performs a OR operation between the all white pieces and all black pieces. Result is stored on the nColor bitboard, which contains all pieces on the board.
+ */
+void Bitboard::updateBitboard() {
 	bitBoards[nColor] = bitBoards[nWhite] | bitBoards[nBlack];
 }
 

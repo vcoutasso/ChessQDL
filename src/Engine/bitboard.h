@@ -103,7 +103,10 @@ namespace chessqdl {
 		void printBoard();
 
 
-		void updateBitBoards();
+		/**
+		 * @brief Updates the nColor bitboard
+		 */
+		void updateBitboard();
 
 	};
 

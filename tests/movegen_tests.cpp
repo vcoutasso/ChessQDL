@@ -10,7 +10,8 @@ TEST(MoveGenerator, PseudoLegalInitialMoves_Test) {
 	chessqdl::MoveGenerator generator;
 
 	EXPECT_EQ(generator.getKnightMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor), 0xa50000a50000);
-	EXPECT_EQ(generator.getPawnMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor), 0xff0000ff0000);
+	EXPECT_EQ(generator.getPawnMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor),
+			  0xffffL << 16 | 0xffffL << 32);
 	EXPECT_EQ(generator.getKingMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor), 0x00);
 	EXPECT_EQ(generator.getBishopMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor,
 									   chessqdl::enumPiece::nBishop), 0x00);
@@ -25,8 +26,8 @@ TEST (MoveGenerator, PseudoLegalEvansGambitMoves_test) {
 	chessqdl::Bitboard board("r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq b3 1 4");
 	chessqdl::MoveGenerator generator;
 
-	EXPECT_EQ(generator.getPawnMoves(board.getBitBoards(), chessqdl::enumColor::nWhite), 0x600cdL << 16);
-	EXPECT_EQ(generator.getPawnMoves(board.getBitBoards(), chessqdl::enumColor::nBlack), 0xeb00L << 32);
+	EXPECT_EQ(generator.getPawnMoves(board.getBitBoards(), chessqdl::enumColor::nWhite), 0x6c9cdL << 16);
+	EXPECT_EQ(generator.getPawnMoves(board.getBitBoards(), chessqdl::enumColor::nBlack), 0xebebL << 32);
 
 	EXPECT_EQ(generator.getKnightMoves(board.getBitBoards(), chessqdl::enumColor::nWhite), 0x5088050040L);
 	EXPECT_EQ(generator.getKnightMoves(board.getBitBoards(), chessqdl::enumColor::nBlack), 0x210a0010aL << 24);

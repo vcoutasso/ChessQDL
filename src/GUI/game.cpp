@@ -9,7 +9,7 @@ using namespace chessqdl;
 
 Game::Game() {
 	createWindow();
-	font.loadFromFile("resources/fonts/arial.ttf");
+	font.loadFromFile("../resources/fonts/arial.ttf");
 
 	mainMenu();
 }
