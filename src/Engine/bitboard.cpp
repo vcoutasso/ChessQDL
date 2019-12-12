@@ -3,10 +3,7 @@
 
 #include <string>
 #include <iostream>
-#include <algorithm>
 #include <cctype>
-#include <cmath>
-#include <cassert>
 
 using namespace chessqdl;
 
@@ -181,63 +178,77 @@ U64 *Bitboard::getBitBoards() {
 }
 
 /**
- * @details Converts the board from bitboards to a readable string and prints it to stdout. It does so very inefficiently, but since its main purpose is to help debugging, it shouldn't be a big deal for now.
+ * @details Converts the board from bitboards to a fancy string and prints it to stdout.
  */
 void Bitboard::printBoard() {
-	std::string board(64, '-');
+	std::vector<std::string> board;
+
 	std::string aux;
 	long unsigned int i;
 
-	aux = bitBoards[nPawn].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = 'p';
+	for (i = 0; i < 64ul; i++)
+		board.push_back("-");
+
+	for (i = 0; i < 64ul; i++) {
+		if (bitBoards[nPawn].test(i)) {
+			if (bitBoards[nWhite].test(i))
+				board[i] = "♟";
+			else
+				board[i] = "♙";
+		}
 	}
 
-	aux = bitBoards[nKnight].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = 'n';
+	for (i = 0; i < 64ul; i++) {
+		if (bitBoards[nKnight].test(i)) {
+			if (bitBoards[nWhite].test(i))
+				board[i] = "♞";
+			else
+				board[i] = "♘";
+		}
 	}
 
-	aux = bitBoards[nBishop].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = 'b';
+	for (i = 0; i < 64ul; i++) {
+		if (bitBoards[nBishop].test(i)) {
+			if (bitBoards[nWhite].test(i))
+				board[i] = "♝";
+			else
+				board[i] = "♗";
+		}
 	}
 
-	aux = bitBoards[nRook].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = 'r';
+	for (i = 0; i < 64ul; i++) {
+		if (bitBoards[nRook].test(i)) {
+			if (bitBoards[nWhite].test(i))
+				board[i] = "♜";
+			else
+				board[i] = "♖";
+		}
 	}
 
-	aux = bitBoards[nQueen].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = 'q';
+	for (i = 0; i < 64ul; i++) {
+		if (bitBoards[nQueen].test(i)) {
+			if (bitBoards[nWhite].test(i))
+				board[i] = "♛";
+			else
+				board[i] = "♕";
+		}
 	}
 
-	aux = bitBoards[nKing].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = 'k';
+	for (i = 0; i < 64ul; i++) {
+		if (bitBoards[nKing].test(i)) {
+			if (bitBoards[nWhite].test(i))
+				board[i] = "♚";
+			else
+				board[i] = "♔";
+		}
 	}
 
-	// White pieces are designated using upper-case letters
-	aux = bitBoards[nWhite].to_string();
-	for (i = 0; i < aux.size(); i++) {
-		if (aux[i] == '1')
-			board[i] = board[i] - 32;
-	}
-
-	std::string rank;
 	for (i = 0; i < 64; i += 8) {
 		std::cout << "\033[1;33m" << (64 - i) / 8 << "  \033[0m";
-		rank = board.substr(i, 8);
-		std::reverse(rank.begin(), rank.end());
-		for (unsigned long j = 0; j < rank.length(); j++)
-			std::cout << rank[j] << ' ';
+
+		for (int j = int(i + 7); j >= int(i); j--)
+			std::cout << board[63 - j] << " ";
+
 		std::cout << std::endl;
 	}
 

@@ -81,6 +81,14 @@ void Engine::parser() {
 		else
 			continue;
 
+		if (bitboard.getKing(nWhite) == 0) {
+			std::cout << std::endl << "Game over! Black wins :)" << std::endl;
+			break;
+		} else if (bitboard.getKing(nBlack) == 0) {
+			std::cout << std::endl << "Game over! White wins :)" << std::endl;
+			break;
+		}
+
     }
 
 }
