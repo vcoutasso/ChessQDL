@@ -233,10 +233,15 @@ void Bitboard::printBoard() {
 
 	std::string rank;
 	for (i = 0; i < 64; i += 8) {
+		std::cout << "\033[1;33m" << (64 - i) / 8 << "  \033[0m";
 		rank = board.substr(i, 8);
 		std::reverse(rank.begin(), rank.end());
-		std::cout << rank << std::endl;
+		for (unsigned long j = 0; j < rank.length(); j++)
+			std::cout << rank[j] << ' ';
+		std::cout << std::endl;
 	}
+
+	std::cout << "   \033[1;33ma b c d e f g h\033[0m" << std::endl;
 }
 
 

@@ -34,7 +34,7 @@ void Game::initTiles() {
 
 	int aux = 0;
 
-	for (int i = 0; i < pieces.length(); ++i) {
+	for (int i = 0; i < int(pieces.length()); ++i) {
 		char ch = pieces.at(i);
 
 		if (ch == '/')
@@ -231,6 +231,7 @@ void Game::movePiece(sf::Event &event) {
 
 		drawBoard();
 	}
+
 	else
-		std::cout << "No piece to move!" << std::endl; std::cout.flush();
+		std::cout << "No piece to move!" << std::endl;
 }

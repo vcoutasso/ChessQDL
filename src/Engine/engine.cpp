@@ -42,13 +42,18 @@ enumColor Engine::getToMove() {
 	return toMove;
 }
 
+void Engine::setDepth(int n) {
+	if (n > 0)
+		depthLevel = n;
+}
+
 
 void Engine::parser() {
     std::string input;
 
     while(true) {
 		if (pieceColor == toMove) {
-			std::string nextMove = getBestMove(bitboard.getBitBoards(), difficulty, pieceColor);
+			std::string nextMove = getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor);
 			makeMove(nextMove);
 		}
 
@@ -67,6 +72,10 @@ void Engine::parser() {
 			std::cin >> num;
 			for (int i = 0; i < num; i++)
 				unmakeMove();
+		} else if (input == "depth" || input == "set_depth") {
+			int d;
+			std::cin >> d;
+			setDepth(d);
 		} else if (input == "exit" || input == "quit")
 			break;
 		else

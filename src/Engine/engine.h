@@ -21,7 +21,7 @@ namespace chessqdl {
 		std::stack<enumColor> captureHistory;
 
 		int ply = 0;
-		int difficulty = 4;
+		int depthLevel = 3;
 
         void printBoard();
 
@@ -39,6 +39,8 @@ namespace chessqdl {
 		void unmakeMove();
 
 		enumColor getToMove();
+
+		void setDepth(int n);
 
 		std::string getBestMove(U64 *board, int depth, enumColor color);
 
