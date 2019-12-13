@@ -5,9 +5,6 @@ using namespace chessqdl;
 
 int main() {
 
-	/*Game game;
-	game.mainMenu();*/
-
 	Engine engine;
 
 	engine.parser();

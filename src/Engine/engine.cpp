@@ -43,8 +43,10 @@ enumColor Engine::getToMove() {
 }
 
 void Engine::setDepth(int n) {
-	if (n > 0)
+	if (n > 0) {
+		std::cout << "New max search depth: " << n << std::endl;
 		depthLevel = n;
+	}
 }
 
 
