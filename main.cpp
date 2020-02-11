@@ -1,4 +1,3 @@
-#include "src/GUI/game.h"
 #include "src/Engine/engine.h"
 
 using namespace chessqdl;
