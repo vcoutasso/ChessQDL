@@ -3,8 +3,6 @@ project(Chessqdl)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(SFML 2.5.1 REQUIRED graphics network audio window system)
-
 set(SOURCE_FILES main.cpp)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
@@ -49,7 +47,7 @@ elseif (CMAKE_BILD_TYPE MATCHES Release)
 endif ()
 
 
-target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib sfml-graphics sfml-audio sfml-window)
+target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib)
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
 	add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
