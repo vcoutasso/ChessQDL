@@ -15,23 +15,23 @@ The engine was designed to allow for games of Human vs Machine. Currently it's o
 Create the build directory:
 
 ```
-mkdir build
-cd build
+$ mkdir build
+$ cd build
 ```
 
 Build Release version:
 
 ```
-cmake ..
-make
+$ cmake ..
+$ make
 ```
 
 Build Debug version:
 
 
 ```
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make
+$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+$ make
 ```
 
 Note: Building in Debug mode will download Google Test from Github.
@@ -39,14 +39,14 @@ Note: Building in Debug mode will download Google Test from Github.
 Run tests (Debug version):
 
 ```
-ctest -V
+$ ctest -V
 ```
 
 Build Doxygen documentation:
 
 ```
-cd docs
-doxygen
+$ cd docs
+$ doxygen
 ```
 
 ## License
