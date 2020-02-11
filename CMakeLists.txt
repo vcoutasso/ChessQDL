@@ -7,7 +7,7 @@ find_package(SFML 2.5.1 REQUIRED graphics network audio window system)
 
 set(SOURCE_FILES main.cpp)
 
-add_executable(${CMAKE_PROJECT_NAME}_run ${SOURCE_FILES})
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
 
 include_directories(src)
 
@@ -49,11 +49,11 @@ elseif (CMAKE_BILD_TYPE MATCHES Release)
 endif ()
 
 
-target_link_libraries(${CMAKE_PROJECT_NAME}_run ${CMAKE_PROJECT_NAME}_lib sfml-graphics sfml-audio sfml-window)
+target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib sfml-graphics sfml-audio sfml-window)
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
-	add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_run
+	add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
 			POST_BUILD
-			COMMAND strip -s ${CMAKE_PROJECT_NAME}_run)
+			COMMAND strip -s ${CMAKE_PROJECT_NAME})
 endif()
 

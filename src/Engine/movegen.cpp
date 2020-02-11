@@ -217,7 +217,6 @@ U64 MoveGenerator::noWeOccl(U64 gen, U64 pro) {
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
- * @todo Currently its only possible to move one file up. Implement the possibility to move two files up on the first move.
  */
 U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
 	if (color == nWhite) {
@@ -415,39 +414,41 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 		int i;
 
 		while (upieces) {
+			// Get index of least significant set bit
 			uint64_t lsb = upieces & -upieces;
 			upieces ^= lsb;
 			i = log2(lsb);
-				bitboardCopy[k].reset();
-				bitboardCopy[k].set(i);
 
-				switch (k) {
-					case nPawn:
-						pieceMoves = getPawnMoves(bitboardCopy, color);
-						break;
+			bitboardCopy[k].reset();
+			bitboardCopy[k].set(i);
 
-					case nKnight:
-						pieceMoves = getKnightMoves(bitboardCopy, color);
-						break;
+			switch (k) {
+				case nPawn:
+					pieceMoves = getPawnMoves(bitboardCopy, color);
+					break;
 
-					case nBishop:
-						pieceMoves = getBishopMoves(bitboardCopy, color, nBishop);
-						break;
+				case nKnight:
+					pieceMoves = getKnightMoves(bitboardCopy, color);
+					break;
 
-					case nRook:
-						pieceMoves = getRookMoves(bitboardCopy, color, nRook);
-						break;
+				case nBishop:
+					pieceMoves = getBishopMoves(bitboardCopy, color, nBishop);
+					break;
 
-					case nQueen:
-						pieceMoves = getQueenMoves(bitboardCopy, color);
-						break;
+				case nRook:
+					pieceMoves = getRookMoves(bitboardCopy, color, nRook);
+					break;
 
-					case nKing:
-						pieceMoves = getKingMoves(bitboardCopy, color);
-						break;
-				}
+				case nQueen:
+					pieceMoves = getQueenMoves(bitboardCopy, color);
+					break;
 
-				from = posToStr(1L << i);
+				case nKing:
+					pieceMoves = getKingMoves(bitboardCopy, color);
+					break;
+			}
+
+			from = posToStr(1L << i);
 
 			uint64_t umoves = pieceMoves.to_ullong();
 
@@ -456,10 +457,10 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 				umoves ^= lsb;
 				i = log2(lsb);
 				to = posToStr(1L << i);
-						moves.push_back(from + to);
-				}
+				moves.push_back(from + to);
 			}
 		}
+	}
 
 	return moves;
 }
