@@ -10,6 +10,7 @@ namespace chessqdl {
 	class Bitboard {
 
 	private:
+
 		/**
 		 * @brief Array containing all bitboards. Indexing follows numColor and enumPiece
 		 */

@@ -2,7 +2,6 @@
 #include "bitboard.h"
 #include "utils.h"
 
-#include <iostream>
 #include <cmath>
 
 

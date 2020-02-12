@@ -11,17 +11,13 @@ using namespace chessqdl;
 
 Engine::Engine() {
     bitboard = Bitboard();
-	generator = MoveGenerator();
 	pieceColor = nBlack;
-	toMove = nWhite;
 }
 
 
 Engine::Engine(enumColor color) {
 	bitboard = Bitboard();
-	generator = MoveGenerator();
 	pieceColor = color;
-	toMove = nWhite;
 }
 
 
@@ -54,11 +50,8 @@ void Engine::parser() {
     std::string input;
 
     while(true) {
-		if (pieceColor == toMove) {
-			std::string nextMove = getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor);
-			makeMove(nextMove);
-		}
-
+		if (pieceColor == toMove)
+			makeMove(getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor));
 
         std::cout << "> ";
         std::cin >> input;
@@ -97,7 +90,7 @@ void Engine::parser() {
 
 
 void Engine::makeMove(std::string mv, bool verbose) {
-	auto pseudoLegal = generator.getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+	auto pseudoLegal = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
 	bool found = std::find(pseudoLegal.begin(), pseudoLegal.end(), mv) != pseudoLegal.end();
 
 	enumColor otherPlayer;
@@ -268,19 +261,17 @@ std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
 
 	std::cout << "Best move found: " << bestMove << std::endl;
 	std::cout << "Nodes visited: " << nodesVisited << std::endl;
-	std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms"
-			  << std::endl;
+	std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
 
 
 	return bestMove;
 }
 
-int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited,
-						 std::string &bestMove) {
+int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 	if (depthLeft == 0)
 		return evaluateBoard(board, color);
 
-	auto allMoves = generator.getPseudoLegalMoves(board, color);
+	auto allMoves = MoveGenerator::getPseudoLegalMoves(board, color);
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
@@ -307,13 +298,12 @@ int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLe
 	return alpha;
 }
 
-int Engine::alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited,
-						 std::string &bestMove) {
+int Engine::alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 
 	if (depthLeft == 0)
 		return -evaluateBoard(board, color);
 
-	auto allMoves = generator.getPseudoLegalMoves(board, color);
+	auto allMoves = MoveGenerator::getPseudoLegalMoves(board, color);
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);

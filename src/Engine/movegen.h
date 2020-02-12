@@ -16,7 +16,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one up
 		 */
-		U64 shiftNorth(U64 bitboard);
+		static U64 shiftNorth(U64 bitboard);
 
 
 		/**
@@ -24,7 +24,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one up one right
 		 */
-		U64 shiftNorthEast(U64 bitboard);
+		static U64 shiftNorthEast(U64 bitboard);
 
 
 		/**
@@ -32,7 +32,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one right
 		 */
-		U64 shiftEast(U64 bitboard);
+		static U64 shiftEast(U64 bitboard);
 
 
 		/**
@@ -40,7 +40,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one right one down
 		 */
-		U64 shiftSouthEast(U64 bitboard);
+		static U64 shiftSouthEast(U64 bitboard);
 
 
 		/**
@@ -48,7 +48,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one down
 		 */
-		U64 shiftSouth(U64 bitboard);
+		static U64 shiftSouth(U64 bitboard);
 
 
 		/**
@@ -56,7 +56,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one down one left
 		 */
-		U64 shiftSouthWest(U64 bitboard);
+		static U64 shiftSouthWest(U64 bitboard);
 
 
 		/**
@@ -64,7 +64,7 @@ namespace chessqdl {
 		 * @param bitboard  bitboard to be shifted
 		 * @return Bitboard shifted one left
 		 */
-		U64 shiftWest(U64 bitboard);
+		static U64 shiftWest(U64 bitboard);
 
 
 		/**
@@ -81,7 +81,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 soutOccl(U64 generator, U64 propagator);
+		static U64 soutOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -90,7 +90,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 nortOccl(U64 generator, U64 propagator);
+		static U64 nortOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -99,7 +99,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 eastOccl(U64 generator, U64 propagator);
+		static U64 eastOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -108,7 +108,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 noEaOccl(U64 generator, U64 propagator);
+		static U64 noEaOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -117,7 +117,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 soEaOccl(U64 generator, U64 propagator);
+		static U64 soEaOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -126,7 +126,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 westOccl(U64 generator, U64 propagator);
+		static U64 westOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -135,7 +135,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 soWeOccl(U64 generator, U64 propagator);
+		static U64 soWeOccl(U64 generator, U64 propagator);
 
 
 		/**
@@ -144,7 +144,7 @@ namespace chessqdl {
 		 * @param propagator  empty board
 		 * @return Bitboard with all possible moves AND the actual position of slider pieces (original \p generator)
 		 */
-		U64 noWeOccl(U64 generator, U64 propagator);
+		static U64 noWeOccl(U64 generator, U64 propagator);
 
 	public:
 
@@ -157,7 +157,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for pawns.
 		 */
-		U64 getPawnMoves(const U64 *bitboard, enumColor color);
+		static U64 getPawnMoves(const U64 *bitboard, enumColor color);
 
 		/**
 		 * @brief Overloaded function for pawn moves generator
@@ -173,7 +173,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for king.
 		 */
-		U64 getKingMoves(const U64 *bitboard, enumColor color);
+		static U64 getKingMoves(const U64 *bitboard, enumColor color);
 
 
 		/**
@@ -182,7 +182,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for knights of a given color.
 		 */
-		U64 getKnightMoves(const U64 *bitboard, enumColor color);
+		static U64 getKnightMoves(const U64 *bitboard, enumColor color);
 
 
 		/**
@@ -191,7 +191,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for bishops of a given color.
 		 */
-		U64 getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece);
+		static U64 getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece);
 
 
 		/**
@@ -200,7 +200,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for rooks of a given color.
 		 */
-		U64 getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece);
+		static U64 getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece);
 
 
 		/**
@@ -209,7 +209,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for queens of a given color.
 		 */
-		U64 getQueenMoves(const U64 *bitboard, enumColor color);
+		static U64 getQueenMoves(const U64 *bitboard, enumColor color);
 
 		/**
 		 * @brief Get all possible pseudo-legal moves for a given bitboard
@@ -217,7 +217,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
-		std::vector<std::string> getPseudoLegalMoves(const U64 *bitboard, enumColor color);
+		static std::vector<std::string> getPseudoLegalMoves(const U64 *bitboard, enumColor color);
 
 	};
 
