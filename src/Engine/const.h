@@ -55,15 +55,15 @@ namespace chessqdl {
 	};
 
 	/**
-	 * @brief Amount of bits to be shifted when moving a bit to the direction. Compass rose for reference:
+	 * @brief Amount of bits to be shifted when moving a bit to the direction. Compass rose for reference: <br> <br>
 	 *
-	 *		noWe         nort         noEa
-	 *				+7    +8    +9
-	 *					\  |  /
-	 *		west    -1 <-  0 -> +1    east
-	 *					/  |  \
-	 *				-9    -8    -7
-	 *		soWe         sout         soEa
+	 *		noWe         nort         noEa	<br>
+	 *				+7    +8    +9 			<br>
+	 *					\  |  /				<br>
+	 *		west    -1 <-  0 -> +1    east	<br>
+	 *					/  |  \				<br>
+	 *				-9    -8    -7			<br>
+	 *		soWe         sout         soEa	<br>
 	 */
 	enum enumDirections {
 		noWe = 7,

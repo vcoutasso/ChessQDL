@@ -9,35 +9,54 @@
 using namespace chessqdl;
 
 
+/**
+ * @details Starts a new standard game of chess with the engine as black pieces
+ */
 Engine::Engine() {
-    bitboard = Bitboard();
+	bitboard = Bitboard();
 	pieceColor = nBlack;
 }
 
 
+/**
+ * @details Starts a new standard game of chess with the engine as \p color pieces
+ */
 Engine::Engine(enumColor color) {
 	bitboard = Bitboard();
 	pieceColor = color;
 }
 
 
+/**
+ * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
+ */
 Engine::Engine(std::string fen, enumColor color) {
-    bitboard = Bitboard(fen);
+	bitboard = Bitboard(fen);
 	pieceColor = color;
 	// FIXME: toMove actually depends on the fen string.
 	toMove = nWhite;
 }
 
 
+/**
+ * @details Prints the current start of the board to stdout
+ */
 void Engine::printBoard() {
-    bitboard.printBoard();
+	bitboard.printBoard();
 }
 
 
+/**
+ * @details Returns Engine::toMove
+ */
 enumColor Engine::getToMove() {
 	return toMove;
 }
 
+
+/**
+ * @details Sets the new max traversal depth of the moves tree to \p nana
+ */
 void Engine::setDepth(int n) {
 	if (n > 0) {
 		std::cout << "New max search depth: " << n << std::endl;
@@ -46,22 +65,34 @@ void Engine::setDepth(int n) {
 }
 
 
+/**
+ * @details Main interface to the engine. Allows the player to interact with the engine with the options: <br>
+ * <b> print </b> calls Engine::printBoard() and prints the current state of the board to stdout using unicode symbols <br>
+ * <b> move </b> or <b> mv </b> expects a string after the keyword with the move to be made. The move will only be made if a) it's your turn to move the desired pieces and b) the move is valid <br>
+ * <b> undo </b> takes back the latest move made. Can take an argument after the keyword to specify the amount of moves to be unmade <br>
+ * <b> depth </b> or <b> set_depth </b> specifies the new maximum search depth of the algorithm. The higher the maximum depth, the higher the difficulty of the engine <br>
+ * <b> exit </b> or <b> quit </b> exits the game without saving the progress <br>
+ */
 void Engine::parser() {
-    std::string input;
+	std::string input;
 
-    while(true) {
-		if (pieceColor == toMove)
+	while(true) {
+		if (pieceColor == toMove) {
+			std::cout << std::endl << "Searching for the next move..." << std::endl;
 			makeMove(getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor));
+			printBoard();
+		}
 
-        std::cout << "> ";
-        std::cin >> input;
+		std::cout << "> ";
+		std::cin >> input;
 
-        if (input == "print" || input == "print_board")
-            printBoard();
-        else if (input == "move" || input == "mv") {
-            // Reads the movement to be made
-            std::cin >> input;
+		if (input == "print" || input == "print_board")
+			printBoard();
+		else if (input == "move" || input == "mv") {
+			// Reads the movement to be made
+			std::cin >> input;
 			makeMove(input);
+			printBoard();
 		} else if (input == "undo") {
 			int num;
 			std::cin >> num;
@@ -84,11 +115,17 @@ void Engine::parser() {
 			break;
 		}
 
-    }
+	}
 
 }
 
 
+/**
+ * @brief Moves a piece from a square to another and updates the bitboards, the move history and the capture history when necessary
+ * @param mv  the move to be made
+ * @param verbose  whether or not to print the move made (in algebraic notation) to stdout. This flag is used so that the engine won't flood stdout with all the moves it has made while searching for
+ * the optimal one
+ */
 void Engine::makeMove(std::string mv, bool verbose) {
 	auto pseudoLegal = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
 	bool found = std::find(pseudoLegal.begin(), pseudoLegal.end(), mv) != pseudoLegal.end();
@@ -103,19 +140,25 @@ void Engine::makeMove(std::string mv, bool verbose) {
 	if (!found)
 		std::cout << "Invalid move!" << std::endl;
 	else {
+		// Source square
 		std::string from = mv.substr(0, 2);
+		// Destination square
 		std::string to = mv.substr(2);
 
+		// Iterators to the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
 		auto toIt = std::find(mapPositions.begin(), mapPositions.end(), to);
 
+		// Index of the respective square
 		int fromIdx = std::distance(mapPositions.begin(), fromIt);
 		int toIdx = std::distance(mapPositions.begin(), toIt);
 
+		// Type of the piece that is being moved
 		enumPiece pieceType = nPawn;
 
 		U64 *bb = bitboard.getBitBoards();
 
+		// It is assumed that the moving piece is a pawn. This loop checks verifies if it's true and if it isn't, it changes the piece type
 		for (int i = nPawn; i <= nKing; i++) {
 			U64 aux = bb[i] & bb[toMove];
 			if (aux.test(fromIdx)) {
@@ -124,6 +167,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 			}
 		}
 
+		// Inserts the appropriate character into the algebraic notation string
 		switch (pieceType) {
 			case nKnight:
 				mv.insert(0, "N");
@@ -155,22 +199,26 @@ void Engine::makeMove(std::string mv, bool verbose) {
 					break;
 				}
 			}
-
+			// Removes piece from the board
 			bb[otherPlayer].reset(toIdx);
 		}
 
+		// Updates bitboards
 		bb[pieceType].reset(fromIdx);
 		bb[toMove].reset(fromIdx);
 		bb[pieceType].set(toIdx);
 		bb[toMove].set(toIdx);
 
+		// Updates the bitboard that contains info about both players
 		bitboard.updateBitboard();
 
+		// Move number after the string when appropriate (if ply is even)
 		if (ply % 2 == 0)
 			mv = std::to_string(ply / 2 + 1) + ". " + mv;
 
 		++ply;
 
+		// Updates move history
 		moveHistory.push(mv);
 
 		toMove = otherPlayer;

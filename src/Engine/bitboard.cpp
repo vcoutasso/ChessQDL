@@ -10,17 +10,18 @@ using namespace chessqdl;
 /* TODO: Implement a method that receives a fen string as parameter to initialize bitboards */
 
 /**
- * @details Initializes bitboards in order to obtain the following board:
- * r n b q k b n r
- * p p p p p p p p
- * - - - - - - - -
- * - - - - - - - -
- * - - - - - - - -
- * - - - - - - - -
- * P P P P P P P P
- * R N B Q K B N R
+ * @details Initializes bitboards in order to obtain the following board: <br><br>
+ * r n b q k b n r <br>
+ * p p p p p p p p <br>
+ * - - - - - - - - <br>
+ * - - - - - - - - <br>
+ * - - - - - - - - <br>
+ * - - - - - - - - <br>
+ * P P P P P P P P <br>
+ * R N B Q K B N R <br>
  *
- * note that upper case letters represent white pieces while lower case letters are black pieces.
+ * note that upper case letters represent white pieces while lower case letters are black pieces. <br>
+ * # represents an empty square
  */
 Bitboard::Bitboard() {
 	bitBoards[nBlack] = 0xffffL << 48;

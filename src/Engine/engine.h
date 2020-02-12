@@ -120,7 +120,7 @@ namespace chessqdl {
 
 
 		/**
-		 * @brief Max implementation of the Minimax algorithm
+		 * @brief Max implementation of the Minimax algorithm with alpha-beta pruning
 		 * @param board  current board state
 		 * @param alpha  score to be maximized
 		 * @param beta  score to be minimized
@@ -135,7 +135,7 @@ namespace chessqdl {
 
 
 		/**
-		 * @brief Min implementation of the Minimax algorithm
+		 * @brief Min implementation of the Minimax algorithm with alpha-beta pruning
 		 * @param board  current board state
 		 * @param alpha  score to be maximized
 		 * @param beta  score to be minimized

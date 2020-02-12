@@ -19,15 +19,15 @@ std::string chessqdl::posToStr(uint64_t pos) {
 
 
 /**
- * @details Performs an evaluation that takes into account the material balance and number of available moves.
+ * @details Performs an evaluation that takes into account the material balance and number of available moves. <br>
  *
- * Piece value is as follows:
- * King   - 200
- * Queen  - 9
- * Rook   - 5
- * Bishop - 3
- * Knight - 3
- * Pawn   - 1
+ * Piece value is as follows: <br>
+ * King   - 200 <br>
+ * Queen  - 9 <br>
+ * Rook   - 5 <br>
+ * Bishop - 3 <br>
+ * Knight - 3 <br>
+ * Pawn   - 1 <br>
  *
  * @todo Count only legal moves
  */
