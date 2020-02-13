@@ -28,13 +28,19 @@ $ make
 
 Build Debug version:
 
-
 ```
 $ cmake -DCMAKE_BUILD_TYPE=Debug ..
 $ make
 ```
 
 Note: Building in Debug mode will download Google Test from Github.
+
+As an alternative to Unix Makefiles, other generators such as Ninja can be used:
+
+```
+$ cmake -G "Ninja" ..
+$ ninja
+```
 
 Run tests (Debug version):
 

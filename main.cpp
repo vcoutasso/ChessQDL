@@ -1,5 +1,4 @@
-#include "Engine/engine.hpp"
-#include "argparser.hpp"
+#include "ChessQDL/chessqdl.hpp"
 
 using namespace chessqdl;
 

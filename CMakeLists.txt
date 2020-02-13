@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
-project(Chessqdl)
+project(ChessQDL)
 
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES main.cpp)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
 
 include_directories(src)
-
 add_subdirectory(src)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
@@ -31,27 +34,20 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_subdirectory("${CMAKE_BINARY_DIR}/tests/googletest-src"
             "${CMAKE_BINARY_DIR}/tests/googletest-build"
             )
-
-    # The gtest/gmock targets carry header search path dependencies
-    # automatically when using CMake 2.8.11 or later. Otherwise we
-    # have to add them here ourselves.
-    if (CMAKE_VERSION VERSION_LESS 2.8.11)
-        include_directories("${gtest_SOURCE_DIR}/include"
-                "${gmock_SOURCE_DIR}/include"
-                )
-    endif ()
     enable_testing()
     add_subdirectory(tests)
-elseif (CMAKE_BILD_TYPE MATCHES Release)
+elseif (CMAKE_BUILD_TYPE MATCHES Release)
     message("CMake in Release mode")
 endif ()
 
+# Include external libraries
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE libs/cxxopts/include include)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib boost_program_options)
-
+# Link ChessQDL libraries
+target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib)
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
             POST_BUILD
-            COMMAND strip -s ${CMAKE_PROJECT_NAME})
+            COMMAND strip -s bin/${CMAKE_PROJECT_NAME})
 endif ()
