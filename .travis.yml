@@ -1,5 +1,7 @@
 language: cpp
-compiler:
-    -clang
-    -g++
+compiler: 
+  - g++
+  - clang
+dist: bionic
 os: linux
+script: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make && ctest -V
