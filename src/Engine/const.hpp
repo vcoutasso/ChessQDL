@@ -1,5 +1,5 @@
-#ifndef CHESSQDL_CONST_H
-#define CHESSQDL_CONST_H
+#ifndef CHESSQDL_CONST_HPP
+#define CHESSQDL_CONST_HPP
 
 #include <vector>
 #include <string>
@@ -94,4 +94,4 @@ namespace chessqdl {
 
 }
 
-#endif //CHESSQDL_CONST_H
+#endif //CHESSQDL_CONST_HPP

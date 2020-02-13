@@ -1,9 +1,9 @@
-#ifndef CHESSQDL_BITBOARD_H
-#define CHESSQDL_BITBOARD_H
+#ifndef CHESSQDL_BITBOARD_HPP
+#define CHESSQDL_BITBOARD_HPP
 
 #include <bitset>
 
-#include "const.h"
+#include "const.hpp"
 
 namespace chessqdl {
 
@@ -113,4 +113,4 @@ namespace chessqdl {
 
 }
 
-#endif //CHESSQDL_BITBOARD_H
+#endif //CHESSQDL_BITBOARD_HPP

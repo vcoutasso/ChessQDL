@@ -1,5 +1,5 @@
-#include "bitboard.h"
-#include "const.h"
+#include "bitboard.hpp"
+#include "const.hpp"
 
 #include <string>
 #include <iostream>

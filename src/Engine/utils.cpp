@@ -1,5 +1,5 @@
-#include "utils.h"
-#include "movegen.h"
+#include "utils.hpp"
+#include "movegen.hpp"
 
 #include <cmath>
 

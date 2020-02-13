@@ -1,6 +1,6 @@
-#include "movegen.h"
-#include "bitboard.h"
-#include "utils.h"
+#include "movegen.hpp"
+#include "bitboard.hpp"
+#include "utils.hpp"
 
 #include <cmath>
 

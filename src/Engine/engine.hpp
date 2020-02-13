@@ -1,16 +1,16 @@
-#ifndef CHESSQDL_ENGINE_H
-#define CHESSQDL_ENGINE_H
+#ifndef CHESSQDL_ENGINE_HPP
+#define CHESSQDL_ENGINE_HPP
 
-#include "bitboard.h"
-#include "movegen.h"
+#include "bitboard.hpp"
+#include "movegen.hpp"
 
 #include <stack>
 
 namespace chessqdl {
 
-    class Engine {
+	class Engine {
 
-    private:
+	private:
 
 		/**
 		 * @brief Bitboard representation of the current board state
@@ -45,7 +45,7 @@ namespace chessqdl {
 		/**
 		 * @brief This variable determines how deep into the moves tree the algorithm should go when searching for the optimal move
 		 */
-		int depthLevel = 3;
+		int depthLevel;
 
 		/**
 		 * @brief Prints the current state of the board to stdout. A terminal with unicode support is recommended since the pieces are represented by unicode symbols
@@ -54,17 +54,12 @@ namespace chessqdl {
 
     public:
 
-		/**
-		 * @brief Default constructor. Starts a new game of chess with the engine assuming the black pieces
-		 */
-		Engine();
-
 
 		/**
-		 * @brief Overloaded constructor. Allows the selection of the engine's pieces. Should replace the default constructor once its possible to execute the game with arguments
+		 * @brief Overloaded constructor. Allows the selection of the engine's pieces.
 		 * @param color  the color of the engine's pieces
 		 */
-		Engine(enumColor color);
+		Engine(enumColor color, int depth);
 
 
 		/**
@@ -72,7 +67,7 @@ namespace chessqdl {
 		 * @param fen  valid fen string that represents a chess game
 		 * @param color  color of the pieces the engine will assume
 		 */
-		Engine(std::string fen, enumColor color);
+		Engine(std::string fen, enumColor color, int depth);
 
 
 		/**
@@ -152,4 +147,4 @@ namespace chessqdl {
 
 }
 
-#endif //CHESSQDL_ENGINE_H
+#endif //CHESSQDL_ENGINE_HPP

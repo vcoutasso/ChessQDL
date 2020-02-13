@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../src/Engine/movegen.h"
-#include "../src/Engine/bitboard.h"
+#include "Engine/movegen.hpp"
+#include "Engine/bitboard.hpp"
 
 //FIXME: These tests do not take into account the possibility of a pawn moving two squares on first move, castles or en passant captures
 

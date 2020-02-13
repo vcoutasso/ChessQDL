@@ -1,5 +1,5 @@
-#include "engine.h"
-#include "utils.h"
+#include "engine.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -10,31 +10,24 @@ using namespace chessqdl;
 
 
 /**
- * @details Starts a new standard game of chess with the engine as black pieces
- */
-Engine::Engine() {
-	bitboard = Bitboard();
-	pieceColor = nBlack;
-}
-
-
-/**
  * @details Starts a new standard game of chess with the engine as \p color pieces
  */
-Engine::Engine(enumColor color) {
+Engine::Engine(enumColor color, int depth) {
 	bitboard = Bitboard();
 	pieceColor = color;
+	depthLevel = depth;
 }
 
 
 /**
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
  */
-Engine::Engine(std::string fen, enumColor color) {
+Engine::Engine(std::string fen, enumColor color, int depth) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
 	// FIXME: toMove actually depends on the fen string.
 	toMove = nWhite;
+	depthLevel = depth;
 }
 
 
@@ -229,6 +222,9 @@ void Engine::makeMove(std::string mv, bool verbose) {
 }
 
 
+/**
+ * @details Removes the latest entry to the move history and updates the bitboards accordingly.
+ */
 void Engine::unmakeMove() {
 
 	if (!moveHistory.empty()) {
@@ -243,6 +239,7 @@ void Engine::unmakeMove() {
 		enumPiece pieceType = nPawn;
 		bool captured = false;
 
+		// Figures out the piece that was moved
 		if (lastMove.find_first_of("NBRQK") != std::string::npos) {
 			if (lastMove.at(0) == 'N')
 				pieceType = nKnight;
@@ -258,17 +255,21 @@ void Engine::unmakeMove() {
 			lastMove.erase(0, 1);
 		}
 
+		// If a piece was captured, it has to be placed back in the board
 		if (lastMove.find("x") != std::string::npos) {
 			captured = true;
 			lastMove.erase(lastMove.find("x"), 1);
 		}
 
+		// Strings with the name of the squares used (source and destination)
 		std::string from = lastMove.substr(0, 2);
 		std::string to = lastMove.substr(2);
 
+		// Iterators of the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
 		auto toIt = std::find(mapPositions.begin(), mapPositions.end(), to);
 
+		// Indexes of the respective square name
 		int fromIdx = std::distance(mapPositions.begin(), fromIt);
 		int toIdx = std::distance(mapPositions.begin(), toIt);
 
@@ -276,11 +277,13 @@ void Engine::unmakeMove() {
 
 		enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
+		// Updates bitboards
 		bb[pieceType].reset(toIdx);
 		bb[hasMoved].reset(toIdx);
 		bb[pieceType].set(fromIdx);
 		bb[hasMoved].set(fromIdx);
 
+		// "Decaptures" a piece
 		if (captured) {
 			enumColor capturedPiece = captureHistory.top();
 			captureHistory.pop();
@@ -297,6 +300,10 @@ void Engine::unmakeMove() {
 	}
 }
 
+
+/**
+ * @details Performs a recursive search on the moves tree using the minimax algorithm with alpha-beta pruning and returns the best move it has found
+ */
 std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
 	std::string bestMove;
 	int nodesVisited = 0;
@@ -315,6 +322,12 @@ std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
 	return bestMove;
 }
 
+
+/**
+ * @details Minimax implementation
+ * @ref https://en.wikipedia.org/wiki/Minimax <br>
+ * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+ */
 int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 	if (depthLeft == 0)
 		return evaluateBoard(board, color);
@@ -346,6 +359,12 @@ int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLe
 	return alpha;
 }
 
+
+/**
+ * @details Minimax implementation
+ * @ref https://en.wikipedia.org/wiki/Minimax <br>
+ * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+ */
 int Engine::alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 
 	if (depthLeft == 0)

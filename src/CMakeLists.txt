@@ -7,9 +7,10 @@ project(${CMAKE_PROJECT_NAME}_lib)
 set(SOURCE_FILES Engine/bitboard.cpp Engine/movegen.cpp
         Engine/engine.cpp Engine/utils.cpp)
 
-set(HEADER_FILES Engine/bitboard.h Engine/const.h Engine/movegen.h
-        Engine/engine.h Engine/utils.h)
+set(HEADER_FILES Engine/bitboard.hpp Engine/const.hpp Engine/movegen.hpp
+		Engine/engine.hpp Engine/utils.hpp argparser.hpp)
 
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ../include)
 
 # The library contains header and source files.
 add_library(${CMAKE_PROJECT_NAME}_lib STATIC

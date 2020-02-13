@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/Engine/bitboard.h"
+#include "Engine/bitboard.hpp"
 
 TEST(Bitboard, InitStandardChessBoard_Test) {
 	chessqdl::Bitboard board;

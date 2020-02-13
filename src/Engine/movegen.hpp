@@ -1,7 +1,7 @@
-#ifndef CHESSQDL_MOVEGEN_H
-#define CHESSQDL_MOVEGEN_H
+#ifndef CHESSQDL_MOVEGEN_HPP
+#define CHESSQDL_MOVEGEN_HPP
 
-#include "bitboard.h"
+#include "bitboard.hpp"
 
 #include <vector>
 
@@ -223,4 +223,4 @@ namespace chessqdl {
 
 }
 
-#endif //CHESSQDL_MOVEGEN_H
+#endif //CHESSQDL_MOVEGEN_HPP

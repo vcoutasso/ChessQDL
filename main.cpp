@@ -1,10 +1,15 @@
-#include "src/Engine/engine.h"
+#include "Engine/engine.hpp"
+#include "argparser.hpp"
 
 using namespace chessqdl;
 
 int main(int argc, char **argv) {
 
-	Engine engine;
+	int level;
+	enumColor enginePieces;
+	argumentParser(argc, argv, level, enginePieces);
+
+	Engine engine(enginePieces, level);
 
 	engine.parser();
 

@@ -1,7 +1,7 @@
-#ifndef CHESSQDL_UTILS_H
-#define CHESSQDL_UTILS_H
+#ifndef CHESSQDL_UTILS_HPP
+#define CHESSQDL_UTILS_HPP
 
-#include "const.h"
+#include "const.hpp"
 
 namespace chessqdl {
 
@@ -30,4 +30,4 @@ namespace chessqdl {
 
 }
 
-#endif //CHESSQDL_UTILS_H
+#endif //CHESSQDL_UTILS_HPP
