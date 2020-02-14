@@ -12,22 +12,24 @@ using namespace chessqdl;
 /**
  * @details Starts a new standard game of chess with the engine as \p color pieces
  */
-Engine::Engine(enumColor color, int depth) {
+Engine::Engine(enumColor color, int depth, bool v) {
 	bitboard = Bitboard();
 	pieceColor = color;
 	depthLevel = depth;
+	beVerbose = v;
 }
 
 
 /**
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
  */
-Engine::Engine(std::string fen, enumColor color, int depth) {
+Engine::Engine(std::string fen, enumColor color, int depth, bool v) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
 	// FIXME: toMove actually depends on the fen string.
 	toMove = nWhite;
 	depthLevel = depth;
+	beVerbose = v;
 }
 
 
@@ -71,7 +73,7 @@ void Engine::parser() {
 
 	while(true) {
 		if (pieceColor == toMove) {
-			std::cout << std::endl << "Searching for the next move..." << std::endl;
+			if (this->beVerbose) std::cout << std::endl << "Searching for the next move..." << std::endl;
 			makeMove(getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor));
 			printBoard();
 		}
@@ -314,9 +316,11 @@ std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
 
 	auto end = std::chrono::steady_clock::now();
 
-	std::cout << "Best move found: " << bestMove << std::endl;
-	std::cout << "Nodes visited: " << nodesVisited << std::endl;
-	std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
+	if (this->beVerbose) {
+		std::cout << "Best move found: " << bestMove << std::endl;
+		std::cout << "Nodes visited: " << nodesVisited << std::endl;
+		std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
+	}
 
 
 	return bestMove;

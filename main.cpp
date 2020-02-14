@@ -6,9 +6,11 @@ int main(int argc, char **argv) {
 
 	int level;
 	enumColor enginePieces;
-	argumentParser(argc, argv, level, enginePieces);
+	bool verbose;
 
-	Engine engine(enginePieces, level);
+	argumentParser(argc, argv, level, enginePieces, verbose);
+
+	Engine engine(enginePieces, level, verbose);
 
 	engine.parser();
 

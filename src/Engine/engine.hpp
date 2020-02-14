@@ -48,18 +48,23 @@ namespace chessqdl {
 		int depthLevel;
 
 		/**
+		 * @brief When set to true the engine will display more information about the process of finding a move
+		 */
+		bool beVerbose;
+
+		/**
 		 * @brief Prints the current state of the board to stdout. A terminal with unicode support is recommended since the pieces are represented by unicode symbols
 		 */
 		void printBoard();
 
-    public:
+	public:
 
 
 		/**
 		 * @brief Overloaded constructor. Allows the selection of the engine's pieces.
 		 * @param color  the color of the engine's pieces
 		 */
-		Engine(enumColor color, int depth);
+		Engine(enumColor color, int depth, bool v);
 
 
 		/**
@@ -67,7 +72,7 @@ namespace chessqdl {
 		 * @param fen  valid fen string that represents a chess game
 		 * @param color  color of the pieces the engine will assume
 		 */
-		Engine(std::string fen, enumColor color, int depth);
+		Engine(std::string fen, enumColor color, int depth, bool v);
 
 
 		/**

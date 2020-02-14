@@ -8,11 +8,12 @@
 using namespace chessqdl;
 
 
-void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces) {
+void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose) {
 	cxxopts::Options options("ChessQDL", "Simple chess engine with a terminal interface");
 
 	options.add_options()
 			("play_as_black", "Play with black pieces against the engine's white pieces")
+			("v,verbose", "Be verbose")
 			("l,level", "Level of the engine. The higher the value, the higher the difficulty. Accepted values range from 1 to 10", cxxopts::value(level))
 			("h,help", "Display this help and exit");
 
@@ -23,6 +24,9 @@ void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces) 
 			std::cout << options.help();
 			exit(0);
 		}
+
+		verbose = args.count("verbose") != 0;
+
 		if (args.count("level")) {
 			if (args["level"].as<int>() > 10 || args["level"].as<int>() < 1) {
 				std::cout << "ChessQDL: Argument value is not valid" << std::endl;
@@ -34,6 +38,7 @@ void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces) 
 			enginePieces = nWhite;
 		else
 			enginePieces = nBlack;
+
 	} catch (cxxopts::OptionException &e) {
 		std::cout << "ChesssQDL: " << e.what() << std::endl;
 		exit(1);
