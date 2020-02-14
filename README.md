@@ -36,6 +36,12 @@ $ make
 
 Note: Building in Debug mode will download Google Test from Github.
 
+Run tests (Debug version only):
+
+```
+$ ctest -V
+```
+
 As an alternative to Unix Makefiles, other generators such as Ninja can be used:
 
 ```
@@ -43,13 +49,7 @@ $ cmake -G "Ninja" ..
 $ ninja
 ```
 
-Run tests (Debug version):
-
-```
-$ ctest -V
-```
-
-Build Doxygen documentation:
+Generate Doxygen files from code documentation:
 
 ```
 $ cd docs

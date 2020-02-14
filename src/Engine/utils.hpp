@@ -21,6 +21,13 @@ namespace chessqdl {
 	 */
 	int evaluateBoard(const U64 *board, enumColor color);
 
+
+	/**
+	 * @brief Method to read a integer from stdin in a clean and sanitized way.
+	 * @param n  variable that will store the integer read from std::cin
+	 */
+	void readInteger(int &n);
+
 	typedef struct scoreStruct scoreStruct;
 
 	struct scoreStruct {

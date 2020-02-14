@@ -87,13 +87,13 @@ void Engine::parser() {
 			makeMove(input);
 			printBoard();
 		} else if (input == "undo") {
-			int num;
-			std::cin >> num;
+			int num = 1;
+			readInteger(num);
 			for (int i = 0; i < num; i++)
 				unmakeMove();
 		} else if (input == "depth" || input == "set_depth") {
-			int d;
-			std::cin >> d;
+			int d = 3;
+			readInteger(d);
 			setDepth(d);
 		} else if (input == "exit" || input == "quit")
 			break;

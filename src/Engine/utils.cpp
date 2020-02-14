@@ -2,6 +2,7 @@
 #include "movegen.hpp"
 
 #include <cmath>
+#include <iostream>
 
 using namespace chessqdl;
 
@@ -71,3 +72,13 @@ int chessqdl::evaluateBoard(const U64 *board, enumColor color) {
 	return score;
 }
 
+
+/**
+ * @details Ignore input if not a valid integer and keep reading from stdin until the input is valid
+ */
+void chessqdl::readInteger(int &n) {
+	while (!(std::cin >> n)) {
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	}
+}
