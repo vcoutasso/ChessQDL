@@ -92,7 +92,7 @@ namespace chessqdl {
 		/**
 		 * @brief Takes back the most recent move
 		 */
-		void unmakeMove();
+		void takeMove();
 
 
 		/**

@@ -92,14 +92,26 @@ void Engine::parser() {
 			int num = 1;
 			readInteger(num);
 			for (int i = 0; i < num; i++)
-				unmakeMove();
+				takeMove();
 		} else if (input == "depth" || input == "set_depth") {
 			int d = 3;
 			readInteger(d);
 			setDepth(d);
 		} else if (input == "exit" || input == "quit")
 			break;
-		else
+		else if (input == "list") {
+			auto moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+			for (auto &mv : moves)
+				std::cout << mv << std::endl;
+		} else if (input == "help") {
+			std::cout << "print_board (print for short) - prints out the current state of the board" << std::endl;
+			std::cout << "move (mv for short)           - makes a movement if valid" << std::endl;
+			std::cout << "set_depth (depth for short)   - specifies the search depth of the minimax algorithm. Used to adjust difficulty of the engine" << std::endl;
+			std::cout << "list                          - prints out a list of valid moves in the expected format" << std::endl;
+			std::cout << "undo                          - takes a movement from the stack. Accepts an integer as argument to specify the amount of moves to be taken" << std::endl;
+			std::cout << "help                          - prints out this message with information about valid commands" << std::endl;
+			std::cout << "exit (or quit)                - exits the game" << std::endl;
+		} else
 			continue;
 
 		if (bitboard.getKing(nWhite) == 0) {
@@ -227,7 +239,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 /**
  * @details Removes the latest entry to the move history and updates the bitboards accordingly.
  */
-void Engine::unmakeMove() {
+void Engine::takeMove() {
 
 	if (!moveHistory.empty()) {
 
@@ -349,7 +361,7 @@ int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLe
 
 		makeMove(currentMove, false);
 		int score = alphaBetaMin(board, alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
-		unmakeMove();
+		takeMove();
 
 		if (score >= beta)
 			return beta;
@@ -387,7 +399,7 @@ int Engine::alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLe
 
 		makeMove(currentMove, false);
 		int score = alphaBetaMax(board, alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
-		unmakeMove();
+		takeMove();
 
 		if (score <= alpha)
 			return alpha;

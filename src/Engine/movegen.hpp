@@ -211,6 +211,9 @@ namespace chessqdl {
 		 */
 		static U64 getQueenMoves(const U64 *bitboard, enumColor color);
 
+
+		static std::vector<std::string> pawnPromotion(const U64 *bitboard, U64 &pawnMoves);
+
 		/**
 		 * @brief Get all possible pseudo-legal moves for a given bitboard
 		 * @param bitboard  reference to bitboards representing the current board status

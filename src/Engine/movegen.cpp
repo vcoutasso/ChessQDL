@@ -375,6 +375,24 @@ U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
 }
 
 
+std::vector<std::string> MoveGenerator::pawnPromotion(const U64 *bitboard, U64 &pawnMoves) {
+	U64 whitePromotions = pawnMoves & U64(0xffL << 56); // Pawns that are a square away from rank 8
+	U64 blackPromotions = pawnMoves & U64(0xffL << 16); // Pawns that are a square away from rank 1
+
+	// Removes any pawn that is not of the desired color
+	whitePromotions = whitePromotions & (bitboard[nPawn] & bitboard[nWhite]);
+	blackPromotions = blackPromotions & (bitboard[nPawn] & bitboard[nBlack]);
+
+	// Removes the promoting pawns from standard moves
+	pawnMoves ^= whitePromotions;
+	pawnMoves ^= blackPromotions;
+
+	std::vector<std::string> promotions;
+
+	return promotions;
+}
+
+
 //FIXME: getPseudoLegalMoves spends way too much time trying to find the bits that are set (squares that contain pieces) because it iterates through all bits until there is no more bits set.
 //This means that if only the MSB is set, it will iterate through all other 63 bits until it reaches the last one. This can possibly be very time consuming given that this operation is repeated many many times.
 
@@ -424,6 +442,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 			switch (k) {
 				case nPawn:
 					pieceMoves = getPawnMoves(bitboardCopy, color);
+					pawnPromotion(bitboard, pieceMoves);
 					break;
 
 				case nKnight:
