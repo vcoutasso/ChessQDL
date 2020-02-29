@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/vcoutasso/Chessqdl.svg?branch=master)](https://travis-ci.com/vcoutasso/Chessqdl)
+[![Build Status](https://travis-ci.com/vcoutasso/Chessqdl.svg?branch=develop)](https://travis-ci.com/vcoutasso/Chessqdl)
 
 
 # ChessQDL

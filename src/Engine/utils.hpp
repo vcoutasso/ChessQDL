@@ -28,12 +28,20 @@ namespace chessqdl {
 	 */
 	void readInteger(int &n);
 
+	/**
+	 * @brief Method to return the index of the least significant bit of \p value that is set
+	 * @param value  number of interest
+	 * @return Index of least significant bit that is set
+	 */
+	int leastSignificantSetBit(uint64_t value);
+
 	typedef struct scoreStruct scoreStruct;
 
 	struct scoreStruct {
 		int score;
 		std::string move;
 	};
+
 
 }
 

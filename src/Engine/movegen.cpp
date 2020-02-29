@@ -432,9 +432,8 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 
 		while (upieces) {
 			// Get index of least significant set bit
-			uint64_t lsb = upieces & -upieces;
-			upieces ^= lsb;
-			i = log2(lsb);
+			i = leastSignificantSetBit(upieces);
+			upieces ^= (1L << i); // Reset bit
 
 			bitboardCopy[k].reset();
 			bitboardCopy[k].set(i);
@@ -471,9 +470,8 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 			uint64_t umoves = pieceMoves.to_ullong();
 
 			while (umoves) {
-				lsb = umoves & -umoves;
-				umoves ^= lsb;
-				i = log2(lsb);
+				i = leastSignificantSetBit(umoves);
+				umoves ^= (1L << i);
 				to = posToStr(1L << i);
 				moves.push_back(from + to);
 			}
