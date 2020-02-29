@@ -2,7 +2,7 @@
 #include "Engine/movegen.hpp"
 #include "Engine/bitboard.hpp"
 
-//FIXME: These tests do not take into account the possibility of a pawn moving two squares on first move, castles or en passant captures
+//FIXME: These tests do not take into account the possibility of castles , en passant captures or promotions
 
 TEST(MoveGenerator, PseudoLegalInitialMoves_Test) {
 
@@ -18,6 +18,9 @@ TEST(MoveGenerator, PseudoLegalInitialMoves_Test) {
 	EXPECT_EQ(generator.getRookMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor, chessqdl::enumPiece::nRook),
 			  0x00);
 	EXPECT_EQ(generator.getQueenMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor), 0x00);
+
+	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nWhite).size(), 10);
+	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nBlack).size(), 10);
 
 }
 
