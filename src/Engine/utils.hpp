@@ -35,6 +35,14 @@ namespace chessqdl {
 	 */
 	int leastSignificantSetBit(uint64_t value);
 
+	/**
+	 * @brief Constructs the name of the move that is formed by moving from \p from to \p to
+	 * @param from  unsigned long int with only one bit set signifying the original position of the moving piece
+	 * @param to  unsigned long int with only one bit set signifying the destination position of the moving piece
+	 * @return Name of the move that is being made (e.g e2e4)
+	 */
+	std::string moveName(uint64_t from, uint64_t to);
+
 	typedef struct scoreStruct scoreStruct;
 
 	struct scoreStruct {

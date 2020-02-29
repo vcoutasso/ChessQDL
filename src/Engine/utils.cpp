@@ -92,3 +92,13 @@ int chessqdl::leastSignificantSetBit(uint64_t value) {
 
 	return log2(lsb);
 }
+
+/**
+ * @details Receives two uint64_t, retrieves their position name in the board and constitutes the move that's being made
+ */
+std::string chessqdl::moveName(uint64_t from, uint64_t to) {
+	std::string from_str = posToStr(from);
+	std::string to_str = posToStr(to);
+
+	return from_str + to_str;
+}
