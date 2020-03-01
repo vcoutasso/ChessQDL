@@ -74,7 +74,7 @@ void Engine::parser() {
 	while(true) {
 		if (pieceColor == toMove) {
 			if (this->beVerbose) std::cout << std::endl << "Searching for the next move..." << std::endl;
-			makeMove(getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor));
+			makeMove(getBestMove(depthLevel, pieceColor));
 			printBoard();
 		}
 
@@ -115,10 +115,10 @@ void Engine::parser() {
 			continue;
 
 		if (bitboard.getKing(nWhite) == 0) {
-			std::cout << std::endl << "Game over! Black wins :)" << std::endl;
+			std::cout << std::endl << "Game over! Black wins" << std::endl;
 			break;
 		} else if (bitboard.getKing(nBlack) == 0) {
-			std::cout << std::endl << "Game over! White wins :)" << std::endl;
+			std::cout << std::endl << "Game over! White wins" << std::endl;
 			break;
 		}
 
@@ -137,12 +137,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 	auto pseudoLegal = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
 	bool found = std::find(pseudoLegal.begin(), pseudoLegal.end(), mv) != pseudoLegal.end();
 
-	enumColor otherPlayer;
-
-	if (toMove == nWhite)
-		otherPlayer = nBlack;
-	else
-		otherPlayer = nWhite;
+	enumColor otherPlayer = (toMove == nWhite) ? nBlack : nWhite;
 
 	if (!found)
 		std::cout << "Invalid move!" << std::endl;
@@ -150,7 +145,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		// Source square
 		std::string from = mv.substr(0, 2);
 		// Destination square
-		std::string to = mv.substr(2);
+		std::string to = mv.substr(2, 4);
 
 		// Iterators to the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
@@ -275,7 +270,7 @@ void Engine::takeMove() {
 
 		// Strings with the name of the squares used (source and destination)
 		std::string from = lastMove.substr(0, 2);
-		std::string to = lastMove.substr(2);
+		std::string to = lastMove.substr(2, 4);
 
 		// Iterators of the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
@@ -314,13 +309,13 @@ void Engine::takeMove() {
 /**
  * @details Performs a recursive search on the moves tree using the minimax algorithm with alpha-beta pruning and returns the best move it has found
  */
-std::string Engine::getBestMove(BitbArray board, int depth, enumColor color) {
+std::string Engine::getBestMove(int depth, enumColor color) {
 	std::string bestMove;
 	int nodesVisited = 0;
 
 	auto begin = std::chrono::steady_clock::now();
 
-	alphaBetaMax(board, intMin, intMax, depth, depth, color, nodesVisited, bestMove);
+	alphaBetaMax(intMin, intMax, depth, depth, color, nodesVisited, bestMove);
 
 	auto end = std::chrono::steady_clock::now();
 
@@ -340,23 +335,23 @@ std::string Engine::getBestMove(BitbArray board, int depth, enumColor color) {
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMax(BitbArray &board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+int Engine::alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 	if (depthLeft == 0)
-		return evaluateBoard(board, color);
+		return evaluateBoard(bitboard.getBitBoards(), color);
 
-	auto allMoves = MoveGenerator::getPseudoLegalMoves(board, color);
+	auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
 
-	enumColor enemyColor = color == nWhite ? nBlack : nWhite;
+	enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
 	for (auto &currentMove : allMoves) {
 
 		nodesVisited++;
 
 		makeMove(currentMove, false);
-		int score = alphaBetaMin(board, alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
+		int score = alphaBetaMin(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
 		takeMove();
 
 		if (score >= beta)
@@ -377,24 +372,24 @@ int Engine::alphaBetaMax(BitbArray &board, int alpha, int beta, int depth, int d
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMin(BitbArray &board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+int Engine::alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 
 	if (depthLeft == 0)
-		return -evaluateBoard(board, color);
+		return -evaluateBoard(bitboard.getBitBoards(), color);
 
-	auto allMoves = MoveGenerator::getPseudoLegalMoves(board, color);
+	auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
 
-	enumColor enemyColor = color == nWhite ? nBlack : nWhite;
+	enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
 	for (auto &currentMove : allMoves) {
 
 		nodesVisited++;
 
 		makeMove(currentMove, false);
-		int score = alphaBetaMax(board, alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
+		int score = alphaBetaMax(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
 		takeMove();
 
 		if (score <= alpha)

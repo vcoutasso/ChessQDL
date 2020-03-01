@@ -223,21 +223,21 @@ void Bitboard::resetBit(int i, int idx) {
  * @details Sets the bit of index \p idx of the bitboard \p color
  */
 void Bitboard::setBit(enumColor color, int idx) {
-	bitBoards[color].reset(idx);
+	bitBoards[color].set(idx);
 }
 
 /**
  * @details Sets the bit of index \p idx of the bitboard \p piece
  */
 void Bitboard::setBit(enumPiece piece, int idx) {
-	bitBoards[piece].reset(idx);
+	bitBoards[piece].set(idx);
 }
 
 /**
  * @details Sets the bit of index \p idx of the bitboard \p i
  */
 void Bitboard::setBit(int i, int idx) {
-	bitBoards[i].reset(idx);
+	bitBoards[i].set(idx);
 }
 
 /**

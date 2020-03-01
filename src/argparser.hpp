@@ -40,7 +40,7 @@ void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces, 
 			enginePieces = nBlack;
 
 	} catch (cxxopts::OptionException &e) {
-		std::cout << "ChesssQDL: " << e.what() << std::endl;
+		std::cout << "ChessQDL: " << e.what() << std::endl;
 		exit(1);
 	}
 }

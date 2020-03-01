@@ -100,5 +100,5 @@ std::string chessqdl::moveName(uint64_t from, uint64_t to) {
 	std::string from_str = posToStr(from);
 	std::string to_str = posToStr(to);
 
-	return from_str + to_str;
+	return from_str.append(to_str);
 }

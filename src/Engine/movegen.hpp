@@ -212,6 +212,12 @@ namespace chessqdl {
 		static U64 getQueenMoves(const BitbArray &bitboard, enumColor color);
 
 
+		/**
+		 * @brief Checks for pawns that are about to promote and generates moves for all possible promotions
+		 * @param bitboard  bitboards representing current state of the game
+		 * @param pawnMoves  all possible pawn moves
+		 * @return Vector with all possible promotions. (e.g e7e8n e7e8b e7e8r e7e8q)
+		 */
 		static std::vector<std::string> pawnPromotion(const BitbArray &bitboard, U64 &pawnMoves);
 
 		/**

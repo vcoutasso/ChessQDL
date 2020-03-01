@@ -368,13 +368,15 @@ U64 MoveGenerator::getRookMoves(const BitbArray &bitboard, enumColor color, enum
  */
 U64 MoveGenerator::getQueenMoves(const BitbArray &bitboard, enumColor color) {
 	if (color == nColor)
-		return getBishopMoves(bitboard, nWhite, nQueen) | getBishopMoves(bitboard, nBlack, nQueen) |
-			   getRookMoves(bitboard, nWhite, nQueen) | getRookMoves(bitboard, nBlack, nQueen);
+		return getQueenMoves(bitboard, nWhite) | getQueenMoves(bitboard, nBlack);
 
 	return getBishopMoves(bitboard, color, nQueen) | getRookMoves(bitboard, color, nQueen);
 }
 
 
+/**
+ * @details Identifies all pawns that can promote on next move and generates a list with all possible promotions. Also removes the option to just move without promoting
+ */
 std::vector<std::string> MoveGenerator::pawnPromotion(const BitbArray &bitboard, U64 &pawnMoves) {
 	U64 whitePromotions = pawnMoves & U64(0xffL << 56); // Pawns that are a square away from rank 8
 	U64 blackPromotions = pawnMoves & U64(0xffL << 16); // Pawns that are a square away from rank 1
@@ -387,14 +389,40 @@ std::vector<std::string> MoveGenerator::pawnPromotion(const BitbArray &bitboard,
 	pawnMoves ^= whitePromotions;
 	pawnMoves ^= blackPromotions;
 
+	// Promotions as uint64_t
+	uint64_t uWhitePromotions = whitePromotions.to_ullong();
+	uint64_t uBlackPromotions = blackPromotions.to_ullong();
+
+	int i;
+	uint64_t aux;
+	std::string move;
 	std::vector<std::string> promotions;
+
+	while (uWhitePromotions) {
+		i = leastSignificantSetBit(uWhitePromotions);
+		aux = 1L << i;
+		uWhitePromotions ^= aux;
+		move = moveName(aux, shiftNorth(aux).to_ullong());
+		promotions.push_back(move + "n"); // Promote to Knight
+		promotions.push_back(move + "b"); // Promote to Bishop
+		promotions.push_back(move + "r"); // Promote to Rook
+		promotions.push_back(move + "q"); // Promote to Queen
+	}
+
+	while (uBlackPromotions) {
+		i = leastSignificantSetBit(uBlackPromotions);
+		aux = 1L << i;
+		uBlackPromotions ^= aux;
+		move = moveName(aux, shiftNorth(aux).to_ullong());
+		promotions.push_back(move + "n"); // Promote to Knight
+		promotions.push_back(move + "b"); // Promote to Bishop
+		promotions.push_back(move + "r"); // Promote to Rook
+		promotions.push_back(move + "q"); // Promote to Queen
+	}
 
 	return promotions;
 }
 
-
-//FIXME: getPseudoLegalMoves spends way too much time trying to find the bits that are set (squares that contain pieces) because it iterates through all bits until there is no more bits set.
-//This means that if only the MSB is set, it will iterate through all other 63 bits until it reaches the last one. This can possibly be very time consuming given that this operation is repeated many many times.
 
 /**
  * @details Iterates through all bitboards (from nPawn to nKing) generating moves for pieces one at a time. If there are 16 pawns on the board, this method will generate pawn moves 16 times, one for each individual pawn.
@@ -413,6 +441,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 
 	uint64_t fromIdx, toIdx;
 	std::vector<std::string> moves;
+	std::vector<std::string> promotions;
 
 	BitbArray bitboardCopy = bitboard;
 
@@ -439,7 +468,10 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 			switch (k) {
 				case nPawn:
 					pieceMoves = getPawnMoves(bitboardCopy, color);
-					pawnPromotion(bitboard, pieceMoves);
+					promotions = pawnPromotion(bitboardCopy, pieceMoves);
+					if (promotions.size() > 0) {
+						moves.insert(moves.end(), promotions.begin(), promotions.end());
+					}
 					break;
 
 				case nKnight:

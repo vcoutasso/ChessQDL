@@ -116,7 +116,7 @@ namespace chessqdl {
 		 * @param color  color of the pieces for which to find the best move
 		 * @return
 		 */
-		std::string getBestMove(BitbArray board, int depth, enumColor color);
+		std::string getBestMove(int depth, enumColor color);
 
 
 		/**
@@ -131,7 +131,7 @@ namespace chessqdl {
 		 * @param bestMove  best move the algorithm has found
 		 * @return returns the value of \p alpha
 		 */
-		int alphaBetaMax(BitbArray &board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
+		int alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
 
 
 		/**
@@ -146,7 +146,7 @@ namespace chessqdl {
 		 * @param bestMove  best move the algorithm has found
 		 * @return returns the value of \p beta
 		 */
-		int alphaBetaMin(BitbArray &board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
+		int alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
 
     };
 
