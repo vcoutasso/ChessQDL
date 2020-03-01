@@ -32,7 +32,7 @@ std::string chessqdl::posToStr(uint64_t pos) {
  *
  * @todo Count only legal moves and create separate files for board evaluation
  */
-int chessqdl::evaluateBoard(const U64 *board, enumColor color) {
+int chessqdl::evaluateBoard(const BitbArray &board, enumColor color) {
 	// King count
 	int k = (board[nKing] & board[color]).count();
 	int kPrime = board[nKing].count() - k;

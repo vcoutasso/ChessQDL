@@ -217,11 +217,11 @@ U64 MoveGenerator::noWeOccl(U64 gen, U64 pro) {
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  */
-U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
+U64 MoveGenerator::getPawnMoves(const BitbArray &bitboard, enumColor color) {
 	if (color == nWhite) {
 		U64 pawns = bitboard[nPawn] & bitboard[nWhite];        // every white pawn on the board
 
-		U64 attacks = shiftNorthEast(pawns) | shiftNorthWest(pawns);				// theoretical possible attacks
+		U64 attacks = shiftNorthEast(pawns) | shiftNorthWest(pawns);                // theoretical possible attacks
 		attacks &= bitboard[nBlack];                                    // real possible attacks (it's only possible to attack if there is a enemy piece)
 
 		U64 moves = shiftNorth(pawns);
@@ -268,7 +268,7 @@ U64 MoveGenerator::getPawnMoves(const U64 *bitboard, enumColor color) {
  * @details Returns a bitboard with all pseudo-legal moves for a given king. "Moves" the king in every direction and checks for collisions. Return the moves that do not collide with pieces of the same color.
  * @todo Implement castle as a pseudo-legal move?
  */
-U64 MoveGenerator::getKingMoves(const U64 *bitboard, enumColor color) {
+U64 MoveGenerator::getKingMoves(const BitbArray &bitboard, enumColor color) {
 	U64 king = bitboard[nKing] & bitboard[color];
 
 	U64 moves = shiftNorth(king) | shiftNorthEast(king) | shiftEast(king) | shiftSouthEast(king) | shiftSouth(king) | shiftSouthWest(king) | shiftWest(king) | shiftNorthWest(king);
@@ -282,16 +282,16 @@ U64 MoveGenerator::getKingMoves(const U64 *bitboard, enumColor color) {
  * @details Returns a bitboard with all pseudo-legal moves for knights of a given color.
  * Every possible theoretical move is accounted for, but only the ones that do not collide with allied pieces are returned.
  */
-U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::enumColor color) {
+U64 MoveGenerator::getKnightMoves(const BitbArray &bitboard, chessqdl::enumColor color) {
 	U64 knights = bitboard[nKnight] & bitboard[color];
 
 	if (color == nColor)
 		return getKnightMoves(bitboard, nBlack) | getKnightMoves(bitboard, nWhite);
 
-	U64 WWN = shiftNorthWest(shiftWest(knights));			// west west north
-	U64 WNN = shiftNorthWest(shiftNorth(knights));			// west north north
-	U64 ENN = shiftNorthEast(shiftNorth(knights));  		// east north north
-	U64 EEN = shiftNorthEast(shiftEast(knights));			// east east north
+	U64 WWN = shiftNorthWest(shiftWest(knights));            // west west north
+	U64 WNN = shiftNorthWest(shiftNorth(knights));            // west north north
+	U64 ENN = shiftNorthEast(shiftNorth(knights));        // east north north
+	U64 EEN = shiftNorthEast(shiftEast(knights));            // east east north
 
 	U64 EES = shiftSouthEast(shiftEast(knights));			// east east south
 	U64 ESS = shiftSouthEast(shiftSouth(knights));			// east south south
@@ -308,7 +308,7 @@ U64 MoveGenerator::getKnightMoves(const U64 *bitboard, chessqdl::enumColor color
 /**
  * @details Gets occluded fills for every direction for the possible moves (excludes blockers). For the attacks, the occluded fills need to be shifted one further.
  */
-U64 MoveGenerator::getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece) {
+U64 MoveGenerator::getBishopMoves(const BitbArray &bitboard, enumColor color, enumPiece piece) {
 	U64 bishops = bitboard[piece] & bitboard[color];
 	U64 empty = ~bitboard[nColor];
 
@@ -337,7 +337,7 @@ U64 MoveGenerator::getBishopMoves(const U64 *bitboard, enumColor color, enumPiec
 /**
  * @details Gets occluded fills for every direction for the possible moves (excludes blockers). For the attacks, the occluded fills need to be shifted one further.
  */
-U64 MoveGenerator::getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece) {
+U64 MoveGenerator::getRookMoves(const BitbArray &bitboard, enumColor color, enumPiece piece) {
 	U64 rooks = bitboard[piece] & bitboard[color];
 	U64 empty = ~bitboard[nColor];
 
@@ -366,7 +366,7 @@ U64 MoveGenerator::getRookMoves(const U64 *bitboard, enumColor color, enumPiece 
 /**
  * @details Makes use of the implementation of bishop and rooks move generation.
  */
-U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
+U64 MoveGenerator::getQueenMoves(const BitbArray &bitboard, enumColor color) {
 	if (color == nColor)
 		return getBishopMoves(bitboard, nWhite, nQueen) | getBishopMoves(bitboard, nBlack, nQueen) |
 			   getRookMoves(bitboard, nWhite, nQueen) | getRookMoves(bitboard, nBlack, nQueen);
@@ -375,7 +375,7 @@ U64 MoveGenerator::getQueenMoves(const U64 *bitboard, enumColor color) {
 }
 
 
-std::vector<std::string> MoveGenerator::pawnPromotion(const U64 *bitboard, U64 &pawnMoves) {
+std::vector<std::string> MoveGenerator::pawnPromotion(const BitbArray &bitboard, U64 &pawnMoves) {
 	U64 whitePromotions = pawnMoves & U64(0xffL << 56); // Pawns that are a square away from rank 8
 	U64 blackPromotions = pawnMoves & U64(0xffL << 16); // Pawns that are a square away from rank 1
 
@@ -400,7 +400,7 @@ std::vector<std::string> MoveGenerator::pawnPromotion(const U64 *bitboard, U64 &
  * @details Iterates through all bitboards (from nPawn to nKing) generating moves for pieces one at a time. If there are 16 pawns on the board, this method will generate pawn moves 16 times, one for each individual pawn.
  * It does so for every type of piece on the board, and then returns a list with strings of all possible moves it has found.
  */
-std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard, enumColor color) {
+std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bitboard, enumColor color) {
 	if (color == nColor) {
 		std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
 		std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
@@ -411,12 +411,10 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 		return white;
 	}
 
-	uint64_t from, to;
+	uint64_t fromIdx, toIdx;
 	std::vector<std::string> moves;
 
-	U64 bitboardCopy[9];
-	for (int k = 0; k < nKing; k++)
-		bitboardCopy[k] = bitboard[k];
+	BitbArray bitboardCopy = bitboard;
 
 	for (int k = nPawn; k <= nKing; k++) {
 
@@ -465,7 +463,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 					break;
 			}
 
-			from = 1L << i; // Original position
+			fromIdx = 1L << i; // Original position
 
 			uint64_t umoves = pieceMoves.to_ullong();
 
@@ -473,9 +471,9 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const U64 *bitboard,
 			while (umoves) {
 				j = leastSignificantSetBit(umoves);
 				umoves ^= (1L << j); // Reset bit
-				to = 1L << j; // Target position
+				toIdx = 1L << j; // Target position
 
-				moves.push_back(moveName(from, to));
+				moves.push_back(moveName(fromIdx, toIdx));
 			}
 		}
 	}

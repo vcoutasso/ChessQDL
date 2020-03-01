@@ -14,7 +14,7 @@ namespace chessqdl {
 		/**
 		 * @brief Array containing all bitboards. Indexing follows numColor and enumPiece
 		 */
-		U64 bitBoards[9];
+		BitbArray bitBoards;
 
 	public:
 
@@ -25,11 +25,12 @@ namespace chessqdl {
 
 		/**
 		 * @brief FEN constructor. Initializes bitBoards according to the given FEN string.
+ 	     * @param fen  fen string that will be used to generate the bitboards
 		 */
 		explicit Bitboard(std::string fen);
 
 		/**
-		 * @brief Returns a bitboard containing all pawns of a given color piece
+		 * @brief Returns a bitboard containing all pawns of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
 		 * @return a bitboard containing all pawns of a given color piece
 		 */
@@ -37,41 +38,41 @@ namespace chessqdl {
 
 
 		/**
-		 * @brief Returns a bitboard containing all knights of a given color piece
+		 * @brief Returns a bitboard containing all knights of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
-		 * @return a bitboard containing all knights of a given color piece
+		 * @return a bitboard containing all knights of a given piece color
 		 */
 		U64 getKnights(enumColor color);
 
 
 		/**
-		 * @brief Returns a bitboard containing all bishops of a given color piece
+		 * @brief Returns a bitboard containing all bishops of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
-		 * @return a bitboard containing all bishops of a given color piece
+		 * @return a bitboard containing all bishops of a given piece color
 		 */
 		U64 getBishops(enumColor color);
 
 
 		/**
-		 * @brief Returns a bitboard containing all rooks of a given color piece
+		 * @brief Returns a bitboard containing all rooks of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
-		 * @return a bitboard containing all rooks of a given color piece
+		 * @return a bitboard containing all rooks of a given piece color
 		 */
 		U64 getRooks(enumColor color);
 
 
 		/**
-		 * @brief Returns a bitboard containing all queens of a given color piece
+		 * @brief Returns a bitboard containing all queens of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
-		 * @return a bitboard containing all queens of a given color piece
+		 * @return a bitboard containing all queens of a given piece color
 		 */
 		U64 getQueens(enumColor color);
 
 
 		/**
-		 * @brief Returns a bitboard containing the king of a given color piece
+		 * @brief Returns a bitboard containing the king of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
-		 * @return a bitboard containing the king of a given color piece
+		 * @return a bitboard containing the king of a given piece color
 		 */
 		U64 getKing(enumColor color);
 
@@ -79,9 +80,25 @@ namespace chessqdl {
 		/**
 		 * @brief Returns a bitboard containing all pieces of a given color
 		 * @param color  the color of desired pieces (nWhite or nBlack)
-		 * @return a bitboard containing all pieces of a given color piece
+		 * @return a bitboard containing all pieces of a given piece color
 		 */
 		U64 getPieces(enumColor color);
+
+
+		/**
+		 * @brief Returns a bitboard containing all pieces of a given type
+		 * @param type  the type of desired pieces (e.g nPawn)
+		 * @return a bitboard containing all pieces of a given piece type
+		 */
+		U64 getPieces(enumPiece type);
+
+
+		/**
+		 * @brief Returns a bitboard containing all pieces at index \p i
+		 * @param i  the desired index
+		 * @return a bitboard containing all pieces at index \p i
+		 */
+		U64 getPiecesAt(int i);
 
 
 		/**
@@ -92,10 +109,85 @@ namespace chessqdl {
 
 
 		/**
+		 * @brief Resets a specific bit on the bitboard that matches \p color
+		 * @param color color of the target bitboard
+		 * @param idx  number of the bit to reset
+		 */
+		void resetBit(enumColor color, int idx);
+
+
+		/**
+		 * @brief Resets a specific bit on the bitboard that matches \p piece
+		 * @param piece  piece type of the target bitboard
+		 * @param idx  number of the bit to reset
+		 */
+		void resetBit(enumPiece piece, int idx);
+
+
+		/**
+		 * @brief Resets a specific bit on the bitboard of index \i
+		 * @param i  index of the bitboard
+		 * @param idx  number of the bit to reset
+		 */
+		void resetBit(int i, int idx);
+
+
+		/**
+		 * @brief Sets a specific bit on the bitboard that matches \p color
+		 * @param color color of the target bitboard
+		 * @param idx  number of the bit to set
+		 */
+		void setBit(enumColor color, int idx);
+
+
+		/**
+		 * @brief Sets a specific bit on the bitboard that matches \p piece
+		 * @param piece  piece type of the target bitboard
+		 * @param idx  number of the bit to set
+		 */
+		void setBit(enumPiece piece, int idx);
+
+
+		/**
+		 * @brief Sets a specific bit on the bitboard of index \i
+		 * @param i  index of the bitboard
+		 * @param idx  number of the bit to set
+		 */
+		void setBit(int i, int idx);
+
+
+		/**
+		 * @brief Tests a specific bit on the bitboard that matches \p color
+		 * @param color color of the target bitboard
+		 * @param idx  number of the bit to test
+		 * @return true if the bit is set, false otherwise
+		 */
+		bool testBit(enumColor color, int idx);
+
+
+		/**
+		 * @brief Tests a specific bit on the bitboard that matches \p piece
+		 * @param piece  piece type of the target bitboard
+		 * @param idx  number of the bit to test
+		 * @return true if the bit is set, false otherwise
+		 */
+		bool testBit(enumPiece piece, int idx);
+
+
+		/**
+		 * @brief Tests a specific bit on the bitboard of index \i
+		 * @param i  index of the bitboard
+		 * @param idx  number of the bit to test
+		 * @return true if the bit is set, false otherwise
+		 */
+		bool testBit(int i, int idx);
+
+
+		/**
 		 * @brief Returns the bitBoard attribute of the class
 		 * @return an array containing all bitboards
 		 */
-		U64 *getBitBoards();
+		BitbArray getBitBoards();
 
 
 		/**

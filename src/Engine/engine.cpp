@@ -163,11 +163,9 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		// Type of the piece that is being moved
 		enumPiece pieceType = nPawn;
 
-		U64 *bb = bitboard.getBitBoards();
-
 		// It is assumed that the moving piece is a pawn. This loop checks verifies if it's true and if it isn't, it changes the piece type
 		for (int i = nPawn; i <= nKing; i++) {
-			U64 aux = bb[i] & bb[toMove];
+			U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(toMove);
 			if (aux.test(fromIdx)) {
 				pieceType = enumPiece(i);
 				break;
@@ -196,25 +194,25 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		}
 
 		// If a piece is being captured
-		if (bb[otherPlayer].test(toIdx)) {
+		if (bitboard.testBit(otherPlayer, toIdx)) {
 			for (int i = nPawn; i <= nKing; i++) {
-				U64 aux = bb[i] & bb[otherPlayer];
+				U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
 				if (aux.test(toIdx)) {
-					bb[i].reset(toIdx);
+					bitboard.resetBit(i, toIdx);
 					captureHistory.push(enumColor(i));
 					mv.insert(mv.find_first_of("12345678") + 1, "x");
 					break;
 				}
 			}
 			// Removes piece from the board
-			bb[otherPlayer].reset(toIdx);
+			bitboard.resetBit(otherPlayer, toIdx);
 		}
 
 		// Updates bitboards
-		bb[pieceType].reset(fromIdx);
-		bb[toMove].reset(fromIdx);
-		bb[pieceType].set(toIdx);
-		bb[toMove].set(toIdx);
+		bitboard.resetBit(pieceType, fromIdx);
+		bitboard.resetBit(toMove, fromIdx);
+		bitboard.setBit(pieceType, toIdx);
+		bitboard.setBit(toMove, toIdx);
 
 		// Updates the bitboard that contains info about both players
 		bitboard.updateBitboard();
@@ -287,23 +285,21 @@ void Engine::takeMove() {
 		int fromIdx = std::distance(mapPositions.begin(), fromIt);
 		int toIdx = std::distance(mapPositions.begin(), toIt);
 
-		U64 *bb = bitboard.getBitBoards();
-
 		enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
 		// Updates bitboards
-		bb[pieceType].reset(toIdx);
-		bb[hasMoved].reset(toIdx);
-		bb[pieceType].set(fromIdx);
-		bb[hasMoved].set(fromIdx);
+		bitboard.resetBit(pieceType, toIdx);
+		bitboard.resetBit(hasMoved, toIdx);
+		bitboard.setBit(pieceType, fromIdx);
+		bitboard.setBit(hasMoved, fromIdx);
 
 		// "Decaptures" a piece
 		if (captured) {
 			enumColor capturedPiece = captureHistory.top();
 			captureHistory.pop();
 
-			bb[toMove].set(toIdx);
-			bb[capturedPiece].set(toIdx);
+			bitboard.setBit(toMove, toIdx);
+			bitboard.setBit(capturedPiece, toIdx);
 		}
 
 		bitboard.updateBitboard();
@@ -318,7 +314,7 @@ void Engine::takeMove() {
 /**
  * @details Performs a recursive search on the moves tree using the minimax algorithm with alpha-beta pruning and returns the best move it has found
  */
-std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
+std::string Engine::getBestMove(BitbArray board, int depth, enumColor color) {
 	std::string bestMove;
 	int nodesVisited = 0;
 
@@ -344,7 +340,7 @@ std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+int Engine::alphaBetaMax(BitbArray &board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 	if (depthLeft == 0)
 		return evaluateBoard(board, color);
 
@@ -381,7 +377,7 @@ int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLe
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+int Engine::alphaBetaMin(BitbArray &board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 
 	if (depthLeft == 0)
 		return -evaluateBoard(board, color);

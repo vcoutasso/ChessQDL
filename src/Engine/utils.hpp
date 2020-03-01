@@ -19,7 +19,7 @@ namespace chessqdl {
 	 * @param color  here colors defines the perspective of the evaluation. If the board is better for the \p color pieces, result will be positive. Otherwise, it will be negative
 	 * @return Score of the board indicating who has the advantage
 	 */
-	int evaluateBoard(const U64 *board, enumColor color);
+	int evaluateBoard(const BitbArray &board, enumColor color);
 
 
 	/**

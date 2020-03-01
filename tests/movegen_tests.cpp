@@ -19,8 +19,8 @@ TEST(MoveGenerator, PseudoLegalInitialMoves_Test) {
 			  0x00);
 	EXPECT_EQ(generator.getQueenMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor), 0x00);
 
-	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nWhite).size(), 10);
-	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nBlack).size(), 10);
+	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nWhite).size(), 20);
+	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nBlack).size(), 20);
 
 }
 

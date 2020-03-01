@@ -38,8 +38,7 @@ Bitboard::Bitboard() {
 
 
 /**
- * @brief Constructor that uses a custom board, represented by the \p fen string.
- * @param fen  fen string that will be used to generate the bitboards
+ * @details Constructor that uses a custom board, represented by the \p fen string.
  */
 Bitboard::Bitboard(std::string fen) {
 	// Just to make sure that all bitboards start with value 0x0;
@@ -158,10 +157,24 @@ U64 Bitboard::getKing(enumColor color) {
 }
 
 /**
- * @details This method returns a bitboard containing all pieces that match the parameter color .
+ * @details This method returns a bitboard containing all pieces that match the parameter color.
  */
 U64 Bitboard::getPieces(enumColor color) {
 	return bitBoards[color];
+}
+
+/**
+ * @details This method returns a bitboard containing all pieces that match the parameter type.
+ */
+U64 Bitboard::getPieces(enumPiece type) {
+	return bitBoards[type];
+}
+
+/**
+ * @details This method returns a bitboard containing all pieces at index \p i
+ */
+U64 Bitboard::getPiecesAt(int i) {
+	return bitBoards[i];
 }
 
 /**
@@ -172,10 +185,80 @@ U64 Bitboard::getAllPieces() {
 }
 
 /**
- * @details Returns a pointer to the bitBoards attribute of the Bitboard class. Since this is a private attribute, it is treated as a constant to prevent modifications.
+ * @details Returns a copy of the std::array with the bitBoards attribute of the Bitboard class.
  */
-U64 *Bitboard::getBitBoards() {
+BitbArray Bitboard::getBitBoards() {
 	return bitBoards;
+}
+
+/**
+ * @details Performs a OR operation between the all white pieces and all black pieces. Result is stored on the nColor bitboard, which contains all pieces on the board.
+ */
+void Bitboard::updateBitboard() {
+	bitBoards[nColor] = bitBoards[nWhite] | bitBoards[nBlack];
+}
+
+/**
+ * @details Resets the bit of index \p idx of the bitboard \p color
+ */
+void Bitboard::resetBit(enumColor color, int idx) {
+	bitBoards[color].reset(idx);
+}
+
+/**
+ * @details Resets the bit of index \p idx of the bitboard \p piece
+ */
+void Bitboard::resetBit(enumPiece piece, int idx) {
+	bitBoards[piece].reset(idx);
+}
+
+/**
+ * @details Resets the bit of index \p idx of the bitboard \p i
+ */
+void Bitboard::resetBit(int i, int idx) {
+	bitBoards[i].reset(idx);
+}
+
+/**
+ * @details Sets the bit of index \p idx of the bitboard \p color
+ */
+void Bitboard::setBit(enumColor color, int idx) {
+	bitBoards[color].reset(idx);
+}
+
+/**
+ * @details Sets the bit of index \p idx of the bitboard \p piece
+ */
+void Bitboard::setBit(enumPiece piece, int idx) {
+	bitBoards[piece].reset(idx);
+}
+
+/**
+ * @details Sets the bit of index \p idx of the bitboard \p i
+ */
+void Bitboard::setBit(int i, int idx) {
+	bitBoards[i].reset(idx);
+}
+
+/**
+ * @details Tests the bit of index \p idx of the bitboard \p color
+ */
+bool Bitboard::testBit(enumColor color, int idx) {
+	return bitBoards[color].test(idx);
+}
+
+/**
+ * @details Tests the bit of index \p idx of the bitboard \p piece
+ */
+bool Bitboard::testBit(enumPiece piece, int idx) {
+	return bitBoards[piece].test(idx);
+}
+
+/**
+ * @details Tests the bit of index \p idx of the bitboard \p i
+ */
+bool Bitboard::testBit(int i, int idx) {
+	return bitBoards[i].test(idx);
 }
 
 /**
@@ -255,12 +338,3 @@ void Bitboard::printBoard() {
 
 	std::cout << "   \033[1;33ma b c d e f g h\033[0m" << std::endl;
 }
-
-
-/**
- * @brief Performs a OR operation between the all white pieces and all black pieces. Result is stored on the nColor bitboard, which contains all pieces on the board.
- */
-void Bitboard::updateBitboard() {
-	bitBoards[nColor] = bitBoards[nWhite] | bitBoards[nBlack];
-}
-
