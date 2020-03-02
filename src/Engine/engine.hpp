@@ -53,6 +53,11 @@ namespace chessqdl {
 		bool beVerbose;
 
 		/**
+		 * @brief When set to true the engine will only take care of the rules of the game, playing no role as a player
+		 */
+		bool pvp = false;
+
+		/**
 		 * @brief Prints the current state of the board to stdout. A terminal with unicode support is recommended since the pieces are represented by unicode symbols
 		 */
 		void printBoard();
@@ -64,7 +69,7 @@ namespace chessqdl {
 		 * @brief Overloaded constructor. Allows the selection of the engine's pieces.
 		 * @param color  the color of the engine's pieces
 		 */
-		Engine(enumColor color, int depth, bool v);
+		Engine(enumColor color, int depth, bool v, bool p);
 
 
 		/**
@@ -72,7 +77,7 @@ namespace chessqdl {
 		 * @param fen  valid fen string that represents a chess game
 		 * @param color  color of the pieces the engine will assume
 		 */
-		Engine(std::string fen, enumColor color, int depth, bool v);
+		Engine(std::string fen, enumColor color, int depth, bool v, bool p);
 
 
 		/**

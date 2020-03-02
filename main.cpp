@@ -8,16 +8,17 @@ int main(int argc, char **argv) {
 	int level;
 	enumColor enginePieces;
 	bool verbose;
+	bool pvp;
 	std::string fen;
 
 	// Parse arguments and initialize variables
-	argumentParser(argc, argv, level, enginePieces, verbose, fen);
+	argumentParser(argc, argv, level, enginePieces, verbose, fen, pvp);
 
 	// Construct engine
-	Engine engine(enginePieces, level, verbose);
+	Engine engine(enginePieces, level, verbose, pvp);
 
 	if (!fen.empty())
-		engine = Engine(fen, enginePieces, level, verbose);
+		engine = Engine(fen, enginePieces, level, verbose, pvp);
 
 	// Call engine's parser to start interaction
 	engine.parser();

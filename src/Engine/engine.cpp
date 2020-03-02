@@ -12,11 +12,12 @@ using namespace chessqdl;
 /**
  * @details Starts a new standard game of chess with the engine as \p color pieces
  */
-Engine::Engine(enumColor color, int depth, bool v) {
+Engine::Engine(enumColor color, int depth, bool v, bool p) {
 	bitboard = Bitboard();
 	pieceColor = color;
 	depthLevel = depth;
 	beVerbose = v;
+	pvp = p;
 }
 
 
@@ -24,12 +25,13 @@ Engine::Engine(enumColor color, int depth, bool v) {
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
  * @fixme not all elements of the fen string are handled
  */
-Engine::Engine(std::string fen, enumColor color, int depth, bool v) {
+Engine::Engine(std::string fen, enumColor color, int depth, bool v, bool p) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
 	toMove = (fen.substr(fen.find(' ') + 1, 1) == "w") ? nWhite : nBlack;
 	depthLevel = depth;
 	beVerbose = v;
+	pvp = p;
 }
 
 
@@ -72,7 +74,7 @@ void Engine::parser() {
 	std::string input;
 
 	while(true) {
-		if (pieceColor == toMove) {
+		if (pieceColor == toMove && !pvp) {
 			if (this->beVerbose) std::cout << std::endl << "Searching for the next move..." << std::endl;
 			makeMove(getBestMove(depthLevel, pieceColor));
 			printBoard();
