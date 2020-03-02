@@ -188,26 +188,40 @@ void Engine::makeMove(std::string mv, bool verbose) {
 				break;
 		}
 
-		// If a piece is being captured
-		if (bitboard.testBit(otherPlayer, toIdx)) {
-			for (int i = nPawn; i <= nKing; i++) {
-				U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
-				if (aux.test(toIdx)) {
-					bitboard.resetBit(i, toIdx);
-					captureHistory.push(enumColor(i));
-					mv.insert(mv.find_first_of("12345678") + 1, "x");
-					break;
-				}
-			}
-			// Removes piece from the board
-			bitboard.resetBit(otherPlayer, toIdx);
-		}
+		// If is promotion
+		if (isalpha(mv.back()) && pieceType == nPawn) {
+			bitboard.resetBit(pieceType, fromIdx);
 
-		// Updates bitboards
-		bitboard.resetBit(pieceType, fromIdx);
-		bitboard.resetBit(toMove, fromIdx);
-		bitboard.setBit(pieceType, toIdx);
-		bitboard.setBit(toMove, toIdx);
+			// Promote to queen by default
+			enumPiece promoteTo = nQueen;
+
+			if (mv.back() == 'n') promoteTo = nKnight;
+			else if (mv.back() == 'b') promoteTo = nBishop;
+			else if (mv.back() == 'r') promoteTo = nRook;
+
+			bitboard.setBit(promoteTo, toIdx);
+		} else {
+			// If a piece is being captured
+			if (bitboard.testBit(otherPlayer, toIdx)) {
+				for (int i = nPawn; i <= nKing; i++) {
+					U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
+					if (aux.test(toIdx)) {
+						bitboard.resetBit(i, toIdx);
+						captureHistory.push(enumColor(i));
+						mv.insert(mv.find_first_of("12345678") + 1, "x");
+						break;
+					}
+				}
+				// Removes piece from the board
+				bitboard.resetBit(otherPlayer, toIdx);
+			}
+
+			// Updates bitboards
+			bitboard.resetBit(pieceType, fromIdx);
+			bitboard.resetBit(toMove, fromIdx);
+			bitboard.setBit(pieceType, toIdx);
+			bitboard.setBit(toMove, toIdx);
+		}
 
 		// Updates the bitboard that contains info about both players
 		bitboard.updateBitboard();
@@ -282,19 +296,33 @@ void Engine::takeMove() {
 
 		enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
-		// Updates bitboards
-		bitboard.resetBit(pieceType, toIdx);
-		bitboard.resetBit(hasMoved, toIdx);
-		bitboard.setBit(pieceType, fromIdx);
-		bitboard.setBit(hasMoved, fromIdx);
+		// If is promotion
+		if (isalpha(lastMove.back()) && pieceType == nPawn) {
+			bitboard.setBit(pieceType, fromIdx);
 
-		// "Decaptures" a piece
-		if (captured) {
-			enumColor capturedPiece = captureHistory.top();
-			captureHistory.pop();
+			// Promote to queen by default
+			enumPiece promoteTo = nQueen;
 
-			bitboard.setBit(toMove, toIdx);
-			bitboard.setBit(capturedPiece, toIdx);
+			if (lastMove.back() == 'n') promoteTo = nKnight;
+			else if (lastMove.back() == 'b') promoteTo = nBishop;
+			else if (lastMove.back() == 'r') promoteTo = nRook;
+
+			bitboard.resetBit(promoteTo, toIdx);
+		} else {
+			// Updates bitboards
+			bitboard.resetBit(pieceType, toIdx);
+			bitboard.resetBit(hasMoved, toIdx);
+			bitboard.setBit(pieceType, fromIdx);
+			bitboard.setBit(hasMoved, fromIdx);
+
+			// "Decaptures" a piece
+			if (captured) {
+				enumColor capturedPiece = captureHistory.top();
+				captureHistory.pop();
+
+				bitboard.setBit(toMove, toIdx);
+				bitboard.setBit(capturedPiece, toIdx);
+			}
 		}
 
 		bitboard.updateBitboard();
