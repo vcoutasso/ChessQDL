@@ -22,12 +22,12 @@ Engine::Engine(enumColor color, int depth, bool v) {
 
 /**
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
+ * @fixme not all elements of the fen string are handled
  */
 Engine::Engine(std::string fen, enumColor color, int depth, bool v) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
-	// FIXME: toMove actually depends on the fen string.
-	toMove = nWhite;
+	toMove = (fen.substr(fen.find(' ') + 1, 1) == "w") ? nWhite : nBlack;
 	depthLevel = depth;
 	beVerbose = v;
 }

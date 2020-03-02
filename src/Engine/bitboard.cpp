@@ -7,8 +7,6 @@
 
 using namespace chessqdl;
 
-/* TODO: Implement a method that receives a fen string as parameter to initialize bitboards */
-
 /**
  * @details Initializes bitboards in order to obtain the following board: <br><br>
  * r n b q k b n r <br>
