@@ -8,13 +8,14 @@
 using namespace chessqdl;
 
 
-void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose) {
+void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose, std::string &fen) {
 	cxxopts::Options options("ChessQDL", "Simple chess engine with a terminal interface");
 
 	options.add_options()
 			("play_as_black", "Play with black pieces against the engine's white pieces")
 			("v,verbose", "Be verbose")
 			("l,level", "Level of the engine. The higher the value, the higher the difficulty. Accepted values range from 1 to 10", cxxopts::value(level))
+			("f,fen", "FEN string that represents the initial state of the desired board", cxxopts::value(fen))
 			("h,help", "Display this help and exit");
 
 	try {
