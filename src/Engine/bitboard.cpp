@@ -273,7 +273,7 @@ void Bitboard::printBoard() {
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nPawn].test(i)) {
-			if (bitBoards[nWhite].test(i))
+			if (bitBoards[nBlack].test(i))
 				board[i] = "♟";
 			else
 				board[i] = "♙";
@@ -282,7 +282,7 @@ void Bitboard::printBoard() {
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nKnight].test(i)) {
-			if (bitBoards[nWhite].test(i))
+			if (bitBoards[nBlack].test(i))
 				board[i] = "♞";
 			else
 				board[i] = "♘";
@@ -291,7 +291,7 @@ void Bitboard::printBoard() {
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nBishop].test(i)) {
-			if (bitBoards[nWhite].test(i))
+			if (bitBoards[nBlack].test(i))
 				board[i] = "♝";
 			else
 				board[i] = "♗";
@@ -300,7 +300,7 @@ void Bitboard::printBoard() {
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nRook].test(i)) {
-			if (bitBoards[nWhite].test(i))
+			if (bitBoards[nBlack].test(i))
 				board[i] = "♜";
 			else
 				board[i] = "♖";
@@ -309,7 +309,7 @@ void Bitboard::printBoard() {
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nQueen].test(i)) {
-			if (bitBoards[nWhite].test(i))
+			if (bitBoards[nBlack].test(i))
 				board[i] = "♛";
 			else
 				board[i] = "♕";
@@ -318,7 +318,7 @@ void Bitboard::printBoard() {
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nKing].test(i)) {
-			if (bitBoards[nWhite].test(i))
+			if (bitBoards[nBlack].test(i))
 				board[i] = "♚";
 			else
 				board[i] = "♔";
