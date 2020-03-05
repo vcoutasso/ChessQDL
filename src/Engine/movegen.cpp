@@ -377,13 +377,9 @@ U64 MoveGenerator::getQueenMoves(const BitbArray &bitboard, enumColor color) {
 /**
  * @details Identifies all pawns that can promote on next move and generates a list with all possible promotions. Also removes the option to just move without promoting
  */
-std::vector<std::string> MoveGenerator::pawnPromotion(const BitbArray &bitboard, U64 &pawnMoves) {
-	U64 whitePromotions = pawnMoves & U64(0xffL << 56); // Pawns that are a square away from rank 8
-	U64 blackPromotions = pawnMoves & U64(0xffL << 16); // Pawns that are a square away from rank 1
-
-	// Removes any pawn that is not of the desired color
-	whitePromotions = whitePromotions & (bitboard[nPawn] & bitboard[nWhite]);
-	blackPromotions = blackPromotions & (bitboard[nPawn] & bitboard[nBlack]);
+std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, uint64_t fromPos) {
+	U64 whitePromotions = pawnMoves & U64(0xffL << 56); // White pawn moves that are promotions
+	U64 blackPromotions = pawnMoves & U64(0xffL); // Black pawn moves that are promotions
 
 	// Removes the promoting pawns from standard moves
 	pawnMoves ^= whitePromotions;
@@ -394,15 +390,15 @@ std::vector<std::string> MoveGenerator::pawnPromotion(const BitbArray &bitboard,
 	uint64_t uBlackPromotions = blackPromotions.to_ullong();
 
 	int i;
-	uint64_t aux;
+	uint64_t toPos;
 	std::string move;
 	std::vector<std::string> promotions;
 
 	while (uWhitePromotions) {
 		i = leastSignificantSetBit(uWhitePromotions);
-		aux = 1L << i;
-		uWhitePromotions ^= aux;
-		move = moveName(aux, shiftNorth(aux).to_ullong());
+		toPos = 1L << i;
+		uWhitePromotions ^= toPos;
+		move = moveName(fromPos, toPos);
 		promotions.push_back(move + "n"); // Promote to Knight
 		promotions.push_back(move + "b"); // Promote to Bishop
 		promotions.push_back(move + "r"); // Promote to Rook
@@ -411,9 +407,9 @@ std::vector<std::string> MoveGenerator::pawnPromotion(const BitbArray &bitboard,
 
 	while (uBlackPromotions) {
 		i = leastSignificantSetBit(uBlackPromotions);
-		aux = 1L << i;
-		uBlackPromotions ^= aux;
-		move = moveName(aux, shiftNorth(aux).to_ullong());
+		toPos = 1l << i;
+		uBlackPromotions ^= toPos;
+		move = moveName(fromPos, toPos);
 		promotions.push_back(move + "n"); // Promote to Knight
 		promotions.push_back(move + "b"); // Promote to Bishop
 		promotions.push_back(move + "r"); // Promote to Rook
@@ -439,7 +435,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 		return white;
 	}
 
-	uint64_t fromIdx, toIdx;
+	uint64_t fromPos, toPos;
 	std::vector<std::string> moves;
 	std::vector<std::string> promotions;
 
@@ -465,10 +461,12 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 			bitboardCopy[k].reset();
 			bitboardCopy[k].set(i);
 
+			fromPos = 1L << i; // Original position
+
 			switch (k) {
 				case nPawn:
 					pieceMoves = getPawnMoves(bitboardCopy, color);
-					promotions = pawnPromotion(bitboardCopy, pieceMoves);
+					promotions = getPawnPromotions(pieceMoves, fromPos);
 					if (promotions.size() > 0) {
 						moves.insert(moves.end(), promotions.begin(), promotions.end());
 					}
@@ -495,17 +493,15 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 					break;
 			}
 
-			fromIdx = 1L << i; // Original position
-
 			uint64_t umoves = pieceMoves.to_ullong();
 
 			// Loops through all possible moves that the piece of type k at the i position can make and adds it to the list of moves
 			while (umoves) {
 				j = leastSignificantSetBit(umoves);
 				umoves ^= (1L << j); // Reset bit
-				toIdx = 1L << j; // Target position
+				toPos = 1L << j; // Target position
 
-				moves.push_back(moveName(fromIdx, toIdx));
+				moves.push_back(moveName(fromPos, toPos));
 			}
 		}
 	}
