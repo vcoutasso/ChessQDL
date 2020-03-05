@@ -218,7 +218,7 @@ namespace chessqdl {
 		 * @param pawnMoves  all possible pawn moves
 		 * @return Vector with all possible promotions. (e.g e7e8n e7e8b e7e8r e7e8q)
 		 */
-		static std::vector<std::string> pawnPromotion(const BitbArray &bitboard, U64 &pawnMoves);
+		static std::vector<std::string> getPawnPromotions(U64 &pawnMoves, uint64_t fromPos);
 
 		/**
 		 * @brief Get all possible pseudo-legal moves for a given bitboard
