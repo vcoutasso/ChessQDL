@@ -93,7 +93,16 @@ void Engine::parser() {
 		} else if (input == "undo") {
 			int num = 1;
 			readInteger(num);
-			for (int i = 0; i < num; i++)
+			for (int i = 0; i < num; i++) {
+				if (!moveHistory.empty())
+					takeMove();
+				else {
+					std::cout << "Move history is empty!" << std::endl;
+					break;
+				}
+			}
+		} else if (input == "restart") {
+			while (!moveHistory.empty())
 				takeMove();
 		} else if (input == "depth" || input == "set_depth") {
 			int d = 3;
@@ -107,14 +116,25 @@ void Engine::parser() {
 				std::cout << mv << std::endl;
 		} else if (input == "help") {
 			std::cout << "print_board (print for short) - prints out the current state of the board" << std::endl;
-			std::cout << "move (mv for short)           - makes a movement if valid" << std::endl;
+			std::cout << "move (mv for short)           - makes a movement if valid. 'move' and 'mv' can be omitted" << std::endl;
 			std::cout << "set_depth (depth for short)   - specifies the search depth of the minimax algorithm. Used to adjust difficulty of the engine" << std::endl;
 			std::cout << "list                          - prints out a list of valid moves in the expected format" << std::endl;
 			std::cout << "undo                          - takes a movement from the stack. Accepts an integer as argument to specify the amount of moves to be taken" << std::endl;
+			std::cout << "restart                       - starts a new match with the standard board configuration" << std::endl;
 			std::cout << "help                          - prints out this message with information about valid commands" << std::endl;
 			std::cout << "exit (or quit)                - exits the game" << std::endl;
-		} else
-			continue;
+		} else {
+			auto moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+			if (std::find(moves.begin(), moves.end(), input) != moves.end()) {
+				makeMove(input);
+				printBoard();
+			} else {
+				std::cout << "'" << input << "' is not a valid command." << std::endl;
+				// Flushing stdin
+				int ch;
+				while ((ch = std::cin.get()) != '\n' && ch != EOF);
+			}
+		}
 
 		if (bitboard.getKing(nWhite) == 0) {
 			std::cout << std::endl << "Game over! Black wins" << std::endl;
