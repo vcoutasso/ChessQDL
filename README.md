@@ -34,6 +34,12 @@ $ cmake ..
 $ make
 ```
 
+Run ChessQDL:
+
+```
+$ ./bin/ChessQDL
+```
+
 Build Debug version:
 
 ```
