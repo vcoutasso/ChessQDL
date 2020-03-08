@@ -2,6 +2,7 @@
 #define CHESSQDL_CONST_HPP
 
 #include <vector>
+#include <array>
 #include <string>
 #include <bitset>
 #include <limits>
@@ -12,6 +13,11 @@ namespace chessqdl {
 	 * @brief Analogous to uint64, but bitset is used to take advantage of its methods.
 	 */
 	typedef std::bitset<64> U64;
+
+	/**
+	 * @brief An std::array to comport all different bitboards that will be used throughout the project
+	 */
+	typedef std::array<U64, 9> BitbArray;
 
 	/**
 	 * @brief Constants representing the board with all bits set except for A or H file

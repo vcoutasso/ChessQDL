@@ -4,12 +4,23 @@ using namespace chessqdl;
 
 int main(int argc, char **argv) {
 
+	// Arguments
 	int level;
 	enumColor enginePieces;
-	argumentParser(argc, argv, level, enginePieces);
+	bool verbose;
+	bool pvp;
+	std::string fen;
 
-	Engine engine(enginePieces, level);
+	// Parse arguments and initialize variables
+	argumentParser(argc, argv, level, enginePieces, verbose, fen, pvp);
 
+	// Construct engine
+	Engine engine(enginePieces, level, verbose, pvp);
+
+	if (!fen.empty())
+		engine = Engine(fen, enginePieces, level, verbose, pvp);
+
+	// Call engine's parser to start interaction
 	engine.parser();
 
 	return 0;

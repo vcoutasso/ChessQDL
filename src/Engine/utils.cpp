@@ -30,9 +30,9 @@ std::string chessqdl::posToStr(uint64_t pos) {
  * Knight - 3 <br>
  * Pawn   - 1 <br>
  *
- * @todo Count only legal moves
+ * @todo Count only legal moves and create separate files for board evaluation
  */
-int chessqdl::evaluateBoard(const U64 *board, enumColor color) {
+int chessqdl::evaluateBoard(const BitbArray &board, enumColor color) {
 	// King count
 	int k = (board[nKing] & board[color]).count();
 	int kPrime = board[nKing].count() - k;
@@ -81,4 +81,24 @@ void chessqdl::readInteger(int &n) {
 		std::cin.clear();
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
+}
+
+
+/**
+ * @details Performs some bitset operations to encounter the least significant bit that is set. Log2 just finds out its index
+ */
+int chessqdl::leastSignificantSetBit(uint64_t value) {
+	uint64_t lsb = value & -value;
+
+	return log2(lsb);
+}
+
+/**
+ * @details Receives two uint64_t, retrieves their position name in the board and constitutes the move that's being made
+ */
+std::string chessqdl::moveName(uint64_t from, uint64_t to) {
+	std::string from_str = posToStr(from);
+	std::string to_str = posToStr(to);
+
+	return from_str.append(to_str);
 }

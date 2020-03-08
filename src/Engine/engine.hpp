@@ -48,18 +48,28 @@ namespace chessqdl {
 		int depthLevel;
 
 		/**
+		 * @brief When set to true the engine will display more information about the process of finding a move
+		 */
+		bool beVerbose;
+
+		/**
+		 * @brief When set to true the engine will only take care of the rules of the game, playing no role as a player
+		 */
+		bool pvp = false;
+
+		/**
 		 * @brief Prints the current state of the board to stdout. A terminal with unicode support is recommended since the pieces are represented by unicode symbols
 		 */
 		void printBoard();
 
-    public:
+	public:
 
 
 		/**
 		 * @brief Overloaded constructor. Allows the selection of the engine's pieces.
 		 * @param color  the color of the engine's pieces
 		 */
-		Engine(enumColor color, int depth);
+		Engine(enumColor color, int depth, bool v, bool p);
 
 
 		/**
@@ -67,7 +77,7 @@ namespace chessqdl {
 		 * @param fen  valid fen string that represents a chess game
 		 * @param color  color of the pieces the engine will assume
 		 */
-		Engine(std::string fen, enumColor color, int depth);
+		Engine(std::string fen, enumColor color, int depth, bool v, bool p);
 
 
 		/**
@@ -87,7 +97,7 @@ namespace chessqdl {
 		/**
 		 * @brief Takes back the most recent move
 		 */
-		void unmakeMove();
+		void takeMove();
 
 
 		/**
@@ -111,7 +121,7 @@ namespace chessqdl {
 		 * @param color  color of the pieces for which to find the best move
 		 * @return
 		 */
-		std::string getBestMove(U64 *board, int depth, enumColor color);
+		std::string getBestMove(int depth, enumColor color);
 
 
 		/**
@@ -126,7 +136,7 @@ namespace chessqdl {
 		 * @param bestMove  best move the algorithm has found
 		 * @return returns the value of \p alpha
 		 */
-		int alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
+		int alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
 
 
 		/**
@@ -141,7 +151,7 @@ namespace chessqdl {
 		 * @param bestMove  best move the algorithm has found
 		 * @return returns the value of \p beta
 		 */
-		int alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
+		int alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove);
 
     };
 

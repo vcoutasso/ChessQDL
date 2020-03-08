@@ -157,7 +157,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for pawns.
 		 */
-		static U64 getPawnMoves(const U64 *bitboard, enumColor color);
+		static U64 getPawnMoves(const BitbArray &bitboard, enumColor color);
 
 		/**
 		 * @brief Overloaded function for pawn moves generator
@@ -173,7 +173,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for king.
 		 */
-		static U64 getKingMoves(const U64 *bitboard, enumColor color);
+		static U64 getKingMoves(const BitbArray &bitboard, enumColor color);
 
 
 		/**
@@ -182,7 +182,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for knights of a given color.
 		 */
-		static U64 getKnightMoves(const U64 *bitboard, enumColor color);
+		static U64 getKnightMoves(const BitbArray &bitboard, enumColor color);
 
 
 		/**
@@ -191,7 +191,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for bishops of a given color.
 		 */
-		static U64 getBishopMoves(const U64 *bitboard, enumColor color, enumPiece piece);
+		static U64 getBishopMoves(const BitbArray &bitboard, enumColor color, enumPiece piece = nBishop);
 
 
 		/**
@@ -200,7 +200,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for rooks of a given color.
 		 */
-		static U64 getRookMoves(const U64 *bitboard, enumColor color, enumPiece piece);
+		static U64 getRookMoves(const BitbArray &bitboard, enumColor color, enumPiece piece = nRook);
 
 
 		/**
@@ -209,7 +209,16 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for queens of a given color.
 		 */
-		static U64 getQueenMoves(const U64 *bitboard, enumColor color);
+		static U64 getQueenMoves(const BitbArray &bitboard, enumColor color);
+
+
+		/**
+		 * @brief Checks for pawns that are about to promote and generates moves for all possible promotions
+		 * @param bitboard  bitboards representing current state of the game
+		 * @param pawnMoves  all possible pawn moves
+		 * @return Vector with all possible promotions. (e.g e7e8n e7e8b e7e8r e7e8q)
+		 */
+		static std::vector<std::string> getPawnPromotions(U64 &pawnMoves, uint64_t fromPos);
 
 		/**
 		 * @brief Get all possible pseudo-legal moves for a given bitboard
@@ -217,7 +226,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
-		static std::vector<std::string> getPseudoLegalMoves(const U64 *bitboard, enumColor color);
+		static std::vector<std::string> getPseudoLegalMoves(const BitbArray &bitboard, enumColor color);
 
 	};
 

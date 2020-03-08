@@ -12,22 +12,26 @@ using namespace chessqdl;
 /**
  * @details Starts a new standard game of chess with the engine as \p color pieces
  */
-Engine::Engine(enumColor color, int depth) {
+Engine::Engine(enumColor color, int depth, bool v, bool p) {
 	bitboard = Bitboard();
 	pieceColor = color;
 	depthLevel = depth;
+	beVerbose = v;
+	pvp = p;
 }
 
 
 /**
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
+ * @fixme not all elements of the fen string are handled
  */
-Engine::Engine(std::string fen, enumColor color, int depth) {
+Engine::Engine(std::string fen, enumColor color, int depth, bool v, bool p) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
-	// FIXME: toMove actually depends on the fen string.
-	toMove = nWhite;
+	toMove = (fen.substr(fen.find(' ') + 1, 1) == "w") ? nWhite : nBlack;
 	depthLevel = depth;
+	beVerbose = v;
+	pvp = p;
 }
 
 
@@ -70,9 +74,9 @@ void Engine::parser() {
 	std::string input;
 
 	while(true) {
-		if (pieceColor == toMove) {
-			std::cout << std::endl << "Searching for the next move..." << std::endl;
-			makeMove(getBestMove(bitboard.getBitBoards(), depthLevel, pieceColor));
+		if (pieceColor == toMove && !pvp) {
+			if (this->beVerbose) std::cout << std::endl << "Searching for the next move..." << std::endl;
+			makeMove(getBestMove(depthLevel, pieceColor));
 			printBoard();
 		}
 
@@ -89,22 +93,54 @@ void Engine::parser() {
 		} else if (input == "undo") {
 			int num = 1;
 			readInteger(num);
-			for (int i = 0; i < num; i++)
-				unmakeMove();
+			for (int i = 0; i < num; i++) {
+				if (!moveHistory.empty())
+					takeMove();
+				else {
+					std::cout << "Move history is empty!" << std::endl;
+					break;
+				}
+			}
+		} else if (input == "restart") {
+			while (!moveHistory.empty())
+				takeMove();
 		} else if (input == "depth" || input == "set_depth") {
 			int d = 3;
 			readInteger(d);
 			setDepth(d);
 		} else if (input == "exit" || input == "quit")
 			break;
-		else
-			continue;
+		else if (input == "list") {
+			auto moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+			for (auto &mv : moves)
+				std::cout << mv << std::endl;
+		} else if (input == "help") {
+			std::cout << "print_board (print for short) - prints out the current state of the board" << std::endl;
+			std::cout << "move (mv for short)           - makes a movement if valid. 'move' and 'mv' can be omitted" << std::endl;
+			std::cout << "set_depth (depth for short)   - specifies the search depth of the minimax algorithm. Used to adjust difficulty of the engine" << std::endl;
+			std::cout << "list                          - prints out a list of valid moves in the expected format" << std::endl;
+			std::cout << "undo                          - takes a movement from the stack. Accepts an integer as argument to specify the amount of moves to be taken" << std::endl;
+			std::cout << "restart                       - starts a new match with the standard board configuration" << std::endl;
+			std::cout << "help                          - prints out this message with information about valid commands" << std::endl;
+			std::cout << "exit (or quit)                - exits the game" << std::endl;
+		} else {
+			auto moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+			if (std::find(moves.begin(), moves.end(), input) != moves.end()) {
+				makeMove(input);
+				printBoard();
+			} else {
+				std::cout << "'" << input << "' is not a valid command." << std::endl;
+				// Flushing stdin
+				int ch;
+				while ((ch = std::cin.get()) != '\n' && ch != EOF);
+			}
+		}
 
 		if (bitboard.getKing(nWhite) == 0) {
-			std::cout << std::endl << "Game over! Black wins :)" << std::endl;
+			std::cout << std::endl << "Game over! Black wins" << std::endl;
 			break;
 		} else if (bitboard.getKing(nBlack) == 0) {
-			std::cout << std::endl << "Game over! White wins :)" << std::endl;
+			std::cout << std::endl << "Game over! White wins" << std::endl;
 			break;
 		}
 
@@ -123,12 +159,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 	auto pseudoLegal = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
 	bool found = std::find(pseudoLegal.begin(), pseudoLegal.end(), mv) != pseudoLegal.end();
 
-	enumColor otherPlayer;
-
-	if (toMove == nWhite)
-		otherPlayer = nBlack;
-	else
-		otherPlayer = nWhite;
+	enumColor otherPlayer = (toMove == nWhite) ? nBlack : nWhite;
 
 	if (!found)
 		std::cout << "Invalid move!" << std::endl;
@@ -136,7 +167,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		// Source square
 		std::string from = mv.substr(0, 2);
 		// Destination square
-		std::string to = mv.substr(2);
+		std::string to = mv.substr(2, 2);
 
 		// Iterators to the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
@@ -149,11 +180,9 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		// Type of the piece that is being moved
 		enumPiece pieceType = nPawn;
 
-		U64 *bb = bitboard.getBitBoards();
-
 		// It is assumed that the moving piece is a pawn. This loop checks verifies if it's true and if it isn't, it changes the piece type
 		for (int i = nPawn; i <= nKing; i++) {
-			U64 aux = bb[i] & bb[toMove];
+			U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(toMove);
 			if (aux.test(fromIdx)) {
 				pieceType = enumPiece(i);
 				break;
@@ -182,25 +211,39 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		}
 
 		// If a piece is being captured
-		if (bb[otherPlayer].test(toIdx)) {
+		if (bitboard.testBit(otherPlayer, toIdx)) {
 			for (int i = nPawn; i <= nKing; i++) {
-				U64 aux = bb[i] & bb[otherPlayer];
+				U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
 				if (aux.test(toIdx)) {
-					bb[i].reset(toIdx);
+					bitboard.resetBit(i, toIdx);
 					captureHistory.push(enumColor(i));
 					mv.insert(mv.find_first_of("12345678") + 1, "x");
 					break;
 				}
 			}
 			// Removes piece from the board
-			bb[otherPlayer].reset(toIdx);
+			bitboard.resetBit(otherPlayer, toIdx);
 		}
 
 		// Updates bitboards
-		bb[pieceType].reset(fromIdx);
-		bb[toMove].reset(fromIdx);
-		bb[pieceType].set(toIdx);
-		bb[toMove].set(toIdx);
+		bitboard.resetBit(pieceType, fromIdx);
+		bitboard.resetBit(toMove, fromIdx);
+		bitboard.setBit(pieceType, toIdx);
+		bitboard.setBit(toMove, toIdx);
+
+		// If is promotion
+		if (isalpha(mv.back()) && pieceType == nPawn) {
+			// Promote to queen by default
+			enumPiece promoteTo = nQueen;
+
+			if (mv.back() == 'n') promoteTo = nKnight;
+			else if (mv.back() == 'b') promoteTo = nBishop;
+			else if (mv.back() == 'r') promoteTo = nRook;
+
+			bitboard.setBit(promoteTo, toIdx);
+			bitboard.resetBit(pieceType, toIdx);
+		}
+
 
 		// Updates the bitboard that contains info about both players
 		bitboard.updateBitboard();
@@ -225,7 +268,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 /**
  * @details Removes the latest entry to the move history and updates the bitboards accordingly.
  */
-void Engine::unmakeMove() {
+void Engine::takeMove() {
 
 	if (!moveHistory.empty()) {
 
@@ -263,7 +306,7 @@ void Engine::unmakeMove() {
 
 		// Strings with the name of the squares used (source and destination)
 		std::string from = lastMove.substr(0, 2);
-		std::string to = lastMove.substr(2);
+		std::string to = lastMove.substr(2, 2);
 
 		// Iterators of the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
@@ -273,23 +316,33 @@ void Engine::unmakeMove() {
 		int fromIdx = std::distance(mapPositions.begin(), fromIt);
 		int toIdx = std::distance(mapPositions.begin(), toIt);
 
-		U64 *bb = bitboard.getBitBoards();
-
 		enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
 		// Updates bitboards
-		bb[pieceType].reset(toIdx);
-		bb[hasMoved].reset(toIdx);
-		bb[pieceType].set(fromIdx);
-		bb[hasMoved].set(fromIdx);
+		bitboard.resetBit(pieceType, toIdx);
+		bitboard.resetBit(hasMoved, toIdx);
+		bitboard.setBit(pieceType, fromIdx);
+		bitboard.setBit(hasMoved, fromIdx);
+
+		// If is promotion
+		if (isalpha(lastMove.back()) && pieceType == nPawn) {
+			// Promote to queen by default
+			enumPiece promoteTo = nQueen;
+
+			if (lastMove.back() == 'n') promoteTo = nKnight;
+			else if (lastMove.back() == 'b') promoteTo = nBishop;
+			else if (lastMove.back() == 'r') promoteTo = nRook;
+
+			bitboard.resetBit(promoteTo, toIdx);
+		}
 
 		// "Decaptures" a piece
 		if (captured) {
 			enumColor capturedPiece = captureHistory.top();
 			captureHistory.pop();
 
-			bb[toMove].set(toIdx);
-			bb[capturedPiece].set(toIdx);
+			bitboard.setBit(toMove, toIdx);
+			bitboard.setBit(capturedPiece, toIdx);
 		}
 
 		bitboard.updateBitboard();
@@ -304,19 +357,21 @@ void Engine::unmakeMove() {
 /**
  * @details Performs a recursive search on the moves tree using the minimax algorithm with alpha-beta pruning and returns the best move it has found
  */
-std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
+std::string Engine::getBestMove(int depth, enumColor color) {
 	std::string bestMove;
 	int nodesVisited = 0;
 
 	auto begin = std::chrono::steady_clock::now();
 
-	alphaBetaMax(board, intMin, intMax, depth, depth, color, nodesVisited, bestMove);
+	alphaBetaMax(intMin, intMax, depth, depth, color, nodesVisited, bestMove);
 
 	auto end = std::chrono::steady_clock::now();
 
-	std::cout << "Best move found: " << bestMove << std::endl;
-	std::cout << "Nodes visited: " << nodesVisited << std::endl;
-	std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
+	if (this->beVerbose) {
+		std::cout << "Best move found: " << bestMove << std::endl;
+		std::cout << "Nodes visited: " << nodesVisited << std::endl;
+		std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
+	}
 
 
 	return bestMove;
@@ -328,24 +383,24 @@ std::string Engine::getBestMove(U64 *board, int depth, enumColor color) {
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+int Engine::alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 	if (depthLeft == 0)
-		return evaluateBoard(board, color);
+		return evaluateBoard(bitboard.getBitBoards(), color);
 
-	auto allMoves = MoveGenerator::getPseudoLegalMoves(board, color);
+	auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
 
-	enumColor enemyColor = color == nWhite ? nBlack : nWhite;
+	enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
 	for (auto &currentMove : allMoves) {
 
 		nodesVisited++;
 
 		makeMove(currentMove, false);
-		int score = alphaBetaMin(board, alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
-		unmakeMove();
+		int score = alphaBetaMin(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
+		takeMove();
 
 		if (score >= beta)
 			return beta;
@@ -365,25 +420,25 @@ int Engine::alphaBetaMax(U64 *board, int alpha, int beta, int depth, int depthLe
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMin(U64 *board, int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+int Engine::alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 
 	if (depthLeft == 0)
-		return -evaluateBoard(board, color);
+		return -evaluateBoard(bitboard.getBitBoards(), color);
 
-	auto allMoves = MoveGenerator::getPseudoLegalMoves(board, color);
+	auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
 
-	enumColor enemyColor = color == nWhite ? nBlack : nWhite;
+	enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
 	for (auto &currentMove : allMoves) {
 
 		nodesVisited++;
 
 		makeMove(currentMove, false);
-		int score = alphaBetaMax(board, alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
-		unmakeMove();
+		int score = alphaBetaMax(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
+		takeMove();
 
 		if (score <= alpha)
 			return alpha;
