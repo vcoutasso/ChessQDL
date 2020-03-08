@@ -467,7 +467,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 				case nPawn:
 					pieceMoves = getPawnMoves(bitboardCopy, color);
 					promotions = getPawnPromotions(pieceMoves, fromPos);
-					if (promotions.size() > 0) {
+					if (!promotions.empty()) {
 						moves.insert(moves.end(), promotions.begin(), promotions.end());
 					}
 					break;
@@ -477,11 +477,11 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 					break;
 
 				case nBishop:
-					pieceMoves = getBishopMoves(bitboardCopy, color, nBishop);
+					pieceMoves = getBishopMoves(bitboardCopy, color);
 					break;
 
 				case nRook:
-					pieceMoves = getRookMoves(bitboardCopy, color, nRook);
+					pieceMoves = getRookMoves(bitboardCopy, color);
 					break;
 
 				case nQueen:

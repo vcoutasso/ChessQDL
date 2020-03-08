@@ -167,7 +167,7 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		// Source square
 		std::string from = mv.substr(0, 2);
 		// Destination square
-		std::string to = mv.substr(2, 4);
+		std::string to = mv.substr(2, 2);
 
 		// Iterators to the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
@@ -210,10 +210,29 @@ void Engine::makeMove(std::string mv, bool verbose) {
 				break;
 		}
 
+		// If a piece is being captured
+		if (bitboard.testBit(otherPlayer, toIdx)) {
+			for (int i = nPawn; i <= nKing; i++) {
+				U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
+				if (aux.test(toIdx)) {
+					bitboard.resetBit(i, toIdx);
+					captureHistory.push(enumColor(i));
+					mv.insert(mv.find_first_of("12345678") + 1, "x");
+					break;
+				}
+			}
+			// Removes piece from the board
+			bitboard.resetBit(otherPlayer, toIdx);
+		}
+
+		// Updates bitboards
+		bitboard.resetBit(pieceType, fromIdx);
+		bitboard.resetBit(toMove, fromIdx);
+		bitboard.setBit(pieceType, toIdx);
+		bitboard.setBit(toMove, toIdx);
+
 		// If is promotion
 		if (isalpha(mv.back()) && pieceType == nPawn) {
-			bitboard.resetBit(pieceType, fromIdx);
-
 			// Promote to queen by default
 			enumPiece promoteTo = nQueen;
 
@@ -222,28 +241,9 @@ void Engine::makeMove(std::string mv, bool verbose) {
 			else if (mv.back() == 'r') promoteTo = nRook;
 
 			bitboard.setBit(promoteTo, toIdx);
-		} else {
-			// If a piece is being captured
-			if (bitboard.testBit(otherPlayer, toIdx)) {
-				for (int i = nPawn; i <= nKing; i++) {
-					U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
-					if (aux.test(toIdx)) {
-						bitboard.resetBit(i, toIdx);
-						captureHistory.push(enumColor(i));
-						mv.insert(mv.find_first_of("12345678") + 1, "x");
-						break;
-					}
-				}
-				// Removes piece from the board
-				bitboard.resetBit(otherPlayer, toIdx);
-			}
-
-			// Updates bitboards
-			bitboard.resetBit(pieceType, fromIdx);
-			bitboard.resetBit(toMove, fromIdx);
-			bitboard.setBit(pieceType, toIdx);
-			bitboard.setBit(toMove, toIdx);
+			bitboard.resetBit(pieceType, toIdx);
 		}
+
 
 		// Updates the bitboard that contains info about both players
 		bitboard.updateBitboard();
@@ -306,7 +306,7 @@ void Engine::takeMove() {
 
 		// Strings with the name of the squares used (source and destination)
 		std::string from = lastMove.substr(0, 2);
-		std::string to = lastMove.substr(2, 4);
+		std::string to = lastMove.substr(2, 2);
 
 		// Iterators of the respective square name
 		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
@@ -318,10 +318,14 @@ void Engine::takeMove() {
 
 		enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
+		// Updates bitboards
+		bitboard.resetBit(pieceType, toIdx);
+		bitboard.resetBit(hasMoved, toIdx);
+		bitboard.setBit(pieceType, fromIdx);
+		bitboard.setBit(hasMoved, fromIdx);
+
 		// If is promotion
 		if (isalpha(lastMove.back()) && pieceType == nPawn) {
-			bitboard.setBit(pieceType, fromIdx);
-
 			// Promote to queen by default
 			enumPiece promoteTo = nQueen;
 
@@ -330,21 +334,15 @@ void Engine::takeMove() {
 			else if (lastMove.back() == 'r') promoteTo = nRook;
 
 			bitboard.resetBit(promoteTo, toIdx);
-		} else {
-			// Updates bitboards
-			bitboard.resetBit(pieceType, toIdx);
-			bitboard.resetBit(hasMoved, toIdx);
-			bitboard.setBit(pieceType, fromIdx);
-			bitboard.setBit(hasMoved, fromIdx);
+		}
 
-			// "Decaptures" a piece
-			if (captured) {
-				enumColor capturedPiece = captureHistory.top();
-				captureHistory.pop();
+		// "Decaptures" a piece
+		if (captured) {
+			enumColor capturedPiece = captureHistory.top();
+			captureHistory.pop();
 
-				bitboard.setBit(toMove, toIdx);
-				bitboard.setBit(capturedPiece, toIdx);
-			}
+			bitboard.setBit(toMove, toIdx);
+			bitboard.setBit(capturedPiece, toIdx);
 		}
 
 		bitboard.updateBitboard();

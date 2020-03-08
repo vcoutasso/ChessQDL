@@ -191,7 +191,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for bishops of a given color.
 		 */
-		static U64 getBishopMoves(const BitbArray &bitboard, enumColor color, enumPiece piece);
+		static U64 getBishopMoves(const BitbArray &bitboard, enumColor color, enumPiece piece = nBishop);
 
 
 		/**
@@ -200,7 +200,7 @@ namespace chessqdl {
 		 * @param color  color of desired piece
 		 * @return Bitboard with pseudo-legal moves for rooks of a given color.
 		 */
-		static U64 getRookMoves(const BitbArray &bitboard, enumColor color, enumPiece piece);
+		static U64 getRookMoves(const BitbArray &bitboard, enumColor color, enumPiece piece = nRook);
 
 
 		/**
