@@ -13,6 +13,13 @@ The engine was designed to allow for games of Player vs Engine and Player vs Pla
 
 ## Build instructions
 
+Clone the repository:
+
+```
+$ git clone https://github.com/vcoutasso/Chessqdl
+$ cd Chessqdl
+```
+
 Create the build directory:
 
 ```
