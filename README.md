@@ -15,34 +15,34 @@ The engine was designed to allow for games of Player vs Engine and Player vs Pla
 
 Clone the repository:
 
-```
+``` sh
 $ git clone https://github.com/vcoutasso/Chessqdl
 $ cd Chessqdl
 ```
 
 Create the build directory:
 
-```
+``` sh
 $ mkdir build
 $ cd build
 ```
 
 Build Release version:
 
-```
+``` sh
 $ cmake ..
 $ make
 ```
 
 Run ChessQDL:
 
-```
+``` sh
 $ ./bin/ChessQDL
 ```
 
 Build Debug version:
 
-```
+``` sh
 $ cmake -DCMAKE_BUILD_TYPE=Debug ..
 $ make
 ```
@@ -51,20 +51,20 @@ Note: Building in Debug mode will download Google Test from Github.
 
 Run tests (Debug version only):
 
-```
+``` sh
 $ ctest -V
 ```
 
 As an alternative to Unix Makefiles, other generators such as Ninja can be used:
 
-```
+``` sh
 $ cmake -G "Ninja" ..
 $ ninja
 ```
 
 Generate Doxygen files from code documentation:
 
-```
+``` sh
 $ cd docs
 $ doxygen
 ```
