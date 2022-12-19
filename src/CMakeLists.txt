@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.23)
 project(${CMAKE_PROJECT_NAME}_lib)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -8,7 +8,6 @@ set(SOURCE_FILES Engine/bitboard.cpp Engine/movegen.cpp
 
 set(HEADER_FILES Engine/bitboard.hpp Engine/const.hpp Engine/movegen.hpp
 		Engine/engine.hpp Engine/utils.hpp argparser.hpp)
-
 
 # The library contains header and source files.
 add_library(${PROJECT_NAME} STATIC

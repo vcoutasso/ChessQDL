@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.23)
+
 project(ChessQDL)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -8,6 +9,22 @@ set(SOURCE_FILES main.cpp)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+include(FetchContent)
+
+set(FETCHCONTENT_QUIET FALSE)
+
+fetchcontent_declare(
+        cxxopts
+        GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+        GIT_TAG v3.0.0
+        GIT_PROGRESS TRUE
+)
+
+if(NOT cxxopts_POPULATED)
+    fetchcontent_populate(cxxopts)
+    add_subdirectory(${cxxopts_SOURCE_DIR} ${cxxopts_BUILD_DIR})
+endif()
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
 
@@ -40,10 +57,11 @@ elseif (CMAKE_BUILD_TYPE MATCHES Release)
     message("CMake in Release mode")
 endif ()
 
-# Include external libraries
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE libs/cxxopts/include include)
+# Include libraries
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE include)
 
 # Link ChessQDL libraries
+target_link_libraries(${CMAKE_PROJECT_NAME} cxxopts)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib)
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
