@@ -12,7 +12,7 @@ run:
 	@ ./build/bin/$(PROJ_NAME)
 
 test:
-	@ ctest -V
+	@ cd build; ctest -V
 
 remake: clean all
 
