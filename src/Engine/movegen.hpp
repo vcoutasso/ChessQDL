@@ -3,6 +3,7 @@
 
 #include "bitboard.hpp"
 
+#include <cstdint>
 #include <vector>
 
 namespace chessqdl {

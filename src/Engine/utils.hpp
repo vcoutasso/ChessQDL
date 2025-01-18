@@ -1,6 +1,7 @@
 #ifndef CHESSQDL_UTILS_HPP
 #define CHESSQDL_UTILS_HPP
 
+#include <cstdint>
 #include "const.hpp"
 
 namespace chessqdl {
