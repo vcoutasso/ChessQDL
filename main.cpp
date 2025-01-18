@@ -10,15 +10,15 @@ int main(const int argc, char **argv) {
 	bool verbose;
 	bool pvp;
 	std::string fen;
+	std::optional<int> seed;
 
 	// Parse arguments and initialize variables
-	argumentParser(argc, argv, level, enginePieces, verbose, fen, pvp);
+	argumentParser(argc, argv, level, enginePieces, verbose, fen, pvp, seed);
 
 	// Construct engine
-	Engine engine(enginePieces, level, verbose, pvp);
-
-	if (!fen.empty())
-		engine = Engine(fen, enginePieces, level, verbose, pvp);
+	Engine engine = fen.empty()
+		                ? Engine(enginePieces, level, verbose, pvp, seed)
+		                : Engine(fen, enginePieces, level, verbose, pvp, seed);
 
 	// Call engine's parser to start interaction
 	engine.parser();

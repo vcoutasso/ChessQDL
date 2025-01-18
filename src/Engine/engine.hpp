@@ -4,6 +4,8 @@
 #include "bitboard.hpp"
 
 #include <stack>
+#include <random>
+#include <optional>
 
 namespace chessqdl {
     class Engine {
@@ -54,6 +56,11 @@ namespace chessqdl {
         bool pvp = false;
 
         /**
+         * @brief Random number generator
+         */
+        std::default_random_engine generator;
+
+        /**
          * @brief Prints the current state of the board to stdout. A terminal with Unicode support is recommended since the pieces are represented by Unicode symbols
          */
         void printBoard() const;
@@ -65,8 +72,9 @@ namespace chessqdl {
          * @param depth  maximum depth for tree traversal
          * @param v  sets whether the engine should be verbose
          * @param p  enable pvp mode
+         * @param seed  seed for the random number generator. If absent, use current time as seed
          */
-        Engine(enumColor color, int depth, bool v, bool p);
+        Engine(enumColor color, int depth, bool v, bool p, std::optional<int> seed);
 
 
         /**
@@ -76,8 +84,9 @@ namespace chessqdl {
          * @param depth  maximum depth for tree traversal
          * @param v  sets whether the engine should be verbose
          * @param p  enable pvp mode
+         * @param seed  seed for the random number generator. If absent, use current time as seed
          */
-        Engine(const std::string &fen, enumColor color, int depth, bool v, bool p);
+        Engine(const std::string &fen, enumColor color, int depth, bool v, bool p, std::optional<int> seed);
 
 
         /**

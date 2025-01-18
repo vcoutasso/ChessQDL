@@ -8,7 +8,7 @@
 using namespace chessqdl;
 
 
-inline void argumentParser(const int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose, std::string &fen, bool &pvp) {
+inline void argumentParser(const int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose, std::string &fen, bool &pvp, std::optional<int> &seed) {
 	cxxopts::Options options("ChessQDL", "Simple chess engine with a terminal interface");
 
 	options.add_options()
@@ -17,6 +17,7 @@ inline void argumentParser(const int argc, char **argv, int &level, enumColor &e
 			("v,verbose", "Be verbose")
 			("l,level", "Level of the engine. The higher the value, the higher the difficulty. Accepted values range from 1 to 10", cxxopts::value(level))
 			("f,fen", "FEN string that represents the initial state of the desired board", cxxopts::value(fen))
+			("s,seed", "Random number generator seed", cxxopts::value(seed))
 			("h,help", "Display this help and exit");
 
 	try {

@@ -13,12 +13,15 @@ using namespace chessqdl;
 /**
  * @details Starts a new standard game of chess with the engine as \p color pieces
  */
-Engine::Engine(const enumColor color, const int depth, const bool v, const bool p) {
+Engine::Engine(const enumColor color, const int depth, const bool v, const bool p, const std::optional<int> seed) {
 	bitboard = Bitboard();
 	pieceColor = color;
 	depthLevel = depth;
 	beVerbose = v;
 	pvp = p;
+	generator = !seed.has_value()
+		            ? std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count())
+		            : std::default_random_engine(seed.value());
 }
 
 
@@ -26,13 +29,16 @@ Engine::Engine(const enumColor color, const int depth, const bool v, const bool 
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
  * @fixme not all elements of the fen string are handled
  */
-Engine::Engine(const std::string &fen, const enumColor color, const int depth, const bool v, const bool p) {
+Engine::Engine(const std::string &fen, const enumColor color, const int depth, const bool v, const bool p, const std::optional<int> seed) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
 	toMove = (fen.substr(fen.find(' ') + 1, 1) == "w") ? nWhite : nBlack;
 	depthLevel = depth;
 	beVerbose = v;
 	pvp = p;
+	generator = !seed.has_value()
+		            ? std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count())
+		            : std::default_random_engine(seed.value());
 }
 
 
@@ -392,8 +398,7 @@ int Engine::alphaBetaMax(int alpha, const int beta, const int depth, const int d
 
 	auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
 
-	auto rng = std::default_random_engine{};
-	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
+	std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
 	const enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
@@ -432,8 +437,7 @@ int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int d
 
 	auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
 
-	auto rng = std::default_random_engine{};
-	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
+	std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
 	const enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
