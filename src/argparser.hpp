@@ -8,7 +8,7 @@
 using namespace chessqdl;
 
 
-void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose, std::string &fen, bool &pvp) {
+inline void argumentParser(const int argc, char **argv, int &level, enumColor &enginePieces, bool &verbose, std::string &fen, bool &pvp) {
 	cxxopts::Options options("ChessQDL", "Simple chess engine with a terminal interface");
 
 	options.add_options()
@@ -20,7 +20,7 @@ void argumentParser(int argc, char **argv, int &level, enumColor &enginePieces, 
 			("h,help", "Display this help and exit");
 
 	try {
-		auto args = options.parse(argc, argv);
+		const auto args = options.parse(argc, argv);
 
 		if (args.count("help")) {
 			std::cout << options.help();

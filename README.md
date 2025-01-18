@@ -47,7 +47,7 @@ $ cmake -DCMAKE_BUILD_TYPE=Debug ..
 $ make
 ```
 
-Note: Building in Debug mode will download Google Test from Github.
+Note: Building in Debug mode will download Google Test from GitHub.
 
 Run tests (Debug version only):
 

@@ -38,7 +38,7 @@ Bitboard::Bitboard() {
 /**
  * @details Constructor that uses a custom board, represented by the \p fen string.
  */
-Bitboard::Bitboard(std::string fen) {
+Bitboard::Bitboard(const std::string &fen) {
 	// Just to make sure that all bitboards start with value 0x0;
 	for (auto& b : bitBoards)
 		b.reset();
@@ -115,77 +115,77 @@ Bitboard::Bitboard(std::string fen) {
 /**
  * @details This method performs an AND operation between the bitboard containing all pawns and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getPawns(enumColor color) {
+U64 Bitboard::getPawns(const enumColor color) const {
 	return bitBoards[nPawn] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all knights and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getKnights(enumColor color) {
+U64 Bitboard::getKnights(const enumColor color) const {
 	return bitBoards[nKnight] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all bishops and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getBishops(enumColor color) {
+U64 Bitboard::getBishops(const enumColor color) const {
 	return bitBoards[nBishop] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all rooks and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getRooks(enumColor color) {
+U64 Bitboard::getRooks(const enumColor color) const {
 	return bitBoards[nRook] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all queens and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getQueens(enumColor color) {
+U64 Bitboard::getQueens(const enumColor color) const {
 	return bitBoards[nQueen] & bitBoards[color];
 }
 
 /**
  * @details This method performs an AND operation between the bitboard containing all kings and the bitboard containing all pieces of the desired color
  */
-U64 Bitboard::getKing(enumColor color) {
+U64 Bitboard::getKing(const enumColor color) const {
 	return bitBoards[nKing] & bitBoards[color];
 }
 
 /**
  * @details This method returns a bitboard containing all pieces that match the parameter color.
  */
-U64 Bitboard::getPieces(enumColor color) {
+U64 Bitboard::getPieces(const enumColor color) const {
 	return bitBoards[color];
 }
 
 /**
  * @details This method returns a bitboard containing all pieces that match the parameter type.
  */
-U64 Bitboard::getPieces(enumPiece type) {
+U64 Bitboard::getPieces(const enumPiece type) const {
 	return bitBoards[type];
 }
 
 /**
  * @details This method returns a bitboard containing all pieces at index \p i
  */
-U64 Bitboard::getPiecesAt(int i) {
+U64 Bitboard::getPiecesAt(const int i) const {
 	return bitBoards[i];
 }
 
 /**
- * @details This method performs and AND operation between all white and black pieces, resulting in a bitboard that contains all the pieces on the board.
+ * @details This method performs an AND operation between all white and black pieces, resulting in a bitboard that contains all the pieces on the board.
  */
-U64 Bitboard::getAllPieces() {
+U64 Bitboard::getAllPieces() const {
 	return bitBoards[nColor];
 }
 
 /**
  * @details Returns a copy of the std::array with the bitBoards attribute of the Bitboard class.
  */
-BitbArray Bitboard::getBitBoards() {
+BitboardArray Bitboard::getBitBoards() const {
 	return bitBoards;
 }
 
@@ -199,77 +199,77 @@ void Bitboard::updateBitboard() {
 /**
  * @details Resets the bit of index \p idx of the bitboard \p color
  */
-void Bitboard::resetBit(enumColor color, int idx) {
+void Bitboard::resetBit(const enumColor color, const int idx) {
 	bitBoards[color].reset(idx);
 }
 
 /**
  * @details Resets the bit of index \p idx of the bitboard \p piece
  */
-void Bitboard::resetBit(enumPiece piece, int idx) {
+void Bitboard::resetBit(const enumPiece piece, const int idx) {
 	bitBoards[piece].reset(idx);
 }
 
 /**
  * @details Resets the bit of index \p idx of the bitboard \p i
  */
-void Bitboard::resetBit(int i, int idx) {
+void Bitboard::resetBit(const int i, const int idx) {
 	bitBoards[i].reset(idx);
 }
 
 /**
  * @details Sets the bit of index \p idx of the bitboard \p color
  */
-void Bitboard::setBit(enumColor color, int idx) {
+void Bitboard::setBit(const enumColor color, const int idx) {
 	bitBoards[color].set(idx);
 }
 
 /**
  * @details Sets the bit of index \p idx of the bitboard \p piece
  */
-void Bitboard::setBit(enumPiece piece, int idx) {
+void Bitboard::setBit(const enumPiece piece, const int idx) {
 	bitBoards[piece].set(idx);
 }
 
 /**
  * @details Sets the bit of index \p idx of the bitboard \p i
  */
-void Bitboard::setBit(int i, int idx) {
+void Bitboard::setBit(const int i, const int idx) {
 	bitBoards[i].set(idx);
 }
 
 /**
  * @details Tests the bit of index \p idx of the bitboard \p color
  */
-bool Bitboard::testBit(enumColor color, int idx) {
+bool Bitboard::testBit(const enumColor color, const int idx) const {
 	return bitBoards[color].test(idx);
 }
 
 /**
  * @details Tests the bit of index \p idx of the bitboard \p piece
  */
-bool Bitboard::testBit(enumPiece piece, int idx) {
+bool Bitboard::testBit(const enumPiece piece, const int idx) const {
 	return bitBoards[piece].test(idx);
 }
 
 /**
  * @details Tests the bit of index \p idx of the bitboard \p i
  */
-bool Bitboard::testBit(int i, int idx) {
+bool Bitboard::testBit(const int i, const int idx) const {
 	return bitBoards[i].test(idx);
 }
 
 /**
  * @details Converts the board from bitboards to a fancy string and prints it to stdout.
  */
-void Bitboard::printBoard() {
+void Bitboard::printBoard() const {
 	std::vector<std::string> board;
 
 	std::string aux;
 	long unsigned int i;
 
 	for (i = 0; i < 64ul; i++)
-		board.push_back("-");
+		board.emplace_back("-");
 
 	for (i = 0; i < 64ul; i++) {
 		if (bitBoards[nPawn].test(i)) {
@@ -328,7 +328,7 @@ void Bitboard::printBoard() {
 	for (i = 0; i < 64; i += 8) {
 		std::cout << "\033[1;33m" << (64 - i) / 8 << "  \033[0m";
 
-		for (int j = int(i + 7); j >= int(i); j--)
+		for (int j = static_cast<int>(i + 7); j >= static_cast<int>(i); j--)
 			std::cout << board[63 - j] << " ";
 
 		std::cout << std::endl;

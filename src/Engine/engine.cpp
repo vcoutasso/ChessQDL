@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "utils.hpp"
+#include "movegen.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -12,7 +13,7 @@ using namespace chessqdl;
 /**
  * @details Starts a new standard game of chess with the engine as \p color pieces
  */
-Engine::Engine(enumColor color, int depth, bool v, bool p) {
+Engine::Engine(const enumColor color, const int depth, const bool v, const bool p) {
 	bitboard = Bitboard();
 	pieceColor = color;
 	depthLevel = depth;
@@ -25,7 +26,7 @@ Engine::Engine(enumColor color, int depth, bool v, bool p) {
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
  * @fixme not all elements of the fen string are handled
  */
-Engine::Engine(std::string fen, enumColor color, int depth, bool v, bool p) {
+Engine::Engine(const std::string &fen, const enumColor color, const int depth, const bool v, const bool p) {
 	bitboard = Bitboard(fen);
 	pieceColor = color;
 	toMove = (fen.substr(fen.find(' ') + 1, 1) == "w") ? nWhite : nBlack;
@@ -38,7 +39,7 @@ Engine::Engine(std::string fen, enumColor color, int depth, bool v, bool p) {
 /**
  * @details Prints the current start of the board to stdout
  */
-void Engine::printBoard() {
+void Engine::printBoard() const {
 	bitboard.printBoard();
 }
 
@@ -46,7 +47,7 @@ void Engine::printBoard() {
 /**
  * @details Returns Engine::toMove
  */
-enumColor Engine::getToMove() {
+enumColor Engine::getToMove() const {
 	return toMove;
 }
 
@@ -54,7 +55,7 @@ enumColor Engine::getToMove() {
 /**
  * @details Sets the new max traversal depth of the moves tree to \p nana
  */
-void Engine::setDepth(int n) {
+void Engine::setDepth(const int n) {
 	if (n > 0) {
 		std::cout << "New max search depth: " << n << std::endl;
 		depthLevel = n;
@@ -64,7 +65,7 @@ void Engine::setDepth(int n) {
 
 /**
  * @details Main interface to the engine. Allows the player to interact with the engine with the options: <br>
- * <b> print </b> calls Engine::printBoard() and prints the current state of the board to stdout using unicode symbols <br>
+ * <b> print </b> calls Engine::printBoard() and prints the current state of the board to stdout using Unicode symbols <br>
  * <b> move </b> or <b> mv </b> expects a string after the keyword with the move to be made. The move will only be made if a) it's your turn to move the desired pieces and b) the move is valid <br>
  * <b> undo </b> takes back the latest move made. Can take an argument after the keyword to specify the amount of moves to be unmade <br>
  * <b> depth </b> or <b> set_depth </b> specifies the new maximum search depth of the algorithm. The higher the maximum depth, the higher the difficulty of the engine <br>
@@ -155,39 +156,38 @@ void Engine::parser() {
 /**
  * @brief Moves a piece from a square to another and updates the bitboards, the move history and the capture history when necessary
  * @param mv  the move to be made
- * @param verbose  whether or not to print the move made (in algebraic notation) to stdout. This flag is used so that the engine won't flood stdout with all the moves it has made while searching for
+ * @param verbose  whether to print the move made (in algebraic notation) to stdout. This flag is used so that the engine won't flood stdout with all the moves it has made while searching for
  * the optimal one
  */
 void Engine::makeMove(std::string mv, bool verbose) {
 	auto pseudoLegal = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
-	bool found = std::find(pseudoLegal.begin(), pseudoLegal.end(), mv) != pseudoLegal.end();
+	const bool found = std::find(pseudoLegal.begin(), pseudoLegal.end(), mv) != pseudoLegal.end();
 
-	enumColor otherPlayer = (toMove == nWhite) ? nBlack : nWhite;
+	const enumColor otherPlayer = (toMove == nWhite) ? nBlack : nWhite;
 
 	if (!found)
 		std::cout << "Invalid move!" << std::endl;
 	else {
 		// Source square
-		std::string from = mv.substr(0, 2);
+		const std::string from = mv.substr(0, 2);
 		// Destination square
-		std::string to = mv.substr(2, 2);
+		const std::string to = mv.substr(2, 2);
 
 		// Iterators to the respective square name
-		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
-		auto toIt = std::find(mapPositions.begin(), mapPositions.end(), to);
+		const auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
+		const auto toIt = std::find(mapPositions.begin(), mapPositions.end(), to);
 
 		// Index of the respective square
-		int fromIdx = std::distance(mapPositions.begin(), fromIt);
-		int toIdx = std::distance(mapPositions.begin(), toIt);
+		const int fromIdx = static_cast<int>(std::distance(mapPositions.begin(), fromIt));
+		const int toIdx = static_cast<int>(std::distance(mapPositions.begin(), toIt));
 
 		// Type of the piece that is being moved
 		enumPiece pieceType = nPawn;
 
 		// It is assumed that the moving piece is a pawn. This loop checks verifies if it's true and if it isn't, it changes the piece type
 		for (int i = nPawn; i <= nKing; i++) {
-			U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(toMove);
-			if (aux.test(fromIdx)) {
-				pieceType = enumPiece(i);
+			if (U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(toMove); aux.test(fromIdx)) {
+				pieceType = static_cast<enumPiece>(i);
 				break;
 			}
 		}
@@ -216,10 +216,9 @@ void Engine::makeMove(std::string mv, bool verbose) {
 		// If a piece is being captured
 		if (bitboard.testBit(otherPlayer, toIdx)) {
 			for (int i = nPawn; i <= nKing; i++) {
-				U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer);
-				if (aux.test(toIdx)) {
+				if (U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer); aux.test(toIdx)) {
 					bitboard.resetBit(i, toIdx);
-					captureHistory.push(enumColor(i));
+					captureHistory.push(static_cast<enumColor>(i));
 					mv.insert(mv.find_first_of("12345678") + 1, "x");
 					break;
 				}
@@ -278,8 +277,8 @@ void Engine::takeMove() {
 		std::string lastMove = moveHistory.top();
 		moveHistory.pop();
 
-		if (lastMove.find(" ") != std::string::npos) {
-			lastMove = lastMove.substr(lastMove.find(" ") + 1);
+		if (lastMove.find(' ') != std::string::npos) {
+			lastMove = lastMove.substr(lastMove.find(' ') + 1);
 		}
 
 		enumPiece pieceType = nPawn;
@@ -302,24 +301,24 @@ void Engine::takeMove() {
 		}
 
 		// If a piece was captured, it has to be placed back in the board
-		if (lastMove.find("x") != std::string::npos) {
+		if (lastMove.find('x') != std::string::npos) {
 			captured = true;
-			lastMove.erase(lastMove.find("x"), 1);
+			lastMove.erase(lastMove.find('x'), 1);
 		}
 
 		// Strings with the name of the squares used (source and destination)
-		std::string from = lastMove.substr(0, 2);
-		std::string to = lastMove.substr(2, 2);
+		const std::string from = lastMove.substr(0, 2);
+		const std::string to = lastMove.substr(2, 2);
 
 		// Iterators of the respective square name
-		auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
-		auto toIt = std::find(mapPositions.begin(), mapPositions.end(), to);
+		const auto fromIt = std::find(mapPositions.begin(), mapPositions.end(), from);
+		const auto toIt = std::find(mapPositions.begin(), mapPositions.end(), to);
 
 		// Indexes of the respective square name
-		int fromIdx = std::distance(mapPositions.begin(), fromIt);
-		int toIdx = std::distance(mapPositions.begin(), toIt);
+		const int fromIdx = static_cast<int>(std::distance(mapPositions.begin(), fromIt));
+		const int toIdx = static_cast<int>(std::distance(mapPositions.begin(), toIt));
 
-		enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
+		const enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
 		// Updates bitboards
 		bitboard.resetBit(pieceType, toIdx);
@@ -339,9 +338,9 @@ void Engine::takeMove() {
 			bitboard.resetBit(promoteTo, toIdx);
 		}
 
-		// "Decaptures" a piece
+		// "De-captures" a piece
 		if (captured) {
-			enumColor capturedPiece = captureHistory.top();
+			const enumColor capturedPiece = captureHistory.top();
 			captureHistory.pop();
 
 			bitboard.setBit(toMove, toIdx);
@@ -386,7 +385,8 @@ std::string Engine::getBestMove(int depth, enumColor color) {
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+// NOLINTBEGIN(misc-no-recursion)
+int Engine::alphaBetaMax(int alpha, const int beta, const int depth, const int depthLeft, const enumColor color, int &nodesVisited, std::string &bestMove) {
 	if (depthLeft == 0)
 		return evaluateBoard(bitboard.getBitBoards(), color);
 
@@ -395,14 +395,14 @@ int Engine::alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColo
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
 
-	enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
+	const enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
-	for (auto &currentMove : allMoves) {
+	for (const auto &currentMove : allMoves) {
 
 		nodesVisited++;
 
 		makeMove(currentMove, false);
-		int score = alphaBetaMin(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
+		const int score = alphaBetaMin(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
 		takeMove();
 
 		if (score >= beta)
@@ -416,6 +416,7 @@ int Engine::alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColo
 	}
 	return alpha;
 }
+// NOLINTEND(misc-no-recursion)
 
 
 /**
@@ -423,7 +424,8 @@ int Engine::alphaBetaMax(int alpha, int beta, int depth, int depthLeft, enumColo
  * @ref https://en.wikipedia.org/wiki/Minimax <br>
  * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
  */
-int Engine::alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
+// NOLINTBEGIN(misc-no-recursion)
+int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int depthLeft, enumColor color, int &nodesVisited, std::string &bestMove) {
 
 	if (depthLeft == 0)
 		return -evaluateBoard(bitboard.getBitBoards(), color);
@@ -433,14 +435,14 @@ int Engine::alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColo
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(allMoves), std::end(allMoves), rng);
 
-	enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
+	const enumColor enemyColor = (color == nWhite) ? nBlack : nWhite;
 
 	for (auto &currentMove : allMoves) {
 
 		nodesVisited++;
 
 		makeMove(currentMove, false);
-		int score = alphaBetaMax(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
+		const int score = alphaBetaMax(alpha, beta, depth, depthLeft - 1, enemyColor, nodesVisited, bestMove);
 		takeMove();
 
 		if (score <= alpha)
@@ -452,3 +454,4 @@ int Engine::alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColo
 	}
 	return beta;
 }
+// NOLINTEND(misc-no-recursion)

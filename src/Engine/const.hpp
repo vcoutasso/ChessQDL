@@ -15,15 +15,15 @@ namespace chessqdl {
 	typedef std::bitset<64> U64;
 
 	/**
-	 * @brief An std::array to comport all different bitboards that will be used throughout the project
+	 * @brief A std::array to comport all different bitboards that will be used throughout the project
 	 */
-	typedef std::array<U64, 9> BitbArray;
+	typedef std::array<U64, 9> BitboardArray;
 
 	/**
 	 * @brief Constants representing the board with all bits set except for A or H file
 	 */
-	const U64 notAFile = 0xfefefefefefefefe;
-	const U64 notHFile = 0x7f7f7f7f7f7f7f7f;
+	constexpr U64 notAFile = 0xfefefefefefefefe;
+	constexpr U64 notHFile = 0x7f7f7f7f7f7f7f7f;
 
 	/**
 	 * @brief Bitboard array indexing by color
@@ -95,8 +95,8 @@ namespace chessqdl {
 												   "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
 												   "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"};
 
-	const int intMin = std::numeric_limits<int>::min();
-	const int intMax = std::numeric_limits<int>::max();
+	constexpr int intMin = std::numeric_limits<int>::min();
+	constexpr int intMax = std::numeric_limits<int>::max();
 
 }
 

@@ -1,8 +1,5 @@
 #include "movegen.hpp"
-#include "bitboard.hpp"
 #include "utils.hpp"
-
-#include <cmath>
 
 
 using namespace chessqdl;
@@ -14,7 +11,7 @@ using namespace chessqdl;
  * 0 1 0 -> 0 0 0
  * 0 0 0	0 0 0
  */
-U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
+U64 MoveGenerator::shiftNorthWest(const U64 bitboard) {
 	return (bitboard << noWe) & notHFile;
 }
 
@@ -25,7 +22,7 @@ U64 MoveGenerator::shiftNorthWest(U64 bitboard) {
  * 0 1 0 -> 0 0 0
  * 0 0 0	0 0 0
  */
-U64 MoveGenerator::shiftNorth(U64 bitboard) {
+U64 MoveGenerator::shiftNorth(const U64 bitboard) {
 	return bitboard << nort;
 }
 
@@ -36,7 +33,7 @@ U64 MoveGenerator::shiftNorth(U64 bitboard) {
  * 0 1 0 -> 0 0 0
  * 0 0 0	0 0 0
  */
-U64 MoveGenerator::shiftNorthEast(U64 bitboard) {
+U64 MoveGenerator::shiftNorthEast(const U64 bitboard) {
 	return (bitboard << noEa) & notAFile;
 }
 
@@ -47,7 +44,7 @@ U64 MoveGenerator::shiftNorthEast(U64 bitboard) {
  * 0 1 0 -> 0 0 1
  * 0 0 0	0 0 0
  */
-U64 MoveGenerator::shiftEast(U64 bitboard) {
+U64 MoveGenerator::shiftEast(const U64 bitboard) {
 	return (bitboard << east) & notAFile;
 }
 
@@ -58,7 +55,7 @@ U64 MoveGenerator::shiftEast(U64 bitboard) {
  * 0 1 0 -> 0 0 0
  * 0 0 0	0 0 1
  */
-U64 MoveGenerator::shiftSouthEast(U64 bitboard) {
+U64 MoveGenerator::shiftSouthEast(const U64 bitboard) {
 	return (bitboard >> -soEa) & notAFile;
 }
 
@@ -69,7 +66,7 @@ U64 MoveGenerator::shiftSouthEast(U64 bitboard) {
  * 0 1 0 -> 0 0 0
  * 0 0 0	0 1 0
  */
-U64 MoveGenerator::shiftSouth(U64 bitboard) {
+U64 MoveGenerator::shiftSouth(const U64 bitboard) {
 	return bitboard >> -sout;
 }
 
@@ -80,7 +77,7 @@ U64 MoveGenerator::shiftSouth(U64 bitboard) {
  * 0 1 0 -> 0 0 0
  * 0 0 0	1 0 0
  */
-U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
+U64 MoveGenerator::shiftSouthWest(const U64 bitboard) {
 	return (bitboard >> -soWe) & notHFile;
 }
 
@@ -91,7 +88,7 @@ U64 MoveGenerator::shiftSouthWest(U64 bitboard) {
  * 0 1 0 -> 1 0 0
  * 0 0 0	0 0 0
  */
-U64 MoveGenerator::shiftWest(U64 bitboard) {
+U64 MoveGenerator::shiftWest(const U64 bitboard) {
 	return (bitboard >> -west) & notHFile;
 }
 
@@ -100,13 +97,13 @@ U64 MoveGenerator::shiftWest(U64 bitboard) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::soutOccl(U64 gen, U64 pro) {
-	gen |= pro & (gen >> 8);
-	pro &= (pro >> 8);
-	gen |= pro & (gen >> 16);
-	pro &= (pro >> 16);
-	gen |= pro & (gen >> 32);
-	return gen;
+U64 MoveGenerator::soutOccl(U64 generator, U64 propagator) {
+	generator |= propagator & (generator >> 8);
+	propagator &= (propagator >> 8);
+	generator |= propagator & (generator >> 16);
+	propagator &= (propagator >> 16);
+	generator |= propagator & (generator >> 32);
+	return generator;
 }
 
 
@@ -114,13 +111,13 @@ U64 MoveGenerator::soutOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::nortOccl(U64 gen, U64 pro) {
-	gen |= pro & (gen << 8);
-	pro &= (pro << 8);
-	gen |= pro & (gen << 16);
-	pro &= (pro << 16);
-	gen |= pro & (gen << 32);
-	return gen;
+U64 MoveGenerator::nortOccl(U64 generator, U64 propagator) {
+	generator |= propagator & (generator << 8);
+	propagator &= (propagator << 8);
+	generator |= propagator & (generator << 16);
+	propagator &= (propagator << 16);
+	generator |= propagator & (generator << 32);
+	return generator;
 }
 
 
@@ -128,14 +125,14 @@ U64 MoveGenerator::nortOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::eastOccl(U64 gen, U64 pro) {
-	pro &= notAFile;
-	gen |= pro & (gen << 1);
-	pro &= (pro << 1);
-	gen |= pro & (gen << 2);
-	pro &= (pro << 2);
-	gen |= pro & (gen << 4);
-	return gen;
+U64 MoveGenerator::eastOccl(U64 generator, U64 propagator) {
+	propagator &= notAFile;
+	generator |= propagator & (generator << 1);
+	propagator &= (propagator << 1);
+	generator |= propagator & (generator << 2);
+	propagator &= (propagator << 2);
+	generator |= propagator & (generator << 4);
+	return generator;
 }
 
 
@@ -143,14 +140,14 @@ U64 MoveGenerator::eastOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::noEaOccl(U64 gen, U64 pro) {
-	pro &= notAFile;
-	gen |= pro & (gen << 9);
-	pro &= (pro << 9);
-	gen |= pro & (gen << 18);
-	pro &= (pro << 18);
-	gen |= pro & (gen << 36);
-	return gen;
+U64 MoveGenerator::noEaOccl(U64 generator, U64 propagator) {
+	propagator &= notAFile;
+	generator |= propagator & (generator << 9);
+	propagator &= (propagator << 9);
+	generator |= propagator & (generator << 18);
+	propagator &= (propagator << 18);
+	generator |= propagator & (generator << 36);
+	return generator;
 }
 
 
@@ -158,14 +155,14 @@ U64 MoveGenerator::noEaOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::soEaOccl(U64 gen, U64 pro) {
-	pro &= notAFile;
-	gen |= pro & (gen >> 7);
-	pro &= (pro >> 7);
-	gen |= pro & (gen >> 14);
-	pro &= (pro >> 14);
-	gen |= pro & (gen >> 28);
-	return gen;
+U64 MoveGenerator::soEaOccl(U64 generator, U64 propagator) {
+	propagator &= notAFile;
+	generator |= propagator & (generator >> 7);
+	propagator &= (propagator >> 7);
+	generator |= propagator & (generator >> 14);
+	propagator &= (propagator >> 14);
+	generator |= propagator & (generator >> 28);
+	return generator;
 }
 
 
@@ -173,14 +170,14 @@ U64 MoveGenerator::soEaOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::westOccl(U64 gen, U64 pro) {
-	pro &= notHFile;
-	gen |= pro & (gen >> 1);
-	pro &= (pro >> 1);
-	gen |= pro & (gen >> 2);
-	pro &= (pro >> 2);
-	gen |= pro & (gen >> 4);
-	return gen;
+U64 MoveGenerator::westOccl(U64 generator, U64 propagator) {
+	propagator &= notHFile;
+	generator |= propagator & (generator >> 1);
+	propagator &= (propagator >> 1);
+	generator |= propagator & (generator >> 2);
+	propagator &= (propagator >> 2);
+	generator |= propagator & (generator >> 4);
+	return generator;
 }
 
 
@@ -188,14 +185,14 @@ U64 MoveGenerator::westOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::soWeOccl(U64 gen, U64 pro) {
-	pro &= notHFile;
-	gen |= pro & (gen >> 9);
-	pro &= (pro >> 9);
-	gen |= pro & (gen >> 18);
-	pro &= (pro >> 18);
-	gen |= pro & (gen >> 36);
-	return gen;
+U64 MoveGenerator::soWeOccl(U64 generator, U64 propagator) {
+	propagator &= notHFile;
+	generator |= propagator & (generator >> 9);
+	propagator &= (propagator >> 9);
+	generator |= propagator & (generator >> 18);
+	propagator &= (propagator >> 18);
+	generator |= propagator & (generator >> 36);
+	return generator;
 }
 
 
@@ -203,26 +200,27 @@ U64 MoveGenerator::soWeOccl(U64 gen, U64 pro) {
  * @details The following private methods are part of the Kogge-Stone algorithm for sliding pieces move generation
  * @ref https://www.chessprogramming.org/Kogge-Stone_Algorithm
  */
-U64 MoveGenerator::noWeOccl(U64 gen, U64 pro) {
-	pro &= notHFile;
-	gen |= pro & (gen << 7);
-	pro &= (pro << 7);
-	gen |= pro & (gen << 14);
-	pro &= (pro << 14);
-	gen |= pro & (gen << 28);
-	return gen;
+U64 MoveGenerator::noWeOccl(U64 generator, U64 propagator) {
+	propagator &= notHFile;
+	generator |= propagator & (generator << 7);
+	propagator &= (propagator << 7);
+	generator |= propagator & (generator << 14);
+	propagator &= (propagator << 14);
+	generator |= propagator & (generator << 28);
+	return generator;
 }
 
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  */
-U64 MoveGenerator::getPawnMoves(const BitbArray &bitboard, enumColor color) {
+// NOLINTBEGIN(misc-no-recursion)
+U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor color) {
 	if (color == nWhite) {
-		U64 pawns = bitboard[nPawn] & bitboard[nWhite];        // every white pawn on the board
+		const U64 pawns = bitboard[nPawn] & bitboard[nWhite];        // every white pawn on the board
 
 		U64 attacks = shiftNorthEast(pawns) | shiftNorthWest(pawns);                // theoretical possible attacks
-		attacks &= bitboard[nBlack];                                    // real possible attacks (it's only possible to attack if there is a enemy piece)
+		attacks &= bitboard[nBlack];                                    // real possible attacks (it's only possible to attack if there is an enemy piece)
 
 		U64 moves = shiftNorth(pawns);
 		moves &= ~bitboard[nColor];                                    // can't move if there is a piece blocking the way
@@ -239,7 +237,7 @@ U64 MoveGenerator::getPawnMoves(const BitbArray &bitboard, enumColor color) {
 		return attacks | moves;														// pseudo-legal moves (capture and move)
 
 	} else if (color == nBlack) {
-		U64 pawns = bitboard[nPawn] & bitboard[nBlack];
+		const U64 pawns = bitboard[nPawn] & bitboard[nBlack];
 
 		U64 attacks = shiftSouthWest(pawns) | shiftSouthEast(pawns);
 		attacks &= bitboard[nWhite];
@@ -256,23 +254,23 @@ U64 MoveGenerator::getPawnMoves(const BitbArray &bitboard, enumColor color) {
 		moves |= shiftSouth(aux);
 		moves &= ~bitboard[nColor];
 
-
 		return attacks | moves;
 	}
 	else
 		return getPawnMoves(bitboard, nBlack) | getPawnMoves(bitboard, nWhite);
 }
+// NOLINTEND(misc-no-recursion)
 
 
 /**
  * @details Returns a bitboard with all pseudo-legal moves for a given king. "Moves" the king in every direction and checks for collisions. Return the moves that do not collide with pieces of the same color.
  * @todo Implement castle as a pseudo-legal move?
  */
-U64 MoveGenerator::getKingMoves(const BitbArray &bitboard, enumColor color) {
-	U64 king = bitboard[nKing] & bitboard[color];
+U64 MoveGenerator::getKingMoves(const BitboardArray &bitboard, const enumColor color) {
+	const U64 king = bitboard[nKing] & bitboard[color];
 
-	U64 moves = shiftNorth(king) | shiftNorthEast(king) | shiftEast(king) | shiftSouthEast(king) | shiftSouth(king) | shiftSouthWest(king) | shiftWest(king) | shiftNorthWest(king);
-	U64 validSquares = ~bitboard[color];
+	const U64 moves = shiftNorth(king) | shiftNorthEast(king) | shiftEast(king) | shiftSouthEast(king) | shiftSouth(king) | shiftSouthWest(king) | shiftWest(king) | shiftNorthWest(king);
+	const U64 validSquares = ~bitboard[color];
 
 	return moves & validSquares;
 }
@@ -282,48 +280,52 @@ U64 MoveGenerator::getKingMoves(const BitbArray &bitboard, enumColor color) {
  * @details Returns a bitboard with all pseudo-legal moves for knights of a given color.
  * Every possible theoretical move is accounted for, but only the ones that do not collide with allied pieces are returned.
  */
-U64 MoveGenerator::getKnightMoves(const BitbArray &bitboard, chessqdl::enumColor color) {
-	U64 knights = bitboard[nKnight] & bitboard[color];
+// NOLINTBEGIN(misc-no-recursion)
+U64 MoveGenerator::getKnightMoves(const BitboardArray &bitboard, const enumColor color) {
+	const U64 knights = bitboard[nKnight] & bitboard[color];
 
 	if (color == nColor)
 		return getKnightMoves(bitboard, nBlack) | getKnightMoves(bitboard, nWhite);
 
-	U64 WWN = shiftNorthWest(shiftWest(knights));            // west west north
-	U64 WNN = shiftNorthWest(shiftNorth(knights));            // west north north
-	U64 ENN = shiftNorthEast(shiftNorth(knights));        // east north north
-	U64 EEN = shiftNorthEast(shiftEast(knights));            // east east north
+	const U64 WWN = shiftNorthWest(shiftWest(knights));            // west-west-north
+	const U64 WNN = shiftNorthWest(shiftNorth(knights));            // west-north-north
+	const U64 ENN = shiftNorthEast(shiftNorth(knights));        // east-north-north
+	const U64 EEN = shiftNorthEast(shiftEast(knights));            // east-east-north
 
-	U64 EES = shiftSouthEast(shiftEast(knights));			// east east south
-	U64 ESS = shiftSouthEast(shiftSouth(knights));			// east south south
-	U64 WSS = shiftSouthWest(shiftSouth(knights));		    // west south south
-	U64 WWS = shiftSouthWest(shiftWest(knights));			// west west south
+	const U64 EES = shiftSouthEast(shiftEast(knights));			// east-east-south
+	const U64 ESS = shiftSouthEast(shiftSouth(knights));			// east-south-south
+	const U64 WSS = shiftSouthWest(shiftSouth(knights));		    // west-south-south
+	const U64 WWS = shiftSouthWest(shiftWest(knights));			// west-west-south
 
-	U64 moves =  WWN | WNN | ENN | EEN | EES | ESS | WSS | WWS;
+	const U64 moves =  WWN | WNN | ENN | EEN | EES | ESS | WSS | WWS;
 
-    U64 notAlly = ~bitboard[color];
+    const U64 notAlly = ~bitboard[color];
 
-    return moves & notAlly;								// moves and every square that doesn't contain an piece of the same color
+    return moves & notAlly;								// moves and every square that doesn't contain a piece of the same color
 }
+
+// NOLINTEND(misc-no-recursion)
 
 /**
  * @details Gets occluded fills for every direction for the possible moves (excludes blockers). For the attacks, the occluded fills need to be shifted one further.
  */
-U64 MoveGenerator::getBishopMoves(const BitbArray &bitboard, enumColor color, enumPiece piece) {
-	U64 bishops = bitboard[piece] & bitboard[color];
-	U64 empty = ~bitboard[nColor];
+// NOLINTBEGIN(misc-no-recursion)
+U64 MoveGenerator::getBishopMoves(const BitboardArray &bitboard, const enumColor color, const enumPiece piece) {
+	const U64 bishops = bitboard[piece] & bitboard[color];
+	const U64 empty = ~bitboard[nColor];
 
 	if (color == nColor)
 		return getBishopMoves(bitboard, nWhite, piece) | getBishopMoves(bitboard, nBlack, piece);
 
-	U64 noEaOcc = noEaOccl(bishops, empty);
-	U64 soEaOcc = soEaOccl(bishops, empty);
-	U64 noWeOcc = noWeOccl(bishops, empty);
-	U64 soWeOcc = soWeOccl(bishops, empty);
+	const U64 noEaOcc = noEaOccl(bishops, empty);
+	const U64 soEaOcc = soEaOccl(bishops, empty);
+	const U64 noWeOcc = noWeOccl(bishops, empty);
+	const U64 soWeOcc = soWeOccl(bishops, empty);
 
-	U64 noEaAttacks = shiftNorthEast(noEaOcc);
-	U64 soEaAttacks = shiftSouthEast(soEaOcc);
-	U64 noWeAttacks = shiftNorthWest(noWeOcc);
-	U64 soWeAttacks = shiftSouthWest(soWeOcc);
+	const U64 noEaAttacks = shiftNorthEast(noEaOcc);
+	const U64 soEaAttacks = shiftSouthEast(soEaOcc);
+	const U64 noWeAttacks = shiftNorthWest(noWeOcc);
+	const U64 soWeAttacks = shiftSouthWest(soWeOcc);
 
 	U64 attacks = noEaAttacks | soEaAttacks | noWeAttacks | soWeAttacks;
 	attacks &= ~bitboard[color]; // Attacks are only valid if the piece is an enemy piece
@@ -332,27 +334,28 @@ U64 MoveGenerator::getBishopMoves(const BitbArray &bitboard, enumColor color, en
 
 	return moves | attacks;
 }
-
+// NOLINTEND(misc-no-recursion)
 
 /**
  * @details Gets occluded fills for every direction for the possible moves (excludes blockers). For the attacks, the occluded fills need to be shifted one further.
  */
-U64 MoveGenerator::getRookMoves(const BitbArray &bitboard, enumColor color, enumPiece piece) {
-	U64 rooks = bitboard[piece] & bitboard[color];
-	U64 empty = ~bitboard[nColor];
+// NOLINTBEGIN(misc-no-recursion)
+U64 MoveGenerator::getRookMoves(const BitboardArray &bitboard, const enumColor color, const enumPiece piece) {
+	const U64 rooks = bitboard[piece] & bitboard[color];
+	const U64 empty = ~bitboard[nColor];
 
 	if (color == nColor)
 		return getRookMoves(bitboard, nWhite, piece) | getRookMoves(bitboard, nBlack, piece);
 
-	U64 soutOcc = soutOccl(rooks, empty);
-	U64 nortOcc = nortOccl(rooks, empty);
-	U64 eastOcc = eastOccl(rooks, empty);
-	U64 westOcc = westOccl(rooks, empty);
+	const U64 soutOcc = soutOccl(rooks, empty);
+	const U64 nortOcc = nortOccl(rooks, empty);
+	const U64 eastOcc = eastOccl(rooks, empty);
+	const U64 westOcc = westOccl(rooks, empty);
 
-	U64 soutAttacks = shiftSouth(soutOcc);
-	U64 nortAttacks = shiftNorth(nortOcc);
-	U64 eastAttacks = shiftEast(eastOcc);
-	U64 westAttacks = shiftWest(westOcc);
+	const U64 soutAttacks = shiftSouth(soutOcc);
+	const U64 nortAttacks = shiftNorth(nortOcc);
+	const U64 eastAttacks = shiftEast(eastOcc);
+	const U64 westAttacks = shiftWest(westOcc);
 
 	U64 attacks = soutAttacks | nortAttacks | eastAttacks | westAttacks;
 	attacks &= ~bitboard[color]; // Attacks are only valid if the piece is an enemy piece
@@ -361,25 +364,27 @@ U64 MoveGenerator::getRookMoves(const BitbArray &bitboard, enumColor color, enum
 
 	return moves | attacks;
 }
+// NOLINTEND(misc-no-recursion)
 
 
 /**
  * @details Makes use of the implementation of bishop and rooks move generation.
  */
-U64 MoveGenerator::getQueenMoves(const BitbArray &bitboard, enumColor color) {
+// NOLINTBEGIN(misc-no-recursion)
+U64 MoveGenerator::getQueenMoves(const BitboardArray &bitboard, const enumColor color) {
 	if (color == nColor)
 		return getQueenMoves(bitboard, nWhite) | getQueenMoves(bitboard, nBlack);
 
 	return getBishopMoves(bitboard, color, nQueen) | getRookMoves(bitboard, color, nQueen);
 }
-
+// NOLINTEND(misc-no-recursion)
 
 /**
  * @details Identifies all pawns that can promote on next move and generates a list with all possible promotions. Also removes the option to just move without promoting
  */
-std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, uint64_t fromPos) {
-	U64 whitePromotions = pawnMoves & U64(0xffL << 56); // White pawn moves that are promotions
-	U64 blackPromotions = pawnMoves & U64(0xffL); // Black pawn moves that are promotions
+std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, const uint64_t fromPos) {
+	const U64 whitePromotions = pawnMoves & U64(0xffL << 56); // White pawn moves that are promotions
+	const U64 blackPromotions = pawnMoves & U64(0xffL); // Black pawn moves that are promotions
 
 	// Removes the promoting pawns from standard moves
 	pawnMoves ^= whitePromotions;
@@ -424,7 +429,8 @@ std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, uint64
  * @details Iterates through all bitboards (from nPawn to nKing) generating moves for pieces one at a time. If there are 16 pawns on the board, this method will generate pawn moves 16 times, one for each individual pawn.
  * It does so for every type of piece on the board, and then returns a list with strings of all possible moves it has found.
  */
-std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bitboard, enumColor color) {
+// NOLINTBEGIN(misc-no-recursion)
+std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray &bitboard, const enumColor color) {
 	if (color == nColor) {
 		std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
 		std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
@@ -435,14 +441,12 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 		return white;
 	}
 
-	uint64_t fromPos, toPos;
 	std::vector<std::string> moves;
 	std::vector<std::string> promotions;
 
-	BitbArray bitboardCopy = bitboard;
+	BitboardArray bitboardCopy = bitboard;
 
 	for (int k = nPawn; k <= nKing; k++) {
-
 
 		U64 pieces = bitboard[k];
 		pieces &= bitboard[color];
@@ -451,17 +455,15 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 
 		uint64_t upieces = pieces.to_ullong();
 
-		int i, j;
-
 		while (upieces) {
-			// Get index of least significant set bit
-			i = leastSignificantSetBit(upieces);
+			// Get index of the least significant set bit
+			const int i = leastSignificantSetBit(upieces);
 			upieces ^= (1L << i); // Reset bit
 
 			bitboardCopy[k].reset();
 			bitboardCopy[k].set(i);
 
-			fromPos = 1L << i; // Original position
+			const uint64_t fromPos = 1L << i; // Original position
 
 			switch (k) {
 				case nPawn:
@@ -491,15 +493,18 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 				case nKing:
 					pieceMoves = getKingMoves(bitboardCopy, color);
 					break;
+
+				default:
+					break;
 			}
 
 			uint64_t umoves = pieceMoves.to_ullong();
 
-			// Loops through all possible moves that the piece of type k at the i position can make and adds it to the list of moves
+			// Loops through all possible moves that the piece of type `k` at the `i` position can make and adds it to the list of moves
 			while (umoves) {
-				j = leastSignificantSetBit(umoves);
+				int j = leastSignificantSetBit(umoves);
 				umoves ^= (1L << j); // Reset bit
-				toPos = 1L << j; // Target position
+				const uint64_t toPos = 1L << j; // Target position
 
 				moves.push_back(moveName(fromPos, toPos));
 			}
@@ -508,3 +513,4 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitbArray &bit
 
 	return moves;
 }
+// NOLINTEND(misc-no-recursion)

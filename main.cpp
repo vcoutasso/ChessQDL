@@ -2,7 +2,7 @@
 
 using namespace chessqdl;
 
-int main(int argc, char **argv) {
+int main(const int argc, char **argv) {
 
 	// Arguments
 	int level;

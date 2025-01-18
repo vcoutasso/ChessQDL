@@ -15,7 +15,7 @@ std::string chessqdl::posToStr(uint64_t pos) {
 	pos &= -pos;
 
 	// log2(pos) is the index of the bit that is set
-	return mapPositions[log2(pos)];
+	return mapPositions[leastSignificantSetBit(pos)];
 }
 
 
@@ -32,40 +32,39 @@ std::string chessqdl::posToStr(uint64_t pos) {
  *
  * @todo Count only legal moves and create separate files for board evaluation
  */
-int chessqdl::evaluateBoard(const BitbArray &board, enumColor color) {
+int chessqdl::evaluateBoard(const BitboardArray &board, const enumColor color) {
 	// King count
-	int k = (board[nKing] & board[color]).count();
-	int kPrime = board[nKing].count() - k;
+	const int k = static_cast<int>((board[nKing] & board[color]).count());
+	const int kPrime = static_cast<int>(board[nKing].count() - k);
 
 	// Queen count
-	int q = (board[nQueen] & board[color]).count();
-	int qPrime = board[nQueen].count() - q;
+	const int q = static_cast<int>((board[nQueen] & board[color]).count());
+	const int qPrime = static_cast<int>(board[nQueen].count() - q);
 
 	// Rook count
-	int r = (board[nRook] & board[color]).count();
-	int rPrime = board[nRook].count() - r;
+	const int r = static_cast<int>((board[nRook] & board[color]).count());
+	const int rPrime = static_cast<int>(board[nRook].count() - r);
 
 	// Knight count
-	int n = (board[nKnight] & board[color]).count();
-	int nPrime = board[nKnight].count() - n;
+	const int n = static_cast<int>((board[nKnight] & board[color]).count());
+	const int nPrime = static_cast<int>(board[nKnight].count() - n);
 
 	// Bishop count
-	int b = (board[nBishop] & board[color]).count();
-	int bPrime = board[nBishop].count() - b;
+	const int b = static_cast<int>((board[nBishop] & board[color]).count());
+	const int bPrime = static_cast<int>(board[nBishop].count() - b);
 
 	// Pawn count
-	int p = (board[nPawn] & board[color]).count();
-	int pPrime = board[nPawn].count() - p;
+	const int p = static_cast<int>((board[nPawn] & board[color]).count());
+	const int pPrime = static_cast<int>(board[nPawn].count() - p);
 
-	MoveGenerator gen;
-	enumColor enemyColor = color == nWhite ? nBlack : nWhite;
+	const enumColor enemyColor = color == nWhite ? nBlack : nWhite;
 
 	// Move count
-	int m = gen.getPseudoLegalMoves(board, color).size();
-	int mPrime = gen.getPseudoLegalMoves(board, enemyColor).size();
+	const int m = static_cast<int>(MoveGenerator::getPseudoLegalMoves(board, color).size());
+	const int mPrime = static_cast<int>(MoveGenerator::getPseudoLegalMoves(board, enemyColor).size());
 
 	int score = 200 * (k - kPrime) + 9 * (q - qPrime) + 5 * (r - rPrime) + 3 * (n - nPrime + b - bPrime) + (p - pPrime);
-	score += 0.1 * (m - mPrime);
+	score += static_cast<int>(0.1 * (m - mPrime));
 
 	//if (color == nBlack) score *= -1;
 
@@ -87,18 +86,19 @@ void chessqdl::readInteger(int &n) {
 /**
  * @details Performs some bitset operations to encounter the least significant bit that is set. Log2 just finds out its index
  */
-int chessqdl::leastSignificantSetBit(uint64_t value) {
-	uint64_t lsb = value & -value;
+int chessqdl::leastSignificantSetBit(const uint64_t value) {
+	const uint64_t lsb = value & -value;
 
-	return log2(lsb);
+	return static_cast<int>(log2(static_cast<double>(lsb)));
 }
+
 
 /**
  * @details Receives two uint64_t, retrieves their position name in the board and constitutes the move that's being made
  */
-std::string chessqdl::moveName(uint64_t from, uint64_t to) {
+std::string chessqdl::moveName(const uint64_t from, const uint64_t to) {
 	std::string from_str = posToStr(from);
-	std::string to_str = posToStr(to);
+	const std::string to_str = posToStr(to);
 
 	return from_str.append(to_str);
 }
