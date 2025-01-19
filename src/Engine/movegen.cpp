@@ -305,7 +305,7 @@ U64 MoveGenerator::getBishopMoves(const BitboardArray &bitboard, const enumColor
     U64 moves = noEaOcc | soEaOcc | noWeOcc | soWeOcc;
     moves &= ~bishop; // "Moving" without leaving the square is invalid
     U64 attacks = noEaAttacks | soEaAttacks | noWeAttacks | soWeAttacks;
-    attacks &= bitboard[color == nWhite ? nBlack : nWhite];
+    attacks &= bitboard[(color == nWhite) ? nBlack : nWhite];
 
     return moves | attacks;
 }
@@ -338,7 +338,7 @@ U64 MoveGenerator::getRookMoves(const BitboardArray &bitboard, const enumColor c
     U64 moves = soutOcc | nortOcc | eastOcc | westOcc;
     moves &= ~rook; // "Moving" without leaving the square is invalid
     U64 attacks = soutAttacks | nortAttacks | eastAttacks | westAttacks;
-    attacks &= bitboard[color == nWhite ? nBlack : nWhite];
+    attacks &= bitboard[(color == nWhite) ? nBlack : nWhite];
 
     return moves | attacks;
 }

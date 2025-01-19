@@ -216,14 +216,14 @@ namespace chessqdl {
 		 */
 		static std::vector<std::string> getPawnPromotions(U64 &pawnMoves, uint64_t fromPos);
 
+
 		/**
 		 * @brief Get all possible pseudo-legal moves for a given bitboard
 		 * @param bitboard  reference to bitboards representing the current board status
-		 * @param color  color of desired piece
+		 * @param color  current player color
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
 		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color);
-
 	};
 
 }

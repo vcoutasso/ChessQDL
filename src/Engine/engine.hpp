@@ -65,6 +65,21 @@ namespace chessqdl {
          */
         void printBoard() const;
 
+
+        /**
+         * @brief Checks if the king of the given color is in check
+         * @param color  color of the king to be checked
+         * @return  true if the king is in check, false otherwise
+         */
+        [[nodiscard]] bool isKingInCheck(enumColor color) const;
+
+
+        /**
+         * @brief Get all possible legal moves for the current player
+         * @return  a list of all possible moves in algebraic notation (e.g "e2e4", "b1c3", etc)
+         */
+        std::vector<std::string> getLegalMoves();
+
     public:
         /**
          * @brief Overloaded constructor. Allows the selection of the engine's pieces.
@@ -98,9 +113,10 @@ namespace chessqdl {
         /**
          * @brief Effectively makes a move (only if \p mv represents a valid move), updates the bitboards and prints to stdout the move made (if \p verbose)
          * @param mv  string with move to be made
+         * @param verify  if set to true, the move will only be made if it is a valid move. Defaults to true
          * @param verbose  sets whether the movement made should be printed to stdout. Defaults to true
          */
-        void makeMove(std::string mv, bool verbose = true);
+        void makeMove(std::string mv, bool verify = true, bool verbose = true);
 
 
         /**
