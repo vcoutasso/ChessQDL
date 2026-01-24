@@ -151,6 +151,21 @@ Bitboard::Bitboard(const std::string &fen) {
 				} else {
 					enPassantSquare = 0;
 				}
+
+				// Parse halfmove clock (5th field)
+				size_t fourthSpace = fen.find_first_of(' ', thirdSpace + 1);
+				if (fourthSpace != std::string::npos) {
+					std::string halfmoveStr = fen.substr(fourthSpace + 1);
+					size_t halfmoveEnd = halfmoveStr.find_first_of(' ');
+					if (halfmoveEnd != std::string::npos)
+						halfmoveStr = halfmoveStr.substr(0, halfmoveEnd);
+					
+					try {
+						halfmoveClock = std::stoi(halfmoveStr);
+					} catch (...) {
+						halfmoveClock = 0;
+					}
+				}
 			}
 		}
 	}
@@ -446,6 +461,34 @@ std::string Bitboard::getCastlingFEN() const {
 	if (castlingRights & 0b0100) fen += 'k';
 	if (castlingRights & 0b1000) fen += 'q';
 	return fen;
+}
+
+/**
+ * @details Returns the halfmove clock for the 50-move rule
+ */
+int Bitboard::getHalfmoveClock() const {
+	return halfmoveClock;
+}
+
+/**
+ * @details Sets the halfmove clock
+ */
+void Bitboard::setHalfmoveClock(int clock) {
+	halfmoveClock = clock;
+}
+
+/**
+ * @details Increments the halfmove clock by 1
+ */
+void Bitboard::incrementHalfmoveClock() {
+	halfmoveClock++;
+}
+
+/**
+ * @details Resets the halfmove clock to 0 (after pawn move or capture)
+ */
+void Bitboard::resetHalfmoveClock() {
+	halfmoveClock = 0;
 }
 
 /**

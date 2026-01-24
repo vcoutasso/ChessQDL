@@ -31,6 +31,12 @@ namespace chessqdl {
 		 */
 		int castlingRights = 0b1111;
 
+		/**
+		 * @brief Halfmove clock for 50-move rule
+		 * Incremented after each move, reset after pawn move or capture
+		 */
+		int halfmoveClock = 0;
+
 	public:
 
 		/**
@@ -255,6 +261,32 @@ namespace chessqdl {
 		 * @return castling rights FEN string
 		 */
 		std::string getCastlingFEN() const;
+
+
+		/**
+		 * @brief Returns the halfmove clock (for 50-move rule)
+		 * @return halfmove clock value
+		 */
+		int getHalfmoveClock() const;
+
+
+		/**
+		 * @brief Sets the halfmove clock
+		 * @param clock the halfmove clock value
+		 */
+		void setHalfmoveClock(int clock);
+
+
+		/**
+		 * @brief Increments the halfmove clock by 1
+		 */
+		void incrementHalfmoveClock();
+
+
+		/**
+		 * @brief Resets the halfmove clock to 0 (called after pawn move or capture)
+		 */
+		void resetHalfmoveClock();
 
 
 		/**
