@@ -189,7 +189,7 @@ bool Engine::isKingInCheck(const enumColor color) const {
     const U64 underAttack = MoveGenerator::getBishopMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getRookMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKnightMoves(bitboard.getBitBoards(), opponentColor) |
-                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor) |
+                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor, bitboard.getEnPassantSquare()) |
                             MoveGenerator::getQueenMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKingMoves(bitboard.getBitBoards(), opponentColor);
 
@@ -242,7 +242,7 @@ bool Engine::isStalemate(const enumColor color) {
  * @details Returns the evaluation of the current board state
  */
 std::vector<std::string> Engine::getLegalMoves() {
-    std::vector<std::string> moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+    std::vector<std::string> moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove, bitboard.getEnPassantSquare());
 
     // `toMove` will be updated during the loop, so it is necessary to store it in a variable
     const enumColor currentPlayer = toMove;
@@ -509,7 +509,7 @@ int Engine::alphaBetaMax(int alpha, const int beta, const int depth, const int d
     if (depthLeft == 0)
         return evaluateBoard(bitboard.getBitBoards(), color);
 
-    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
+    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare());
 
     std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
@@ -548,7 +548,7 @@ int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int d
     if (depthLeft == 0)
         return -evaluateBoard(bitboard.getBitBoards(), color);
 
-    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
+    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare());
 
     std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 

@@ -16,6 +16,11 @@ namespace chessqdl {
 		 */
 		BitboardArray bitBoards;
 
+		/**
+		 * @brief En passant square, if any. 0 if no en passant is available
+		 */
+		int enPassantSquare = 0;
+
 	public:
 
 		/**
@@ -188,6 +193,13 @@ namespace chessqdl {
 		 * @return an array containing all bitboards
 		 */
 		BitboardArray getBitBoards() const;
+
+
+		/**
+		 * @brief Returns the en passant square
+		 * @return the en passant square, or 0 if no en passant is available
+		 */
+		int getEnPassantSquare() const;
 
 
 		/**

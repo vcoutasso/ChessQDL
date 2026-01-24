@@ -110,6 +110,36 @@ Bitboard::Bitboard(const std::string &fen) {
 
 	bitBoards[nColor] = bitBoards[nBlack] | bitBoards[nWhite];
 
+	// Parse en passant square from FEN
+	// FEN format: "board turn castling enPassant halfmove fullmove"
+	// Example: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+	// The en passant square is the 4th space-delimited token
+	size_t firstSpace = fen.find_first_of(' ');
+	if (firstSpace != std::string::npos) {
+		// Skip turn (b/w)
+		size_t secondSpace = fen.find_first_of(' ', firstSpace + 1);
+		if (secondSpace != std::string::npos) {
+			// Skip castling rights
+			size_t thirdSpace = fen.find_first_of(' ', secondSpace + 1);
+			if (thirdSpace != std::string::npos) {
+				// Get en passant square
+				std::string enPassantStr = fen.substr(thirdSpace + 1);
+				size_t enPassantEnd = enPassantStr.find_first_of(' ');
+				if (enPassantEnd != std::string::npos)
+					enPassantStr = enPassantStr.substr(0, enPassantEnd);
+				
+				// Parse the square (e.g., "e3" -> square number)
+				if (enPassantStr.length() == 2 && enPassantStr[0] != '-') {
+					int file = enPassantStr[0] - 'a';  // 0-7 (a-h)
+					int rank = enPassantStr[1] - '1';  // 0-7 (rank 1-8)
+					enPassantSquare = rank * 8 + file;
+				} else {
+					enPassantSquare = 0;
+				}
+			}
+		}
+	}
+
 }
 
 /**
@@ -335,4 +365,11 @@ void Bitboard::printBoard() const {
 	}
 
 	std::cout << "   \033[1;33ma b c d e f g h\033[0m" << std::endl;
+}
+
+/**
+ * @details Returns the en passant square
+ */
+int Bitboard::getEnPassantSquare() const {
+	return enPassantSquare;
 }

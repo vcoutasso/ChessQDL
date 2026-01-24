@@ -215,8 +215,8 @@ U64 MoveGenerator::noWeOccl(U64 generator, U64 propagator) {
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  */
 // NOLINTBEGIN(misc-no-recursion)
-U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor color) {
-    if (color == nColor) return getPawnMoves(bitboard, nBlack) | getPawnMoves(bitboard, nWhite);
+U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor color, int enPassantSquare) {
+    if (color == nColor) return getPawnMoves(bitboard, nBlack, enPassantSquare) | getPawnMoves(bitboard, nWhite, enPassantSquare);
 
     const enumColor opponentColor = color == nWhite ? nBlack : nWhite;
     const U64 pawn = bitboard[nPawn] & bitboard[color];
@@ -240,7 +240,25 @@ U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor c
                                                        ? shiftNorthEast(pawn) | shiftNorthWest(pawn)
                                                        : shiftSouthEast(pawn) | shiftSouthWest(pawn));
 
-    return (validSingleMoves | validDoubleMoves) | attacks;
+    // En passant captures
+    U64 enPassantMoves = 0UL;
+    if (enPassantSquare != 0) {
+        // Create a bitboard with the en passant square set
+        U64 enPassantBitboard;
+        enPassantBitboard.reset();
+        enPassantBitboard.set(enPassantSquare);
+        
+        // Get pawns that can capture en passant
+        if (color == nWhite) {
+            // White pawns capture diagonally upward to en passant square
+            enPassantMoves = (shiftNorthEast(pawn) | shiftNorthWest(pawn)) & enPassantBitboard;
+        } else {
+            // Black pawns capture diagonally downward to en passant square
+            enPassantMoves = (shiftSouthEast(pawn) | shiftSouthWest(pawn)) & enPassantBitboard;
+        }
+    }
+
+    return (validSingleMoves | validDoubleMoves) | attacks | enPassantMoves;
 }
 // NOLINTEND(misc-no-recursion)
 
@@ -421,10 +439,10 @@ std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, const 
  * It does so for every type of piece on the board, and then returns a list with strings of all possible moves it has found.
  */
 // NOLINTBEGIN(misc-no-recursion)
-std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray &bitboard, const enumColor color) {
+std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray &bitboard, const enumColor color, int enPassantSquare) {
     if (color == nColor) {
-        std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
-        std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
+        std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite, enPassantSquare);
+        std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack, enPassantSquare);
 
         // Concatenates both lists (inserts the black list on the end of white list)
         white.insert(white.end(), black.begin(), black.end());
@@ -457,7 +475,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray 
 
             switch (k) {
                 case nPawn:
-                    pieceMoves = getPawnMoves(bitboardCopy, color);
+                    pieceMoves = getPawnMoves(bitboardCopy, color, enPassantSquare);
                     promotions = getPawnPromotions(pieceMoves, fromPos);
                     if (!promotions.empty()) {
                         moves.insert(moves.end(), promotions.begin(), promotions.end());
