@@ -43,6 +43,9 @@ Bitboard::Bitboard(const std::string &fen) {
 	for (auto& b : bitBoards)
 		b.reset();
 
+	// Initialize castling rights to 0 (will be set from FEN if present)
+	castlingRights = 0;
+
 	int pos = 56;
 
 	for (unsigned long int i = 0; i < fen.find_first_of(' '); i++) {
@@ -124,8 +127,7 @@ Bitboard::Bitboard(const std::string &fen) {
 			if (castlingEnd != std::string::npos)
 				castlingStr = castlingStr.substr(0, castlingEnd);
 			
-			// Reset castling rights and parse from FEN
-			castlingRights = 0;
+			// Parse castling rights from FEN
 			for (char c : castlingStr) {
 				if (c == 'K') castlingRights |= 0b0001;
 				else if (c == 'Q') castlingRights |= 0b0010;

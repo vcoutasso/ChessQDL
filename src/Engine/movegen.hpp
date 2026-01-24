@@ -227,7 +227,7 @@ namespace chessqdl {
 		 * @param castlingRights  castling rights bitfield (bits: 0=K, 1=Q, 2=k, 3=q)
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
-		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0, int castlingRights = 0);
+		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare, int castlingRights);
 
 
 		/**
@@ -238,6 +238,15 @@ namespace chessqdl {
 		 * @return  a list of castling moves (e.g "e1g1", "e8c8")
 		 */
 		static std::vector<std::string> getCastlingMoves(const BitboardArray &bitboard, enumColor color, int castlingRights);
+
+
+		/**
+		 * @brief Get pawn attacks for a given color (diagonal squares only, no pushes)
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  color of the attacking pawns
+		 * @return  Bitboard with all squares attacked by pawns
+		 */
+		static U64 getPawnAttacks(const BitboardArray &bitboard, enumColor color);
 
 
 		/**

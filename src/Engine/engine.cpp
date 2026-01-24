@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <stdexcept>
 
 using namespace chessqdl;
 
@@ -378,6 +379,13 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
                 // Kingside castling (king moves right)
                 int rookFromIdx = (toMove == nWhite) ? h1 : h8;
                 int rookToIdx = (toMove == nWhite) ? f1 : f8;
+                
+                // Verify rook is present on the expected square
+                if (!bitboard.getBitBoards()[nRook].test(rookFromIdx) || 
+                    !bitboard.getBitBoards()[toMove].test(rookFromIdx)) {
+                    throw std::runtime_error("Invalid castling: rook not found on expected square");
+                }
+                
                 bitboard.resetBit(nRook, rookFromIdx);
                 bitboard.resetBit(toMove, rookFromIdx);
                 bitboard.setBit(nRook, rookToIdx);
@@ -387,6 +395,13 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
                 // Queenside castling (king moves left)
                 int rookFromIdx = (toMove == nWhite) ? a1 : a8;
                 int rookToIdx = (toMove == nWhite) ? d1 : d8;
+                
+                // Verify rook is present on the expected square
+                if (!bitboard.getBitBoards()[nRook].test(rookFromIdx) || 
+                    !bitboard.getBitBoards()[toMove].test(rookFromIdx)) {
+                    throw std::runtime_error("Invalid castling: rook not found on expected square");
+                }
+                
                 bitboard.resetBit(nRook, rookFromIdx);
                 bitboard.resetBit(toMove, rookFromIdx);
                 bitboard.setBit(nRook, rookToIdx);

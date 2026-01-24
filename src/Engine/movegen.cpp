@@ -466,17 +466,37 @@ std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, const 
 
 
 /**
+ * @details Returns all squares attacked by pawns of the given color.
+ *          This includes only diagonal capture directions and ignores
+ *          occupancy (no forward pushes or en-passant squares).
+ */
+U64 MoveGenerator::getPawnAttacks(const BitboardArray &bitboard, enumColor color) {
+    const U64 pawns = bitboard[nPawn] & bitboard[color];
+
+    // Select diagonal attack directions based on color
+    if (color == nWhite) {
+        // White pawns attack one rank north, diagonally left and right
+        return shiftNorthEast(pawns) | shiftNorthWest(pawns);
+    }
+
+    // Black pawns attack one rank south, diagonally left and right
+    return shiftSouthEast(pawns) | shiftSouthWest(pawns);
+}
+
+
+/**
  * @details Check if a square is attacked by the opponent
  */
 bool MoveGenerator::isSquareAttacked(const BitboardArray &bitboard, int square, enumColor attackerColor) {
     U64 squareBB;
     squareBB.set(square);
     
-    // Check attacks from all piece types
+    // Check attacks from all piece types. For pawns, use a dedicated
+    // attack generator that excludes non-attacking pushes and en-passant.
     U64 attacks = getBishopMoves(bitboard, attackerColor) |
                   getRookMoves(bitboard, attackerColor) |
                   getKnightMoves(bitboard, attackerColor) |
-                  getPawnMoves(bitboard, attackerColor, 0) |
+                  getPawnAttacks(bitboard, attackerColor) |
                   getQueenMoves(bitboard, attackerColor) |
                   getKingMoves(bitboard, attackerColor);
     
@@ -499,6 +519,8 @@ std::vector<std::string> MoveGenerator::getCastlingMoves(const BitboardArray &bi
     
     const enumColor opponentColor = (color == nWhite) ? nBlack : nWhite;
     const U64 allPieces = bitboard[nColor];
+    const U64 kings = bitboard[nKing] & bitboard[color];
+    const U64 rooks = bitboard[nRook] & bitboard[color];
     
     // Kingside castling
     bool canCastleKingside = (color == nWhite) ? (castlingRights & 0b0001) : (castlingRights & 0b0100);
@@ -506,51 +528,81 @@ std::vector<std::string> MoveGenerator::getCastlingMoves(const BitboardArray &bi
     bool canCastleQueenside = (color == nWhite) ? (castlingRights & 0b0010) : (castlingRights & 0b1000);
     
     if (color == nWhite) {
+        // Verify king is on e1 before generating any white castling moves
+        if (!kings.test(e1)) {
+            return moves;
+        }
+        
         // White kingside: e1-g1, rook h1-f1
         // Squares f1 and g1 must be empty, king passes through f1 to g1
         if (canCastleKingside) {
-            // Check squares between king (e1=4) and rook (h1=7) are empty: f1=5, g1=6
-            bool pathClear = !allPieces.test(f1) && !allPieces.test(g1);
-            // King must not be in check, and must not pass through or land on attacked square
-            bool kingNotInCheck = !isSquareAttacked(bitboard, e1, opponentColor);
-            bool pathNotAttacked = !isSquareAttacked(bitboard, f1, opponentColor) && 
-                                   !isSquareAttacked(bitboard, g1, opponentColor);
-            if (pathClear && kingNotInCheck && pathNotAttacked) {
-                moves.push_back("e1g1");
+            // Verify rook is on h1
+            if (!rooks.test(h1)) {
+                canCastleKingside = false;
+            } else {
+                // Check squares between king (e1=4) and rook (h1=7) are empty: f1=5, g1=6
+                bool pathClear = !allPieces.test(f1) && !allPieces.test(g1);
+                // King must not be in check, and must not pass through or land on attacked square
+                bool kingNotInCheck = !isSquareAttacked(bitboard, e1, opponentColor);
+                bool pathNotAttacked = !isSquareAttacked(bitboard, f1, opponentColor) && 
+                                       !isSquareAttacked(bitboard, g1, opponentColor);
+                if (pathClear && kingNotInCheck && pathNotAttacked) {
+                    moves.push_back("e1g1");
+                }
             }
         }
         
         // White queenside: e1-c1, rook a1-d1
         // Squares b1, c1, d1 must be empty (rook passes through b1), king passes through d1 to c1
         if (canCastleQueenside) {
-            bool pathClear = !allPieces.test(b1) && !allPieces.test(c1) && !allPieces.test(d1);
-            bool kingNotInCheck = !isSquareAttacked(bitboard, e1, opponentColor);
-            bool pathNotAttacked = !isSquareAttacked(bitboard, d1, opponentColor) && 
-                                   !isSquareAttacked(bitboard, c1, opponentColor);
-            if (pathClear && kingNotInCheck && pathNotAttacked) {
-                moves.push_back("e1c1");
+            // Verify rook is on a1
+            if (!rooks.test(a1)) {
+                canCastleQueenside = false;
+            } else {
+                bool pathClear = !allPieces.test(b1) && !allPieces.test(c1) && !allPieces.test(d1);
+                bool kingNotInCheck = !isSquareAttacked(bitboard, e1, opponentColor);
+                bool pathNotAttacked = !isSquareAttacked(bitboard, d1, opponentColor) && 
+                                       !isSquareAttacked(bitboard, c1, opponentColor);
+                if (pathClear && kingNotInCheck && pathNotAttacked) {
+                    moves.push_back("e1c1");
+                }
             }
         }
     } else {
+        // Verify king is on e8 before generating any black castling moves
+        if (!kings.test(e8)) {
+            return moves;
+        }
+        
         // Black kingside: e8-g8, rook h8-f8
         if (canCastleKingside) {
-            bool pathClear = !allPieces.test(f8) && !allPieces.test(g8);
-            bool kingNotInCheck = !isSquareAttacked(bitboard, e8, opponentColor);
-            bool pathNotAttacked = !isSquareAttacked(bitboard, f8, opponentColor) && 
-                                   !isSquareAttacked(bitboard, g8, opponentColor);
-            if (pathClear && kingNotInCheck && pathNotAttacked) {
-                moves.push_back("e8g8");
+            // Verify rook is on h8
+            if (!rooks.test(h8)) {
+                canCastleKingside = false;
+            } else {
+                bool pathClear = !allPieces.test(f8) && !allPieces.test(g8);
+                bool kingNotInCheck = !isSquareAttacked(bitboard, e8, opponentColor);
+                bool pathNotAttacked = !isSquareAttacked(bitboard, f8, opponentColor) && 
+                                       !isSquareAttacked(bitboard, g8, opponentColor);
+                if (pathClear && kingNotInCheck && pathNotAttacked) {
+                    moves.push_back("e8g8");
+                }
             }
         }
         
         // Black queenside: e8-c8, rook a8-d8
         if (canCastleQueenside) {
-            bool pathClear = !allPieces.test(b8) && !allPieces.test(c8) && !allPieces.test(d8);
-            bool kingNotInCheck = !isSquareAttacked(bitboard, e8, opponentColor);
-            bool pathNotAttacked = !isSquareAttacked(bitboard, d8, opponentColor) && 
-                                   !isSquareAttacked(bitboard, c8, opponentColor);
-            if (pathClear && kingNotInCheck && pathNotAttacked) {
-                moves.push_back("e8c8");
+            // Verify rook is on a8
+            if (!rooks.test(a8)) {
+                canCastleQueenside = false;
+            } else {
+                bool pathClear = !allPieces.test(b8) && !allPieces.test(c8) && !allPieces.test(d8);
+                bool kingNotInCheck = !isSquareAttacked(bitboard, e8, opponentColor);
+                bool pathNotAttacked = !isSquareAttacked(bitboard, d8, opponentColor) && 
+                                       !isSquareAttacked(bitboard, c8, opponentColor);
+                if (pathClear && kingNotInCheck && pathNotAttacked) {
+                    moves.push_back("e8c8");
+                }
             }
         }
     }
