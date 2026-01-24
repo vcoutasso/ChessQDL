@@ -27,7 +27,6 @@ Engine::Engine(const enumColor color, const int depth, const bool v, const bool 
 
 /**
  * @details Sets up a game of chess according to the \p fen argument with the engine as \p color pieces
- * @fixme not all elements of the fen string are handled
  */
 Engine::Engine(const std::string &fen, const enumColor color, const int depth, const bool v, const bool p,
                const std::optional<int> seed) {
@@ -245,7 +244,7 @@ bool Engine::isStalemate(const enumColor color) {
  * @details Returns the evaluation of the current board state
  */
 std::vector<std::string> Engine::getLegalMoves() {
-    std::vector<std::string> moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove, bitboard.getEnPassantSquare());
+    std::vector<std::string> moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove, bitboard.getEnPassantSquare(), bitboard.getCastlingRights());
 
     // `toMove` will be updated during the loop, so it is necessary to store it in a variable
     const enumColor currentPlayer = toMove;
@@ -302,6 +301,9 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
 
         // Save current en passant square for undo
         enPassantHistory.push(bitboard.getEnPassantSquare());
+
+        // Save current castling rights for undo
+        castlingRightsHistory.push(bitboard.getCastlingRights());
 
         // Type of the piece that is being moved
         enumPiece pieceType = nPawn;
@@ -369,6 +371,30 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             mv.insert(mv.find_first_of("12345678") + 1, "x");
         }
 
+        // Check if this is a castling move
+        if (pieceType == nKing && std::abs(toIdx - fromIdx) == 2) {
+            // Move the rook as well
+            if (toIdx > fromIdx) {
+                // Kingside castling (king moves right)
+                int rookFromIdx = (toMove == nWhite) ? h1 : h8;
+                int rookToIdx = (toMove == nWhite) ? f1 : f8;
+                bitboard.resetBit(nRook, rookFromIdx);
+                bitboard.resetBit(toMove, rookFromIdx);
+                bitboard.setBit(nRook, rookToIdx);
+                bitboard.setBit(toMove, rookToIdx);
+                mv = "O-O"; // Short castling notation
+            } else {
+                // Queenside castling (king moves left)
+                int rookFromIdx = (toMove == nWhite) ? a1 : a8;
+                int rookToIdx = (toMove == nWhite) ? d1 : d8;
+                bitboard.resetBit(nRook, rookFromIdx);
+                bitboard.resetBit(toMove, rookFromIdx);
+                bitboard.setBit(nRook, rookToIdx);
+                bitboard.setBit(toMove, rookToIdx);
+                mv = "O-O-O"; // Long castling notation
+            }
+        }
+
         // Updates bitboards
         bitboard.resetBit(pieceType, fromIdx);
         bitboard.resetBit(toMove, fromIdx);
@@ -387,6 +413,28 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             bitboard.setBit(promoteTo, toIdx);
             bitboard.resetBit(pieceType, toIdx);
         }
+
+        // Update castling rights
+        // If king moves, lose both castling rights for that color
+        if (pieceType == nKing) {
+            bitboard.removeCastlingRight(toMove, true);  // kingside
+            bitboard.removeCastlingRight(toMove, false); // queenside
+        }
+        // If rook moves from original square, lose that side's castling right
+        if (pieceType == nRook) {
+            if (toMove == nWhite) {
+                if (fromIdx == h1) bitboard.removeCastlingRight(nWhite, true);
+                if (fromIdx == a1) bitboard.removeCastlingRight(nWhite, false);
+            } else {
+                if (fromIdx == h8) bitboard.removeCastlingRight(nBlack, true);
+                if (fromIdx == a8) bitboard.removeCastlingRight(nBlack, false);
+            }
+        }
+        // If rook is captured on its original square, lose that side's castling right
+        if (toIdx == h1) bitboard.removeCastlingRight(nWhite, true);
+        if (toIdx == a1) bitboard.removeCastlingRight(nWhite, false);
+        if (toIdx == h8) bitboard.removeCastlingRight(nBlack, true);
+        if (toIdx == a8) bitboard.removeCastlingRight(nBlack, false);
 
         // Handle en passant square update
         // Clear en passant square by default (it's only valid for one move)
@@ -445,6 +493,73 @@ void Engine::takeMove() {
             lastMove = lastMove.substr(lastMove.find(' ') + 1);
         }
 
+        // Remove check indicator if present
+        if (!lastMove.empty() && lastMove.back() == '+') {
+            lastMove.pop_back();
+        }
+
+        const enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
+
+        // Handle castling
+        if (lastMove == "O-O" || lastMove == "O-O-O") {
+            bool isKingside = (lastMove == "O-O");
+            
+            if (hasMoved == nWhite) {
+                // Undo white castling
+                // Move king back from g1/c1 to e1
+                int kingFrom = e1;
+                int kingTo = isKingside ? g1 : c1;
+                bitboard.resetBit(nKing, kingTo);
+                bitboard.resetBit(nWhite, kingTo);
+                bitboard.setBit(nKing, kingFrom);
+                bitboard.setBit(nWhite, kingFrom);
+                
+                // Move rook back
+                int rookFrom = isKingside ? h1 : a1;
+                int rookTo = isKingside ? f1 : d1;
+                bitboard.resetBit(nRook, rookTo);
+                bitboard.resetBit(nWhite, rookTo);
+                bitboard.setBit(nRook, rookFrom);
+                bitboard.setBit(nWhite, rookFrom);
+            } else {
+                // Undo black castling
+                int kingFrom = e8;
+                int kingTo = isKingside ? g8 : c8;
+                bitboard.resetBit(nKing, kingTo);
+                bitboard.resetBit(nBlack, kingTo);
+                bitboard.setBit(nKing, kingFrom);
+                bitboard.setBit(nBlack, kingFrom);
+                
+                // Move rook back
+                int rookFrom = isKingside ? h8 : a8;
+                int rookTo = isKingside ? f8 : d8;
+                bitboard.resetBit(nRook, rookTo);
+                bitboard.resetBit(nBlack, rookTo);
+                bitboard.setBit(nRook, rookFrom);
+                bitboard.setBit(nBlack, rookFrom);
+            }
+            
+            bitboard.updateBitboard();
+            
+            // Restore castling rights from history
+            if (!castlingRightsHistory.empty()) {
+                int prevCastlingRights = castlingRightsHistory.top();
+                castlingRightsHistory.pop();
+                bitboard.setCastlingRights(prevCastlingRights);
+            }
+            
+            // Restore en passant square from history
+            if (!enPassantHistory.empty()) {
+                int prevEnPassantSquare = enPassantHistory.top();
+                enPassantHistory.pop();
+                bitboard.setEnPassantSquare(prevEnPassantSquare);
+            }
+            
+            toMove = hasMoved;
+            --ply;
+            return;
+        }
+
         enumPiece pieceType = nPawn;
         bool captured = false;
 
@@ -481,8 +596,6 @@ void Engine::takeMove() {
         // Indexes of the respective square name
         const int fromIdx = static_cast<int>(std::distance(mapPositions.begin(), fromIt));
         const int toIdx = static_cast<int>(std::distance(mapPositions.begin(), toIt));
-
-        const enumColor hasMoved = toMove == nWhite ? nBlack : nWhite;
 
         // Updates bitboards
         bitboard.resetBit(pieceType, toIdx);
@@ -535,6 +648,13 @@ void Engine::takeMove() {
 
         bitboard.updateBitboard();
 
+        // Restore castling rights from history
+        if (!castlingRightsHistory.empty()) {
+            int prevCastlingRights = castlingRightsHistory.top();
+            castlingRightsHistory.pop();
+            bitboard.setCastlingRights(prevCastlingRights);
+        }
+
         // Restore en passant square from history
         if (!enPassantHistory.empty()) {
             int prevEnPassantSquare = enPassantHistory.top();
@@ -585,7 +705,7 @@ int Engine::alphaBetaMax(int alpha, const int beta, const int depth, const int d
     if (depthLeft == 0)
         return evaluateBoard(bitboard.getBitBoards(), color);
 
-    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare());
+    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare(), bitboard.getCastlingRights());
 
     std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
@@ -624,7 +744,7 @@ int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int d
     if (depthLeft == 0)
         return -evaluateBoard(bitboard.getBitBoards(), color);
 
-    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare());
+    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare(), bitboard.getCastlingRights());
 
     std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
@@ -660,8 +780,8 @@ std::string Engine::getFEN() const {
     fen += (toMove == nWhite) ? 'w' : 'b';
     fen += ' ';
     
-    // FIXME: Castling rights (not yet supported, assume always available)
-    fen += "KQkq";
+    // Castling rights
+    fen += bitboard.getCastlingFEN();
     fen += ' ';
     
     // En passant target square

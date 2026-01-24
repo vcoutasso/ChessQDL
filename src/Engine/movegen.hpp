@@ -224,9 +224,30 @@ namespace chessqdl {
 		 * @param bitboard  reference to bitboards representing the current board status
 		 * @param color  current player color
 		 * @param enPassantSquare  en passant square (0 if not available)
+		 * @param castlingRights  castling rights bitfield (bits: 0=K, 1=Q, 2=k, 3=q)
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
-		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0);
+		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0, int castlingRights = 0);
+
+
+		/**
+		 * @brief Get castling moves for a given color
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param color  current player color
+		 * @param castlingRights  castling rights bitfield (bits: 0=K, 1=Q, 2=k, 3=q)
+		 * @return  a list of castling moves (e.g "e1g1", "e8c8")
+		 */
+		static std::vector<std::string> getCastlingMoves(const BitboardArray &bitboard, enumColor color, int castlingRights);
+
+
+		/**
+		 * @brief Check if a square is attacked by the opponent
+		 * @param bitboard  reference to bitboards representing the current board status
+		 * @param square  the square to check
+		 * @param attackerColor  the color of the attacking side
+		 * @return  true if the square is attacked
+		 */
+		static bool isSquareAttacked(const BitboardArray &bitboard, int square, enumColor attackerColor);
 	};
 
 }

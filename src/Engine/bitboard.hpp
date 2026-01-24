@@ -21,6 +21,16 @@ namespace chessqdl {
 		 */
 		int enPassantSquare = 0;
 
+		/**
+		 * @brief Castling rights flags
+		 * Each bit represents a castling right:
+		 * bit 0: White kingside (K)
+		 * bit 1: White queenside (Q)
+		 * bit 2: Black kingside (k)
+		 * bit 3: Black queenside (q)
+		 */
+		int castlingRights = 0b1111;
+
 	public:
 
 		/**
@@ -207,6 +217,44 @@ namespace chessqdl {
 		 * @param square the en passant target square (0 to clear en passant)
 		 */
 		void setEnPassantSquare(int square);
+
+
+		/**
+		 * @brief Returns the castling rights as a bitfield
+		 * @return castling rights (bits: 0=K, 1=Q, 2=k, 3=q)
+		 */
+		int getCastlingRights() const;
+
+
+		/**
+		 * @brief Sets the castling rights
+		 * @param rights castling rights as a bitfield (bits: 0=K, 1=Q, 2=k, 3=q)
+		 */
+		void setCastlingRights(int rights);
+
+
+		/**
+		 * @brief Checks if a specific castling right is available
+		 * @param color the color (nWhite or nBlack)
+		 * @param kingSide true for kingside castling, false for queenside
+		 * @return true if the castling right is available
+		 */
+		bool canCastle(enumColor color, bool kingSide) const;
+
+
+		/**
+		 * @brief Removes a specific castling right
+		 * @param color the color (nWhite or nBlack)
+		 * @param kingSide true for kingside castling, false for queenside
+		 */
+		void removeCastlingRight(enumColor color, bool kingSide);
+
+
+		/**
+		 * @brief Returns castling rights as a FEN string (e.g., "KQkq", "Kq", "-")
+		 * @return castling rights FEN string
+		 */
+		std::string getCastlingFEN() const;
 
 
 		/**

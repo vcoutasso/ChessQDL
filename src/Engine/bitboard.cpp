@@ -110,19 +110,32 @@ Bitboard::Bitboard(const std::string &fen) {
 
 	bitBoards[nColor] = bitBoards[nBlack] | bitBoards[nWhite];
 
-	// Parse en passant square from FEN
+	// Parse castling rights and en passant square from FEN
 	// FEN format: "board turn castling enPassant halfmove fullmove"
 	// Example: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-	// The en passant square is the 4th space-delimited token
 	size_t firstSpace = fen.find_first_of(' ');
 	if (firstSpace != std::string::npos) {
 		// Skip turn (b/w)
 		size_t secondSpace = fen.find_first_of(' ', firstSpace + 1);
 		if (secondSpace != std::string::npos) {
-			// Skip castling rights
+			// Parse castling rights
+			std::string castlingStr = fen.substr(secondSpace + 1);
+			size_t castlingEnd = castlingStr.find_first_of(' ');
+			if (castlingEnd != std::string::npos)
+				castlingStr = castlingStr.substr(0, castlingEnd);
+			
+			// Reset castling rights and parse from FEN
+			castlingRights = 0;
+			for (char c : castlingStr) {
+				if (c == 'K') castlingRights |= 0b0001;
+				else if (c == 'Q') castlingRights |= 0b0010;
+				else if (c == 'k') castlingRights |= 0b0100;
+				else if (c == 'q') castlingRights |= 0b1000;
+			}
+
+			// Get en passant square
 			size_t thirdSpace = fen.find_first_of(' ', secondSpace + 1);
 			if (thirdSpace != std::string::npos) {
-				// Get en passant square
 				std::string enPassantStr = fen.substr(thirdSpace + 1);
 				size_t enPassantEnd = enPassantStr.find_first_of(' ');
 				if (enPassantEnd != std::string::npos)
@@ -379,6 +392,58 @@ int Bitboard::getEnPassantSquare() const {
  */
 void Bitboard::setEnPassantSquare(int square) {
 	enPassantSquare = square;
+}
+
+/**
+ * @details Returns the castling rights as a bitfield
+ */
+int Bitboard::getCastlingRights() const {
+	return castlingRights;
+}
+
+/**
+ * @details Sets the castling rights
+ */
+void Bitboard::setCastlingRights(int rights) {
+	castlingRights = rights;
+}
+
+/**
+ * @details Checks if a specific castling right is available
+ * Bit mapping: 0=K (white kingside), 1=Q (white queenside), 2=k (black kingside), 3=q (black queenside)
+ */
+bool Bitboard::canCastle(enumColor color, bool kingSide) const {
+	if (color == nWhite) {
+		return kingSide ? (castlingRights & 0b0001) : (castlingRights & 0b0010);
+	} else {
+		return kingSide ? (castlingRights & 0b0100) : (castlingRights & 0b1000);
+	}
+}
+
+/**
+ * @details Removes a specific castling right
+ */
+void Bitboard::removeCastlingRight(enumColor color, bool kingSide) {
+	if (color == nWhite) {
+		if (kingSide) castlingRights &= ~0b0001;
+		else castlingRights &= ~0b0010;
+	} else {
+		if (kingSide) castlingRights &= ~0b0100;
+		else castlingRights &= ~0b1000;
+	}
+}
+
+/**
+ * @details Returns castling rights as a FEN string
+ */
+std::string Bitboard::getCastlingFEN() const {
+	if (castlingRights == 0) return "-";
+	std::string fen;
+	if (castlingRights & 0b0001) fen += 'K';
+	if (castlingRights & 0b0010) fen += 'Q';
+	if (castlingRights & 0b0100) fen += 'k';
+	if (castlingRights & 0b1000) fen += 'q';
+	return fen;
 }
 
 /**

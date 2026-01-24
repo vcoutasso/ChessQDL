@@ -5,7 +5,7 @@
 #include "Engine/bitboard.hpp"
 #include "Engine/utils.hpp"
 
-//FIXME: These tests do not take into account the possibility of castles or en passant captures
+// Note: Castling and en passant tests are included at the end of this file
 
 TEST(MoveGenerator, PseudoLegalInitialMoves_Test) {
 
@@ -278,4 +278,151 @@ TEST(MoveGenerator, EnPassantNotAvailableAfterOneMove_Test) {
 	// Check that e5e4 (en passant capture) is NOT possible (no en passant square in FEN)
 	bool canEnPassant = std::find(moves.begin(), moves.end(), "e5e4") != moves.end();
 	EXPECT_FALSE(canEnPassant);
+}
+
+
+// ============================================================================
+// CASTLING TESTS
+// ============================================================================
+
+TEST(MoveGenerator, WhiteKingsideCastlingAvailable_Test) {
+	// White can castle kingside: king on e1, rook on h1, f1 and g1 empty
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Check that e1g1 (kingside castling) is available
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	EXPECT_TRUE(canCastleKingside);
+}
+
+TEST(MoveGenerator, WhiteQueensideCastlingAvailable_Test) {
+	// White can castle queenside: king on e1, rook on a1, b1, c1, d1 empty
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Check that e1c1 (queenside castling) is available
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
+	EXPECT_TRUE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, BlackKingsideCastlingAvailable_Test) {
+	// Black can castle kingside
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, 0, board.getCastlingRights());
+	
+	// Check that e8g8 (kingside castling) is available
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e8g8") != moves.end();
+	EXPECT_TRUE(canCastleKingside);
+}
+
+TEST(MoveGenerator, BlackQueensideCastlingAvailable_Test) {
+	// Black can castle queenside
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, 0, board.getCastlingRights());
+	
+	// Check that e8c8 (queenside castling) is available
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e8c8") != moves.end();
+	EXPECT_TRUE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, CastlingBlockedByPiece_Test) {
+	// Castling should not be available if pieces are in the way
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RN2KB1R w KQkq - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Neither castling should be available due to blocking pieces (knight on b1, bishop on f1)
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+	EXPECT_FALSE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, CastlingRightsRemovedKingside_Test) {
+	// If kingside castling right is removed, cannot castle kingside
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w Qkq - 0 1"); // No 'K'
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+	EXPECT_TRUE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, CastlingRightsRemovedQueenside_Test) {
+	// If queenside castling right is removed, cannot castle queenside
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w Kkq - 0 1"); // No 'Q'
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
+	EXPECT_TRUE(canCastleKingside);
+	EXPECT_FALSE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, NoCastlingRightsAvailable_Test) {
+	// No castling rights at all
+	chessqdl::Bitboard board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w - - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+	EXPECT_FALSE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, CastlingBlockedByAttackedSquare_Test) {
+	// Cannot castle through an attacked square
+	// Black rook on f8 attacks f1 - white cannot castle kingside
+	chessqdl::Bitboard board("5r2/8/8/8/8/8/8/R3K2R w KQ - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Kingside castling should be blocked (king passes through f1 which is attacked)
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+}
+
+TEST(MoveGenerator, CastlingBlockedByKingInCheck_Test) {
+	// Cannot castle while in check
+	// Black rook on e8 attacks e1 - white king is in check
+	chessqdl::Bitboard board("4r3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Neither castling should be available when king is in check
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+	EXPECT_FALSE(canCastleQueenside);
+}
+
+TEST(MoveGenerator, CastlingBlockedByDestinationAttacked_Test) {
+	// Cannot castle if destination square is attacked
+	// Black rook on g8 attacks g1 - white cannot castle kingside
+	chessqdl::Bitboard board("6r1/8/8/8/8/8/8/R3K2R w KQ - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Kingside castling should be blocked (destination g1 is attacked)
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
 }
