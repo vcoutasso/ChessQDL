@@ -15,11 +15,10 @@ inline int popCount(chessqdl::U64 x) {
 // ============================================================================
 
 TEST(ChessRules, CastlingKingsideWhite_Test) {
-	GTEST_SKIP() << "Castling not yet implemented";
 	chessqdl::Bitboard board("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
 	
 	// Check that e1g1 (kingside castling) is in the move list
 	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
@@ -27,11 +26,10 @@ TEST(ChessRules, CastlingKingsideWhite_Test) {
 }
 
 TEST(ChessRules, CastlingQueensideWhite_Test) {
-	GTEST_SKIP() << "Castling not yet implemented";
 	chessqdl::Bitboard board("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
 	
 	// Check that e1c1 (queenside castling) is in the move list
 	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
@@ -39,11 +37,10 @@ TEST(ChessRules, CastlingQueensideWhite_Test) {
 }
 
 TEST(ChessRules, CastlingKingsideBlack_Test) {
-	GTEST_SKIP() << "Castling not yet implemented";
 	chessqdl::Bitboard board("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, 0, board.getCastlingRights());
 	
 	// Check that e8g8 (kingside castling) is in the move list
 	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e8g8") != moves.end();
@@ -51,11 +48,10 @@ TEST(ChessRules, CastlingKingsideBlack_Test) {
 }
 
 TEST(ChessRules, CastlingQueensideBlack_Test) {
-	GTEST_SKIP() << "Castling not yet implemented";
 	chessqdl::Bitboard board("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, 0, board.getCastlingRights());
 	
 	// Check that e8c8 (queenside castling) is in the move list
 	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e8c8") != moves.end();
@@ -67,7 +63,7 @@ TEST(ChessRules, CastlingBlockedByPiece_Test) {
 	chessqdl::Bitboard board("r3k2r/8/8/8/8/8/8/R3K1NR w KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
 	
 	// Check that e1g1 (kingside castling) is NOT in the move list
 	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
@@ -75,11 +71,11 @@ TEST(ChessRules, CastlingBlockedByPiece_Test) {
 }
 
 TEST(ChessRules, CastlingThroughCheck_Test) {
-	// Bishop on a6 attacks d1, castling queenside would move through check
-	chessqdl::Bitboard board("4k3/8/b7/8/8/8/8/R3K2R w KQ - 0 1");
+	// Bishop on a4 attacks d1 via diagonal a4-b3-c2-d1, castling queenside would move through check
+	chessqdl::Bitboard board("4k3/8/8/8/b7/8/8/R3K2R w KQ - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
 	
 	// Check that e1c1 (queenside castling) is NOT in the move list (would pass through check on d1)
 	bool canCastleQueenside = std::find(moves.begin(), moves.end(), "e1c1") != moves.end();
@@ -91,7 +87,7 @@ TEST(ChessRules, CastlingWhileInCheck_Test) {
 	chessqdl::Bitboard board("4k3/8/8/8/8/4r3/8/R3K2R w KQ - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
 	
 	// Check that neither e1g1 nor e1c1 are in the move list
 	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
@@ -122,15 +118,15 @@ TEST(ChessRules, PinnedPieceCannotMove_Test) {
 }
 
 TEST(ChessRules, PinnedPieceCanCaptureAlongPin_Test) {
-	GTEST_SKIP() << "Pinned piece capture validation not yet complete";
-	// Bishop on e2 is pinned by rook on e8, but can capture the rook
-	chessqdl::Engine engine("4r3/8/8/8/8/8/4B3/4K3 w - - 0 1", chessqdl::nWhite, 1, false, true, 42);
+	// Rook on e4 is pinned by queen on e8, but can capture the queen along the pin
+	// (A rook CAN move along the e-file, unlike a bishop which can only move diagonally)
+	chessqdl::Engine engine("4q3/8/8/8/4R3/8/8/4K3 w - - 0 1", chessqdl::nWhite, 1, false, true, 42);
 	
 	auto legalMoves = engine.getLegalMoves();
 	
-	// Bishop can capture the rook along the pin
-	bool canCaptureRook = std::find(legalMoves.begin(), legalMoves.end(), "e2e8") != legalMoves.end();
-	EXPECT_TRUE(canCaptureRook);
+	// Rook can capture the queen along the pin (e4e8 is a valid rook move)
+	bool canCaptureQueen = std::find(legalMoves.begin(), legalMoves.end(), "e4e8") != legalMoves.end();
+	EXPECT_TRUE(canCaptureQueen);
 }
 
 // ============================================================================

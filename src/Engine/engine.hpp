@@ -41,6 +41,11 @@ namespace chessqdl {
         std::stack<int> enPassantHistory;
 
         /**
+         * @brief Stack with castling rights history. Used to restore castling rights on undo
+         */
+        std::stack<int> castlingRightsHistory;
+
+        /**
          * @brief Ply counter. The counter is incremented after every valid move made and decremented after each undo
          */
         int ply = 0;
