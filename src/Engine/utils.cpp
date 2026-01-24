@@ -59,9 +59,9 @@ int chessqdl::evaluateBoard(const BitboardArray &board, const enumColor color) {
 
 	const enumColor enemyColor = color == nWhite ? nBlack : nWhite;
 
-	// Move count
-	const int m = static_cast<int>(MoveGenerator::getPseudoLegalMoves(board, color).size());
-	const int mPrime = static_cast<int>(MoveGenerator::getPseudoLegalMoves(board, enemyColor).size());
+	// Move count (no castling rights or en passant for evaluation)
+	const int m = static_cast<int>(MoveGenerator::getPseudoLegalMoves(board, color, 0, 0).size());
+	const int mPrime = static_cast<int>(MoveGenerator::getPseudoLegalMoves(board, enemyColor, 0, 0).size());
 
 	int score = 200 * (k - kPrime) + 9 * (q - qPrime) + 5 * (r - rPrime) + 3 * (n - nPrime + b - bPrime) + (p - pPrime);
 	score += static_cast<int>(0.1 * (m - mPrime));

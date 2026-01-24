@@ -22,8 +22,9 @@ TEST(MoveGenerator, PseudoLegalInitialMoves_Test) {
 			  0x00);
 	EXPECT_EQ(generator.getQueenMoves(bitboard.getBitBoards(), chessqdl::enumColor::nColor), 0x00);
 
-	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nWhite).size(), 20);
-	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nBlack).size(), 20);
+	// Initial position: both sides can castle
+	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nWhite, 0, 0b1111).size(), 20);
+	EXPECT_EQ(generator.getPseudoLegalMoves(bitboard.getBitBoards(), chessqdl::enumColor::nBlack, 0, 0b1111).size(), 20);
 
 }
 
@@ -248,7 +249,7 @@ TEST(MoveGenerator, EnPassantCaptureByBlack_Test) {
 	chessqdl::MoveGenerator generator;
 	
 	// en passant square is e3 (square 20 in bitboard coordinates)  
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, board.getEnPassantSquare());
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, board.getEnPassantSquare(), board.getCastlingRights());
 	
 	// Check that d4e3 (en passant capture) is possible
 	bool canEnPassant = std::find(moves.begin(), moves.end(), "d4e3") != moves.end();
@@ -261,7 +262,7 @@ TEST(MoveGenerator, EnPassantCaptureByWhite_Test) {
 	chessqdl::MoveGenerator generator;
 	
 	// en passant square is d6 (square 43 in bitboard coordinates)
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, board.getEnPassantSquare());
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, board.getEnPassantSquare(), board.getCastlingRights());
 	
 	// Check that e5d6 (en passant capture) is possible
 	bool canEnPassant = std::find(moves.begin(), moves.end(), "e5d6") != moves.end();
@@ -273,7 +274,7 @@ TEST(MoveGenerator, EnPassantNotAvailableAfterOneMove_Test) {
 	chessqdl::Bitboard board("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
-	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack);
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, board.getEnPassantSquare(), board.getCastlingRights());
 	
 	// Check that e5e4 (en passant capture) is NOT possible (no en passant square in FEN)
 	bool canEnPassant = std::find(moves.begin(), moves.end(), "e5e4") != moves.end();
@@ -423,6 +424,34 @@ TEST(MoveGenerator, CastlingBlockedByDestinationAttacked_Test) {
 	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
 	
 	// Kingside castling should be blocked (destination g1 is attacked)
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+}
+
+TEST(MoveGenerator, CastlingBlockedByPawnAttack_Test) {
+	// Cannot castle through a square attacked by opponent's pawn
+	// White kingside castling: king on e1 needs to pass through f1 to g1
+	// Black pawn on g2 attacks f1 - white cannot castle kingside
+	chessqdl::Bitboard board("4k3/8/8/8/8/8/6p1/R3K2R w KQ - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Kingside castling should be blocked (f1 is attacked by pawn on g2)
+	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
+	EXPECT_FALSE(canCastleKingside);
+}
+
+TEST(MoveGenerator, CastlingBlockedByKnightAttack_Test) {
+	// Cannot castle through a square attacked by opponent's knight
+	// White kingside castling: king on e1 needs to pass through f1 to g1
+	// Black knight on e3 attacks f1 - white cannot castle kingside
+	chessqdl::Bitboard board("4k3/8/8/8/8/4n3/8/R3K2R w KQ - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, 0, board.getCastlingRights());
+	
+	// Kingside castling should be blocked (f1 is attacked by knight on e3)
 	bool canCastleKingside = std::find(moves.begin(), moves.end(), "e1g1") != moves.end();
 	EXPECT_FALSE(canCastleKingside);
 }
