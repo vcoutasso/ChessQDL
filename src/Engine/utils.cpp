@@ -84,9 +84,12 @@ void chessqdl::readInteger(int &n) {
 
 
 /**
- * @details Performs some bitset operations to encounter the least significant bit that is set. Log2 just finds out its index
+ * @details Performs some bitset operations to encounter the least significant bit that is set. Log2 just finds out its index.
+ * @note Callers typically pass a non-zero value. If value is 0, this function returns -1 to indicate that no bit is set.
  */
 int chessqdl::leastSignificantSetBit(const uint64_t value) {
+	if (value == 0) return -1;
+	
 	const uint64_t lsb = value & -value;
 
 	return static_cast<int>(log2(static_cast<double>(lsb)));

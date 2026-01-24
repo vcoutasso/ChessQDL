@@ -40,3 +40,11 @@ add_executable(${TEST_NAME} ${SOURCE_FILES})
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 target_link_libraries(${TEST_NAME} ${CMAKE_PROJECT_NAME}_lib gtest_main gmock)
 
+
+# Engine state tests (FEN roundtrip, move/undo, edge cases)
+set(SOURCE_FILES engine_state_tests.cpp)
+set(TEST_NAME engine_state_tests)
+
+add_executable(${TEST_NAME} ${SOURCE_FILES})
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+target_link_libraries(${TEST_NAME} ${CMAKE_PROJECT_NAME}_lib gtest_main gmock)

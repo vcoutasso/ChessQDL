@@ -33,9 +33,9 @@ namespace chessqdl {
         std::stack<std::string> moveHistory;
 
         /**
-         * @brief Stack with capture history. Used to undo captures
+         * @brief Stack with capture history. Used to undo captures (stores piece type)
          */
-        std::stack<enumColor> captureHistory;
+        std::stack<enumPiece> captureHistory;
 
         /**
          * @brief Stack with en passant square history. Used to restore en passant on undo
