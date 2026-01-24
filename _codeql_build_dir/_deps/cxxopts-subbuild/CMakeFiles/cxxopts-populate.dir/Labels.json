@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/CMakeFiles/cxxopts-populate"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/CMakeFiles/cxxopts-populate.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/CMakeFiles/cxxopts-populate-complete.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-build.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-configure.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-download.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-install.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-patch.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-test.rule"
+		},
+		{
+			"file" : "/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/cxxopts-populate-prefix/src/cxxopts-populate-stamp/cxxopts-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"cxxopts-populate"
+		],
+		"name" : "cxxopts-populate"
+	}
+}

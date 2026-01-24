@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/ChessQDL_lib.a CMakeFiles/ChessQDL_lib.dir/Engine/bitboard.cpp.o CMakeFiles/ChessQDL_lib.dir/Engine/movegen.cpp.o CMakeFiles/ChessQDL_lib.dir/Engine/engine.cpp.o CMakeFiles/ChessQDL_lib.dir/Engine/utils.cpp.o
+/usr/bin/ranlib ../lib/ChessQDL_lib.a
