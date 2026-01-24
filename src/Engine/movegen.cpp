@@ -227,8 +227,9 @@ U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor c
     const U64 validSingleMoves = singleMoves & ~bitboard[nColor];
     
     // Double moves: only from initial position and only if both squares are empty
+    // Find pawns on starting rank whose single-move destination is empty (can advance one square)
     const U64 doubleMovesPawns = initialPawns & (color == nWhite 
-                                                     ? shiftSouth(validSingleMoves)  // pawns that can do single move
+                                                     ? shiftSouth(validSingleMoves)
                                                      : shiftNorth(validSingleMoves));
     const U64 doubleMoveSquares = color == nWhite
                                 ? shiftNorth(shiftNorth(doubleMovesPawns))
