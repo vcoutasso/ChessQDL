@@ -129,3 +129,169 @@ TEST(Check, DiscoveredCheckAfterMove_Test) {
     }
     EXPECT_FALSE(hasBishopMoves);
 }
+
+// ============================================================================
+// DRAW CONDITION TESTS
+// ============================================================================
+
+// Test 50-move rule detection
+TEST(Draw, FiftyMoveRule_Test) {
+    // Position with 100 halfmoves (50 full moves) in FEN
+    // FEN format: ... halfmove fullmove
+    Engine engine("8/8/8/4k3/8/4K3/8/8 w - - 100 50", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isFiftyMoveRule());
+}
+
+TEST(Draw, NotFiftyMoveRule_Test) {
+    // Standard starting position (0 halfmoves)
+    Engine engine(nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isFiftyMoveRule());
+}
+
+TEST(Draw, FiftyMoveRuleAt99_Test) {
+    // Position with 99 halfmoves (not quite 50 moves yet)
+    Engine engine("8/8/8/4k3/8/4K3/8/8 w - - 99 50", nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isFiftyMoveRule());
+}
+
+// Test insufficient material detection
+TEST(Draw, InsufficientMaterial_KingVsKing_Test) {
+    // K vs K - definitely a draw
+    Engine engine("8/8/8/4k3/8/4K3/8/8 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, InsufficientMaterial_KingBishopVsKing_Test) {
+    // K+B vs K - draw
+    Engine engine("8/8/8/4k3/8/4K3/3B4/8 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, InsufficientMaterial_KingKnightVsKing_Test) {
+    // K+N vs K - draw
+    Engine engine("8/8/8/4k3/8/4K3/3N4/8 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, InsufficientMaterial_KingVsKingBishop_Test) {
+    // K vs K+B - draw
+    Engine engine("8/8/4b3/4k3/8/4K3/8/8 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, InsufficientMaterial_KingBishopVsKingBishop_SameColor_Test) {
+    // K+B vs K+B with both bishops on same color squares - draw
+    // White bishop on c1 (dark square), black bishop on f8 (dark square)
+    Engine engine("5b2/8/8/4k3/8/4K3/8/2B5 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, NotInsufficientMaterial_KingBishopVsKingBishop_DifferentColor_Test) {
+    // K+B vs K+B with bishops on different color squares - NOT a draw
+    // White bishop on c1 (dark square), black bishop on e8 (light square)
+    Engine engine("4b3/8/8/4k3/8/4K3/8/2B5 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, NotInsufficientMaterial_WithPawn_Test) {
+    // K+P vs K - NOT a draw (pawn can promote)
+    Engine engine("8/4P3/8/4k3/8/4K3/8/8 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, NotInsufficientMaterial_WithRook_Test) {
+    // K+R vs K - NOT a draw (rook can deliver checkmate)
+    Engine engine("8/8/8/4k3/8/4K3/8/4R3 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isInsufficientMaterial());
+}
+
+TEST(Draw, NotInsufficientMaterial_WithQueen_Test) {
+    // K+Q vs K - NOT a draw (queen can deliver checkmate)
+    Engine engine("8/8/8/4k3/8/4K3/8/4Q3 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isInsufficientMaterial());
+}
+
+// Test isDraw() composite function
+TEST(Draw, IsDraw_Stalemate_Test) {
+    // Stalemate position
+    Engine engine("7k/8/6Q1/8/8/8/8/7K b - - 0 1", nBlack, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isDraw());
+}
+
+TEST(Draw, IsDraw_InsufficientMaterial_Test) {
+    // K vs K
+    Engine engine("8/8/8/4k3/8/4K3/8/8 w - - 0 1", nWhite, 1, false, true, 42);
+    
+    EXPECT_TRUE(engine.isDraw());
+}
+
+TEST(Draw, NotDraw_StandardPosition_Test) {
+    // Standard starting position
+    Engine engine(nWhite, 1, false, true, 42);
+    
+    EXPECT_FALSE(engine.isDraw());
+}
+
+// Test threefold repetition
+TEST(Draw, ThreefoldRepetition_Test) {
+    // Start with a simple position without castling rights (so moving rook doesn't change position key)
+    Engine engine("4k3/8/8/8/8/8/8/R3K2R w - - 0 1", nWhite, 1, false, true, 42);
+    
+    // Initially, no repetition
+    EXPECT_FALSE(engine.isThreefoldRepetition());
+    
+    // Move rook back and forth to create repetition
+    // Position 1: initial, Position 2: after Ra2a1, Kd8e8, Position 3: after second cycle
+    engine.makeMove("a1a2", false, false);
+    engine.makeMove("e8d8", false, false);
+    engine.makeMove("a2a1", false, false);
+    engine.makeMove("d8e8", false, false);
+    
+    // Position occurred twice now
+    EXPECT_FALSE(engine.isThreefoldRepetition());
+    
+    engine.makeMove("a1a2", false, false);
+    engine.makeMove("e8d8", false, false);
+    engine.makeMove("a2a1", false, false);
+    engine.makeMove("d8e8", false, false);
+    
+    // Position now occurred 3 times - threefold repetition
+    EXPECT_TRUE(engine.isThreefoldRepetition());
+}
+
+TEST(Draw, NotThreefoldRepetition_AfterUndo_Test) {
+    // Make sure undo properly decrements position history
+    // Use position without castling rights so positions match exactly
+    Engine engine("4k3/8/8/8/8/8/8/R3K2R w - - 0 1", nWhite, 1, false, true, 42);
+    
+    // Make moves to get 2 repetitions
+    engine.makeMove("a1a2", false, false);
+    engine.makeMove("e8d8", false, false);
+    engine.makeMove("a2a1", false, false);
+    engine.makeMove("d8e8", false, false);
+    
+    // Make move towards 3rd repetition
+    engine.makeMove("a1a2", false, false);
+    engine.makeMove("e8d8", false, false);
+    engine.makeMove("a2a1", false, false);
+    
+    // Not yet 3 repetitions (need black to complete the move)
+    EXPECT_FALSE(engine.isThreefoldRepetition());
+    
+    // Undo the move and no threefold
+    engine.takeMove();
+    EXPECT_FALSE(engine.isThreefoldRepetition());
+}

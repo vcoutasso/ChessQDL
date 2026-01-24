@@ -6,6 +6,8 @@
 #include <stack>
 #include <random>
 #include <optional>
+#include <vector>
+#include <unordered_map>
 
 namespace chessqdl {
     class Engine {
@@ -46,6 +48,17 @@ namespace chessqdl {
         std::stack<int> castlingRightsHistory;
 
         /**
+         * @brief Stack with halfmove clock history. Used to restore halfmove clock on undo
+         */
+        std::stack<int> halfmoveClockHistory;
+
+        /**
+         * @brief Map of position hashes to occurrence counts for threefold repetition detection
+         * Key is position string (FEN without move counters), value is count
+         */
+        std::unordered_map<std::string, int> positionHistory;
+
+        /**
          * @brief Ply counter. The counter is incremented after every valid move made and decremented after each undo
          */
         int ply = 0;
@@ -69,6 +82,12 @@ namespace chessqdl {
          * @brief Random number generator
          */
         std::default_random_engine generator;
+
+        /**
+         * @brief Generates the position key used for threefold repetition detection
+         * @return  Position key string (piece placement, turn, castling, en passant)
+         */
+        [[nodiscard]] std::string getPositionKey() const;
 
         /**
          * @brief Prints the current state of the board to stdout. A terminal with Unicode support is recommended since the pieces are represented by Unicode symbols
@@ -98,6 +117,34 @@ namespace chessqdl {
          * @return  true if the color is in stalemate, false otherwise
          */
         [[nodiscard]] bool isStalemate(enumColor color);
+
+
+        /**
+         * @brief Checks if the game is a draw by the 50-move rule
+         * @return  true if 50 moves have passed without a pawn move or capture
+         */
+        [[nodiscard]] bool isFiftyMoveRule() const;
+
+
+        /**
+         * @brief Checks if the game is a draw by threefold repetition
+         * @return  true if the current position has occurred 3 times
+         */
+        [[nodiscard]] bool isThreefoldRepetition() const;
+
+
+        /**
+         * @brief Checks if the game is a draw due to insufficient material
+         * @return  true if neither side can checkmate (K vs K, K+B vs K, K+N vs K, K+B vs K+B same color)
+         */
+        [[nodiscard]] bool isInsufficientMaterial() const;
+
+
+        /**
+         * @brief Checks if the game is a draw (stalemate, 50-move, threefold repetition, or insufficient material)
+         * @return  true if the game is a draw
+         */
+        [[nodiscard]] bool isDraw();
 
 
         /**

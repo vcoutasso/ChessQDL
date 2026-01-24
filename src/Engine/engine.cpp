@@ -23,6 +23,8 @@ Engine::Engine(const enumColor color, const int depth, const bool v, const bool 
     generator = !seed.has_value()
                     ? std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count())
                     : std::default_random_engine(seed.value());
+    // Initialize position history with starting position
+    positionHistory[getPositionKey()] = 1;
 }
 
 
@@ -40,6 +42,8 @@ Engine::Engine(const std::string &fen, const enumColor color, const int depth, c
     generator = !seed.has_value()
                     ? std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count())
                     : std::default_random_engine(seed.value());
+    // Initialize position history with starting position
+    positionHistory[getPositionKey()] = 1;
 }
 
 
@@ -48,6 +52,25 @@ Engine::Engine(const std::string &fen, const enumColor color, const int depth, c
  */
 void Engine::printBoard() const {
     bitboard.printBoard();
+}
+
+
+/**
+ * @details Generates a position key for threefold repetition detection
+ */
+std::string Engine::getPositionKey() const {
+    std::string posKey = bitboard.getPiecePlacementFEN();
+    posKey += (toMove == nWhite) ? " w " : " b ";
+    posKey += bitboard.getCastlingFEN();
+    posKey += " ";
+    int epSquare = bitboard.getEnPassantSquare();
+    if (epSquare > 0) {
+        posKey += static_cast<char>('a' + (epSquare % 8));
+        posKey += static_cast<char>('1' + (epSquare / 8));
+    } else {
+        posKey += "-";
+    }
+    return posKey;
 }
 
 
@@ -165,9 +188,19 @@ void Engine::parser() {
             break;
         }
         
-        // Check for stalemate
-        if (isStalemate(toMove)) {
-            std::cout << std::endl << "Stalemate! Game is a draw" << std::endl;
+        // Check for draw conditions
+        if (isDraw()) {
+            std::cout << std::endl << "Draw! ";
+            if (isStalemate(toMove)) {
+                std::cout << "Stalemate";
+            } else if (isFiftyMoveRule()) {
+                std::cout << "50-move rule";
+            } else if (isThreefoldRepetition()) {
+                std::cout << "Threefold repetition";
+            } else if (isInsufficientMaterial()) {
+                std::cout << "Insufficient material";
+            }
+            std::cout << std::endl;
             break;
         }
 
@@ -240,6 +273,94 @@ bool Engine::isStalemate(const enumColor color) {
 }
 
 
+/**
+ * @details Checks if 50 moves (100 half-moves) have passed without a pawn move or capture
+ */
+bool Engine::isFiftyMoveRule() const {
+    return bitboard.getHalfmoveClock() >= 100;
+}
+
+
+/**
+ * @details Checks if the current position has occurred 3 or more times
+ */
+bool Engine::isThreefoldRepetition() const {
+    std::string posKey = getPositionKey();
+    auto it = positionHistory.find(posKey);
+    return it != positionHistory.end() && it->second >= 3;
+}
+
+
+/**
+ * @details Checks if neither side has sufficient material to checkmate
+ * Insufficient material cases:
+ * - K vs K
+ * - K+B vs K
+ * - K+N vs K
+ * - K+B vs K+B (bishops on same color squares)
+ */
+bool Engine::isInsufficientMaterial() const {
+    // Count pieces for each side
+    int whitePawns = static_cast<int>(bitboard.getPawns(nWhite).count());
+    int blackPawns = static_cast<int>(bitboard.getPawns(nBlack).count());
+    int whiteKnights = static_cast<int>(bitboard.getKnights(nWhite).count());
+    int blackKnights = static_cast<int>(bitboard.getKnights(nBlack).count());
+    int whiteBishops = static_cast<int>(bitboard.getBishops(nWhite).count());
+    int blackBishops = static_cast<int>(bitboard.getBishops(nBlack).count());
+    int whiteRooks = static_cast<int>(bitboard.getRooks(nWhite).count());
+    int blackRooks = static_cast<int>(bitboard.getRooks(nBlack).count());
+    int whiteQueens = static_cast<int>(bitboard.getQueens(nWhite).count());
+    int blackQueens = static_cast<int>(bitboard.getQueens(nBlack).count());
+    
+    // If any side has pawns, rooks, or queens, there's sufficient material
+    if (whitePawns > 0 || blackPawns > 0) return false;
+    if (whiteRooks > 0 || blackRooks > 0) return false;
+    if (whiteQueens > 0 || blackQueens > 0) return false;
+    
+    int whitePieces = whiteKnights + whiteBishops;
+    int blackPieces = blackKnights + blackBishops;
+    
+    // K vs K
+    if (whitePieces == 0 && blackPieces == 0) return true;
+    
+    // K+B vs K or K+N vs K
+    if (whitePieces == 0 && blackPieces == 1) return true;
+    if (blackPieces == 0 && whitePieces == 1) return true;
+    
+    // K+B vs K+B with bishops on same color squares
+    if (whiteBishops == 1 && blackBishops == 1 && whiteKnights == 0 && blackKnights == 0) {
+        // Find bishop positions and check if they're on the same color square
+        U64 whiteBishopBB = bitboard.getBishops(nWhite);
+        U64 blackBishopBB = bitboard.getBishops(nBlack);
+        
+        int whiteBishopSquare = -1;
+        int blackBishopSquare = -1;
+        
+        for (int i = 0; i < 64; i++) {
+            if (whiteBishopBB.test(i)) whiteBishopSquare = i;
+            if (blackBishopBB.test(i)) blackBishopSquare = i;
+        }
+        
+        // Check if both bishops are on same color squares
+        // Light squares: (file + rank) % 2 == 0, Dark squares: (file + rank) % 2 == 1
+        int whiteSquareColor = ((whiteBishopSquare % 8) + (whiteBishopSquare / 8)) % 2;
+        int blackSquareColor = ((blackBishopSquare % 8) + (blackBishopSquare / 8)) % 2;
+        
+        if (whiteSquareColor == blackSquareColor) return true;
+    }
+    
+    return false;
+}
+
+
+/**
+ * @details Checks if the game is a draw by any rule
+ */
+bool Engine::isDraw() {
+    return isStalemate(toMove) || isFiftyMoveRule() || isThreefoldRepetition() || isInsufficientMaterial();
+}
+
+
 // NOLINTBEGIN(misc-no-recursion)
 /**
  * @details Returns the evaluation of the current board state
@@ -306,6 +427,9 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         // Save current castling rights for undo
         castlingRightsHistory.push(bitboard.getCastlingRights());
 
+        // Save current halfmove clock for undo
+        halfmoveClockHistory.push(bitboard.getHalfmoveClock());
+
         // Type of the piece that is being moved
         enumPiece pieceType = nPawn;
 
@@ -339,7 +463,9 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         }
 
         // If a piece is being captured
+        bool isCapture = false;
         if (bitboard.testBit(otherPlayer, toIdx)) {
+            isCapture = true;
             for (int i = nPawn; i <= nKing; i++) {
                 if (U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer); aux.test(toIdx)) {
                     bitboard.resetBit(i, toIdx);
@@ -354,6 +480,7 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         // Check if this is an en passant capture
         // En passant: pawn moves diagonally but no piece at destination
         else if (pieceType == nPawn && fromIdx % 8 != toIdx % 8 && bitboard.getEnPassantSquare() == toIdx) {
+            isCapture = true;
             // This is an en passant capture
             // The captured pawn is adjacent to the destination square
             int capturedPawnIdx;
@@ -473,8 +600,28 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         
         bitboard.setEnPassantSquare(newEnPassantSquare);
 
+        // Update halfmove clock (reset on pawn move or capture, otherwise increment)
+        if (pieceType == nPawn || isCapture) {
+            bitboard.resetHalfmoveClock();
+        } else {
+            bitboard.incrementHalfmoveClock();
+        }
+
         // Updates the bitboard that contains info about both players
         bitboard.updateBitboard();
+
+        // Update position history for threefold repetition detection
+        std::string posKey = bitboard.getPiecePlacementFEN();
+        posKey += (otherPlayer == nWhite) ? " w " : " b ";  // Next player to move
+        posKey += bitboard.getCastlingFEN();
+        posKey += " ";
+        if (newEnPassantSquare > 0) {
+            posKey += static_cast<char>('a' + (newEnPassantSquare % 8));
+            posKey += static_cast<char>('1' + (newEnPassantSquare / 8));
+        } else {
+            posKey += "-";
+        }
+        positionHistory[posKey]++;
 
         // Move number after the string when appropriate (if ply is even)
         if (ply % 2 == 0)
@@ -501,6 +648,17 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
  */
 void Engine::takeMove() {
     if (!moveHistory.empty()) {
+        // Decrement position history FIRST, before any state changes
+        // The current state is exactly what was recorded in makeMove
+        std::string posKey = getPositionKey();
+        auto it = positionHistory.find(posKey);
+        if (it != positionHistory.end() && it->second > 0) {
+            it->second--;
+            if (it->second == 0) {
+                positionHistory.erase(it);
+            }
+        }
+
         std::string lastMove = moveHistory.top();
         moveHistory.pop();
 
@@ -562,6 +720,13 @@ void Engine::takeMove() {
                 castlingRightsHistory.pop();
                 bitboard.setCastlingRights(prevCastlingRights);
             }
+
+            // Restore halfmove clock from history
+            if (!halfmoveClockHistory.empty()) {
+                int prevHalfmoveClock = halfmoveClockHistory.top();
+                halfmoveClockHistory.pop();
+                bitboard.setHalfmoveClock(prevHalfmoveClock);
+            }
             
             // Restore en passant square from history
             if (!enPassantHistory.empty()) {
@@ -569,7 +734,7 @@ void Engine::takeMove() {
                 enPassantHistory.pop();
                 bitboard.setEnPassantSquare(prevEnPassantSquare);
             }
-            
+
             toMove = hasMoved;
             --ply;
             return;
@@ -668,6 +833,13 @@ void Engine::takeMove() {
             int prevCastlingRights = castlingRightsHistory.top();
             castlingRightsHistory.pop();
             bitboard.setCastlingRights(prevCastlingRights);
+        }
+
+        // Restore halfmove clock from history
+        if (!halfmoveClockHistory.empty()) {
+            int prevHalfmoveClock = halfmoveClockHistory.top();
+            halfmoveClockHistory.pop();
+            bitboard.setHalfmoveClock(prevHalfmoveClock);
         }
 
         // Restore en passant square from history
@@ -811,8 +983,8 @@ std::string Engine::getFEN() const {
     }
     fen += ' ';
     
-    // Halfmove clock (reset after captures or pawn moves - we don't track this yet, so always 0)
-    fen += '0';
+    // Halfmove clock (for 50-move rule)
+    fen += std::to_string(bitboard.getHalfmoveClock());
     fen += ' ';
     
     // Fullmove number (1-indexed, increments after each black move)
