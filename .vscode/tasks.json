@@ -2,27 +2,10 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "cmake: build [debug]",
+			"label": "build [debug]",
 			"type": "shell",
 			"command": "make",
 			"args": ["debug"],
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			},
-			"problemMatcher": ["$gcc"],
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared"
-			}
-		},
-		{
-			"label": "cmake: build [release]",
-			"type": "shell",
-			"command": "make",
-			"args": ["release"],
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -36,11 +19,73 @@
 			}
 		},
 		{
-			"label": "cmake: run",
+			"label": "build [release]",
+			"type": "shell",
+			"command": "make",
+			"args": ["release"],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"problemMatcher": ["$gcc"],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "run [debug]",
+			"type": "shell",
+			"command": "make",
+			"args": ["run-debug"],
+			"group": "test",
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "run [release]",
 			"type": "shell",
 			"command": "make",
 			"args": ["run"],
 			"group": "test",
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "test",
+			"type": "shell",
+			"command": "make",
+			"args": ["test"],
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "clean",
+			"type": "shell",
+			"command": "make",
+			"args": ["clean"],
+			"group": "none",
 			"problemMatcher": [],
 			"presentation": {
 				"echo": true,
@@ -50,16 +95,16 @@
 			}
 		},
 		{
-			"label": "cmake: build and run [release]",
+			"label": "rebuild [debug]",
 			"type": "shell",
-			"command": "./build/bin/ChessQDL",
-			"dependsOn": ["cmake: build [release]"],
-			"group": "none",
-			"problemMatcher": [],
+			"command": "make",
+			"args": ["remake"],
+			"group": "build",
+			"problemMatcher": ["$gcc"],
 			"presentation": {
 				"echo": true,
 				"reveal": "always",
-				"focus": true,
+				"focus": false,
 				"panel": "shared"
 			}
 		}
