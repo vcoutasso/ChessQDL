@@ -253,8 +253,8 @@ TEST(Draw, ThreefoldRepetition_Test) {
     // Initially, no repetition
     EXPECT_FALSE(engine.isThreefoldRepetition());
     
-    // Move rook back and forth to create repetition
-    // Position 1: initial, Position 2: after Ra2a1, Kd8e8, Position 3: after second cycle
+    // Move rook and king back and forth to create repetition
+    // Position 1: initial; Position 2: after a1a2, e8d8; Position 3: after repeating a1a2, e8d8, a2a1, d8e8
     engine.makeMove("a1a2", false, false);
     engine.makeMove("e8d8", false, false);
     engine.makeMove("a2a1", false, false);
