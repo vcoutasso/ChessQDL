@@ -221,15 +221,25 @@ U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor c
     const enumColor opponentColor = color == nWhite ? nBlack : nWhite;
     const U64 pawn = bitboard[nPawn] & bitboard[color];
     const U64 initialPawns = pawn & U64(0xffL << (color == nWhite ? 8 : 48));
-    const U64 doubleMoves = color == nWhite
-                                ? shiftNorth(shiftNorth(initialPawns))
-                                : shiftSouth(shiftSouth(initialPawns));
+    
+    // Single pawn moves
+    const U64 singleMoves = color == nWhite ? shiftNorth(pawn) : shiftSouth(pawn);
+    const U64 validSingleMoves = singleMoves & ~bitboard[nColor];
+    
+    // Double moves: only from initial position and only if both squares are empty
+    const U64 doubleMovesPawns = initialPawns & (color == nWhite 
+                                                     ? shiftSouth(validSingleMoves)  // pawns that can do single move
+                                                     : shiftNorth(validSingleMoves));
+    const U64 doubleMoveSquares = color == nWhite
+                                ? shiftNorth(shiftNorth(doubleMovesPawns))
+                                : shiftSouth(shiftSouth(doubleMovesPawns));
+    const U64 validDoubleMoves = doubleMoveSquares & ~bitboard[nColor];
+    
     const U64 attacks = bitboard[opponentColor] & (color == nWhite
                                                        ? shiftNorthEast(pawn) | shiftNorthWest(pawn)
                                                        : shiftSouthEast(pawn) | shiftSouthWest(pawn));
-    const U64 moves = color == nWhite ? shiftNorth(pawn) : shiftSouth(pawn);
 
-    return ((moves | doubleMoves) & ~bitboard[nColor]) | attacks;
+    return (validSingleMoves | validDoubleMoves) | attacks;
 }
 // NOLINTEND(misc-no-recursion)
 

@@ -168,6 +168,7 @@ void Engine::parser() {
             break;
         }
 
+        // TODO: Remove this legacy check once we verify it's not needed
         // Legacy check: This should not happen if legal move generation works correctly
         // but kept as a safety net
         if (bitboard.getKing(nWhite) == 0) {
