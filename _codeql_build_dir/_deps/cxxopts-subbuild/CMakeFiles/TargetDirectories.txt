@@ -1,3 +1,0 @@
-/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/CMakeFiles/cxxopts-populate.dir
-/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/CMakeFiles/edit_cache.dir
-/home/runner/work/ChessQDL/ChessQDL/_codeql_build_dir/_deps/cxxopts-subbuild/CMakeFiles/rebuild_cache.dir
