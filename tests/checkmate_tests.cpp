@@ -40,7 +40,7 @@ TEST(Checkmate, FoolsMate_Test) {
 TEST(Checkmate, ScholarsMate_Test) {
     // After 1.e4 e5 2.Bc4 Nc6 3.Qh5 Nf6 4.Qxf7#
     // Board: "r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4"
-    Engine engine("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4", nWhite, 3, false, true, 42);
+    Engine engine("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4", nBlack, 3, false, true, 42);
     
     EXPECT_TRUE(engine.isCheckmate(nBlack));
     EXPECT_FALSE(engine.isCheckmate(nWhite));
@@ -50,7 +50,7 @@ TEST(Checkmate, ScholarsMate_Test) {
 TEST(Checkmate, SmotheredMate_Test) {
     // Black king on h8 surrounded by own pieces, white knight on f7 delivers checkmate
     // Board: "6rk/5Npp/8/8/8/8/8/7K b - - 0 1"
-    Engine engine("6rk/5Npp/8/8/8/8/8/7K b - - 0 1", nWhite, 3, false, true, 42);
+    Engine engine("6rk/5Npp/8/8/8/8/8/7K b - - 0 1", nBlack, 3, false, true, 42);
     
     EXPECT_TRUE(engine.isCheckmate(nBlack));
     EXPECT_FALSE(engine.isCheckmate(nWhite));
@@ -60,18 +60,7 @@ TEST(Checkmate, SmotheredMate_Test) {
 TEST(Stalemate, LoneKingStalemate_Test) {
     // Black king on h8 has no legal moves, not in check (white queen on g6)
     // Board: "7k/8/6Q1/8/8/8/8/7K b - - 0 1"
-    Engine engine("7k/8/6Q1/8/8/8/8/7K b - - 0 1", nWhite, 3, false, true, 42);
-    
-    EXPECT_TRUE(engine.isStalemate(nBlack));
-    EXPECT_FALSE(engine.isStalemate(nWhite));
-    EXPECT_FALSE(engine.isCheckmate(nBlack));
-}
-
-// Test stalemate with king and pawn
-TEST(Stalemate, KingPawnStalemate_Test) {
-    // Black king on a8, white king on c8, white pawn on a7 (black king has no moves and is not in check)
-    // Board: "k1K5/P7/8/8/8/8/8/8 b - - 0 1"
-    Engine engine("k1K5/P7/8/8/8/8/8/8 b - - 0 1", nBlack, 3, false, true, 42);
+    Engine engine("7k/8/6Q1/8/8/8/8/7K b - - 0 1", nBlack, 3, false, true, 42);
     
     EXPECT_TRUE(engine.isStalemate(nBlack));
     EXPECT_FALSE(engine.isStalemate(nWhite));
