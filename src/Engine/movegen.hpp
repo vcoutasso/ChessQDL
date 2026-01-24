@@ -157,9 +157,10 @@ namespace chessqdl {
 		 * @param bitboard  reference to bitboards representing the current board status
 		 * @param color  color of desired piece
 		 * @param enPassantSquare  en passant square (0 if not available)
+		 * @param originalBitboard  reference to original bitboards for checking opponent pieces in en passant
 		 * @return Bitboard with pseudo-legal moves for pawns.
 		 */
-		static U64 getPawnMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0);
+		static U64 getPawnMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0, const BitboardArray* originalBitboard = nullptr);
 
 
 		/**

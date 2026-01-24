@@ -300,6 +300,9 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         const int fromIdx = static_cast<int>(std::distance(mapPositions.begin(), fromIt));
         const int toIdx = static_cast<int>(std::distance(mapPositions.begin(), toIt));
 
+        // Save current en passant square for undo
+        enPassantHistory.push(bitboard.getEnPassantSquare());
+
         // Type of the piece that is being moved
         enumPiece pieceType = nPawn;
 
@@ -365,6 +368,27 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             bitboard.resetBit(pieceType, toIdx);
         }
 
+        // Handle en passant square update
+        // Clear en passant square by default (it's only valid for one move)
+        int newEnPassantSquare = 0;
+        
+        // Check if this move was a pawn double push (possible en passant)
+        if (pieceType == nPawn) {
+            int fromRank = fromIdx / 8;
+            int toRank = toIdx / 8;
+            int fromFile = fromIdx % 8;
+            int toFile = toIdx % 8;
+            
+            // Pawn moved exactly 2 squares vertically and same file
+            if (fromFile == toFile && std::abs(toRank - fromRank) == 2) {
+                // En passant square is the square the pawn passed through
+                // For white moving up (north): middle square = (fromRank + toRank) / 2 * 8 + file
+                // For black moving down (south): same calculation
+                newEnPassantSquare = ((fromRank + toRank) / 2) * 8 + fromFile;
+            }
+        }
+        
+        bitboard.setEnPassantSquare(newEnPassantSquare);
 
         // Updates the bitboard that contains info about both players
         bitboard.updateBitboard();
@@ -468,6 +492,13 @@ void Engine::takeMove() {
         }
 
         bitboard.updateBitboard();
+
+        // Restore en passant square from history
+        if (!enPassantHistory.empty()) {
+            int prevEnPassantSquare = enPassantHistory.top();
+            enPassantHistory.pop();
+            bitboard.setEnPassantSquare(prevEnPassantSquare);
+        }
 
         toMove = hasMoved;
 

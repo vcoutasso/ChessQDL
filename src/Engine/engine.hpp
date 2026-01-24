@@ -36,6 +36,11 @@ namespace chessqdl {
         std::stack<enumColor> captureHistory;
 
         /**
+         * @brief Stack with en passant square history. Used to restore en passant on undo
+         */
+        std::stack<int> enPassantHistory;
+
+        /**
          * @brief Ply counter. The counter is incremented after every valid move made and decremented after each undo
          */
         int ply = 0;

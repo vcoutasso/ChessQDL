@@ -236,3 +236,46 @@ TEST(MoveGenerator, PawnPromotionHBlack_Test) {
 	EXPECT_THAT(promotions, testing::ElementsAre("h2g1n", "h2g1b", "h2g1r", "h2g1q", "h2h1n", "h2h1b", "h2h1r", "h2h1q"));
 	EXPECT_EQ(moves, 0x0);
 }
+
+
+// ============================================================================
+// EN PASSANT TESTS
+// ============================================================================
+
+TEST(MoveGenerator, EnPassantCaptureWhite_Test) {
+	// Black pawn on d4, white pawn just moved e2-e4, black can capture en passant
+	chessqdl::Bitboard board("rnbqkbnr/pppp1ppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	// en passant square is e3 (square 20 in bitboard coordinates)  
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack, board.getEnPassantSquare());
+	
+	// Check that d4e3 (en passant capture) is possible
+	bool canEnPassant = std::find(moves.begin(), moves.end(), "d4e3") != moves.end();
+	EXPECT_TRUE(canEnPassant);
+}
+
+TEST(MoveGenerator, EnPassantCaptureBlack_Test) {
+	// White pawn on e5, black pawn moves d7-d5, white can capture en passant
+	chessqdl::Bitboard board("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	// en passant square is d6 (square 43 in bitboard coordinates)
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nWhite, board.getEnPassantSquare());
+	
+	// Check that e5d6 (en passant capture) is possible
+	bool canEnPassant = std::find(moves.begin(), moves.end(), "e5d6") != moves.end();
+	EXPECT_TRUE(canEnPassant);
+}
+
+TEST(MoveGenerator, EnPassantNotAvailableAfterOneMove_Test) {
+	// En passant should only be available immediately after the pawn's two-square move
+	chessqdl::Bitboard board("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+	chessqdl::MoveGenerator generator;
+	
+	auto moves = generator.getPseudoLegalMoves(board.getBitBoards(), chessqdl::nBlack);
+	
+	// Check that e5e4 (en passant capture) is NOT possible (no en passant square in FEN)
+	bool canEnPassant = std::find(moves.begin(), moves.end(), "e5e4") != moves.end();
+	EXPECT_FALSE(canEnPassant);
+}

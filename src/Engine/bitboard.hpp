@@ -201,6 +201,13 @@ namespace chessqdl {
 		 */
 		int getEnPassantSquare() const;
 
+		
+		/**
+		 * @brief Sets the en passant square for the current position
+		 * @param square the en passant target square (0 to clear en passant)
+		 */
+		void setEnPassantSquare(int square);
+
 
 		/**
 		 * @brief Generates the piece placement portion of a FEN string from the current board state.

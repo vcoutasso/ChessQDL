@@ -375,6 +375,13 @@ int Bitboard::getEnPassantSquare() const {
 }
 
 /**
+ * @details Sets the en passant square
+ */
+void Bitboard::setEnPassantSquare(int square) {
+	enPassantSquare = square;
+}
+
+/**
  * @details Generates the piece placement portion of a FEN string from the current board state.
  * This represents rank 8 down to rank 1, with files a-h for each rank.
  * Empty squares are represented as digits (1-8), and pieces as letters.
