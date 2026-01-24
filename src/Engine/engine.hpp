@@ -65,7 +65,7 @@ namespace chessqdl {
          */
         void printBoard() const;
 
-
+    public:
         /**
          * @brief Checks if the king of the given color is in check
          * @param color  color of the king to be checked
@@ -75,12 +75,27 @@ namespace chessqdl {
 
 
         /**
+         * @brief Checks if the given color is in checkmate
+         * @param color  color to check for checkmate
+         * @return  true if the color is in checkmate, false otherwise
+         */
+        [[nodiscard]] bool isCheckmate(enumColor color);
+
+
+        /**
+         * @brief Checks if the given color is in stalemate
+         * @param color  color to check for stalemate
+         * @return  true if the color is in stalemate, false otherwise
+         */
+        [[nodiscard]] bool isStalemate(enumColor color);
+
+
+        /**
          * @brief Get all possible legal moves for the current player
          * @return  a list of all possible moves in algebraic notation (e.g "e2e4", "b1c3", etc)
          */
         std::vector<std::string> getLegalMoves();
 
-    public:
         /**
          * @brief Overloaded constructor. Allows the selection of the engine's pieces.
          * @param color  the color of the engine's pieces

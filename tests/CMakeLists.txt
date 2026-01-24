@@ -22,3 +22,11 @@ add_executable(${TEST_NAME} ${SOURCE_FILES})
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 target_link_libraries(${TEST_NAME} ${CMAKE_PROJECT_NAME}_lib gtest gtest_main)
 
+# Checkmate and stalemate tests
+set(SOURCE_FILES checkmate_tests.cpp)
+set(TEST_NAME checkmate_tests)
+
+add_executable(${TEST_NAME} ${SOURCE_FILES})
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+target_link_libraries(${TEST_NAME} ${CMAKE_PROJECT_NAME}_lib gtest gtest_main gmock)
+
