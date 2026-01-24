@@ -373,3 +373,61 @@ void Bitboard::printBoard() const {
 int Bitboard::getEnPassantSquare() const {
 	return enPassantSquare;
 }
+
+/**
+ * @details Generates the piece placement portion of a FEN string from the current board state.
+ * This represents rank 8 down to rank 1, with files a-h for each rank.
+ * Empty squares are represented as digits (1-8), and pieces as letters.
+ */
+std::string Bitboard::getPiecePlacementFEN() const {
+	std::string fen;
+	
+	// Iterate from rank 8 (index 7) down to rank 1 (index 0)
+	for (int rank = 7; rank >= 0; rank--) {
+		int emptyCount = 0;
+		
+		// Iterate files a-h (0-7) for this rank
+		for (int file = 0; file < 8; file++) {
+			int square = rank * 8 + file;
+			
+			if (bitBoards[nColor].test(square)) {
+				// There's a piece at this square
+				if (emptyCount > 0) {
+					fen += std::to_string(emptyCount);
+					emptyCount = 0;
+				}
+				
+				// Determine piece type and color
+				char piece = '?';
+				if (bitBoards[nPawn].test(square)) piece = 'p';
+				else if (bitBoards[nKnight].test(square)) piece = 'n';
+				else if (bitBoards[nBishop].test(square)) piece = 'b';
+				else if (bitBoards[nRook].test(square)) piece = 'r';
+				else if (bitBoards[nQueen].test(square)) piece = 'q';
+				else if (bitBoards[nKing].test(square)) piece = 'k';
+				
+				// Make uppercase if white piece
+				if (bitBoards[nWhite].test(square)) {
+					piece = std::toupper(piece);
+				}
+				
+				fen += piece;
+			} else {
+				// Empty square
+				emptyCount++;
+			}
+		}
+		
+		// Handle remaining empty squares at end of rank
+		if (emptyCount > 0) {
+			fen += std::to_string(emptyCount);
+		}
+		
+		// Add rank separator (except after last rank)
+		if (rank > 0) {
+			fen += '/';
+		}
+	}
+	
+	return fen;
+}

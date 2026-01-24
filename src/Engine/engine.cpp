@@ -124,6 +124,8 @@ void Engine::parser() {
                 std::cout << mv << std::endl;
         } else if (input == "hint") {
             std::cout << getBestMove(depthLevel, toMove) << std::endl;
+        } else if (input == "fen") {
+            std::cout << getFEN() << std::endl;
         } else if (input == "help") {
             std::cout << "print_board (print for short) - prints out the current state of the board" << std::endl;
             std::cout << "move (mv for short)           - makes a movement if valid. 'move' and 'mv' can be omitted" <<
@@ -134,6 +136,7 @@ void Engine::parser() {
             std::cout << "list                          - prints out a list of valid moves in the expected format" <<
                     std::endl;
             std::cout << "hint                          - prints the move that the engine would make" << std::endl;
+            std::cout << "fen                           - exports the current board position as a FEN string" << std::endl;
             std::cout <<
                     "undo                          - takes a movement from the stack. Accepts an integer as argument to specify the amount of moves to be taken"
                     << std::endl;
@@ -565,10 +568,49 @@ int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int d
             return alpha;
         if (score < beta) {
             beta = score;
-            //std::cout << "New move found for depth " << depth << " " << currentMove << " score: " << score << std::endl;
         }
     }
     return beta;
 }
 
 // NOLINTEND(misc-no-recursion)
+
+/**
+ * @details Generates a complete FEN string representing the current game state.
+ * Components: piece placement, side to move, castling rights, en passant, halfmove clock, fullmove number
+ */
+std::string Engine::getFEN() const {
+    std::string fen = bitboard.getPiecePlacementFEN();
+    fen += ' ';
+    
+    // Side to move
+    fen += (toMove == nWhite) ? 'w' : 'b';
+    fen += ' ';
+    
+    // FIXME: Castling rights (not yet supported, assume always available)
+    fen += "KQkq";
+    fen += ' ';
+    
+    // En passant target square
+    int epSquare = bitboard.getEnPassantSquare();
+    if (epSquare > 0) {
+        int file = epSquare % 8;
+        int rank = epSquare / 8;
+        fen += static_cast<char>('a' + file);
+        fen += static_cast<char>('1' + rank);
+    } else {
+        fen += '-';
+    }
+    fen += ' ';
+    
+    // Halfmove clock (reset after captures or pawn moves - we don't track this yet, so always 0)
+    fen += '0';
+    fen += ' ';
+    
+    // Fullmove number (1-indexed, increments after each black move)
+    // ply is 0-indexed, so fullmove = (ply / 2) + 1
+    int fullmove = (ply / 2) + 1;
+    fen += std::to_string(fullmove);
+    
+    return fen;
+}

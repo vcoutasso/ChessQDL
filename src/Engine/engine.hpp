@@ -191,6 +191,12 @@ namespace chessqdl {
          */
         int alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited,
                          std::string &bestMove);
+
+        /**
+         * @brief Generates a complete FEN string representing the current game state.
+         * @return Complete FEN string (e.g., "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+         */
+        std::string getFEN() const;
     };
 }
 
