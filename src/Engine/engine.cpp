@@ -155,6 +155,21 @@ void Engine::parser() {
             }
         }
 
+        // Check for checkmate
+        if (isCheckmate(toMove)) {
+            const enumColor winner = (toMove == nWhite) ? nBlack : nWhite;
+            std::cout << std::endl << "Checkmate! " << ((winner == nWhite) ? "White" : "Black") << " wins" << std::endl;
+            break;
+        }
+        
+        // Check for stalemate
+        if (isStalemate(toMove)) {
+            std::cout << std::endl << "Stalemate! Game is a draw" << std::endl;
+            break;
+        }
+
+        // Legacy check: This should not happen if legal move generation works correctly
+        // but kept as a safety net
         if (bitboard.getKing(nWhite) == 0) {
             std::cout << std::endl << "Game over! Black wins" << std::endl;
             break;
@@ -174,9 +189,50 @@ bool Engine::isKingInCheck(const enumColor color) const {
                             MoveGenerator::getRookMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKnightMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor) |
-                            MoveGenerator::getQueenMoves(bitboard.getBitBoards(), opponentColor);
+                            MoveGenerator::getQueenMoves(bitboard.getBitBoards(), opponentColor) |
+                            MoveGenerator::getKingMoves(bitboard.getBitBoards(), opponentColor);
 
     return (king & underAttack) != 0;
+}
+
+
+/**
+ * @details Checks if the given color is in checkmate (king is in check and has no legal moves)
+ */
+bool Engine::isCheckmate(const enumColor color) {
+    // Checkmate requires the king to be in check
+    if (!isKingInCheck(color)) {
+        return false;
+    }
+    
+    // Check if there are any legal moves available
+    const enumColor savedToMove = toMove;
+    toMove = color;
+    const auto legalMoves = getLegalMoves();
+    toMove = savedToMove;
+    
+    // If there are no legal moves and king is in check, it's checkmate
+    return legalMoves.empty();
+}
+
+
+/**
+ * @details Checks if the given color is in stalemate (king is not in check but has no legal moves)
+ */
+bool Engine::isStalemate(const enumColor color) {
+    // Stalemate requires the king to NOT be in check
+    if (isKingInCheck(color)) {
+        return false;
+    }
+    
+    // Check if there are any legal moves available
+    const enumColor savedToMove = toMove;
+    toMove = color;
+    const auto legalMoves = getLegalMoves();
+    toMove = savedToMove;
+    
+    // If there are no legal moves and king is not in check, it's stalemate
+    return legalMoves.empty();
 }
 
 
