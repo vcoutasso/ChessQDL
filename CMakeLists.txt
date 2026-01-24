@@ -65,7 +65,14 @@ target_link_libraries(${CMAKE_PROJECT_NAME} cxxopts)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib)
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
-            POST_BUILD
-            COMMAND strip -s bin/${CMAKE_PROJECT_NAME})
+    # Strip the binary in a platform-independent way
+    if(APPLE)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
+                POST_BUILD
+                COMMAND xcrun strip -x ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME})
+    else()
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
+                POST_BUILD
+                COMMAND strip ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME})
+    endif()
 endif ()
