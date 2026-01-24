@@ -192,7 +192,7 @@ bool Engine::isKingInCheck(const enumColor color) const {
     const U64 underAttack = MoveGenerator::getBishopMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getRookMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKnightMoves(bitboard.getBitBoards(), opponentColor) |
-                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor, bitboard.getEnPassantSquare()) |
+                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor, 0) |
                             MoveGenerator::getQueenMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKingMoves(bitboard.getBitBoards(), opponentColor);
 
@@ -348,6 +348,26 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             // Removes piece from the board
             bitboard.resetBit(otherPlayer, toIdx);
         }
+        // Check if this is an en passant capture
+        // En passant: pawn moves diagonally but no piece at destination
+        else if (pieceType == nPawn && fromIdx % 8 != toIdx % 8 && bitboard.getEnPassantSquare() == toIdx) {
+            // This is an en passant capture
+            // The captured pawn is adjacent to the destination square
+            int capturedPawnIdx;
+            if (toMove == nWhite) {
+                // White capturing: captured pawn is south of destination
+                capturedPawnIdx = toIdx - 8;
+            } else {
+                // Black capturing: captured pawn is north of destination
+                capturedPawnIdx = toIdx + 8;
+            }
+            
+            // Remove the captured pawn
+            bitboard.resetBit(nPawn, capturedPawnIdx);
+            bitboard.resetBit(otherPlayer, capturedPawnIdx);
+            captureHistory.push(static_cast<enumColor>(nPawn));
+            mv.insert(mv.find_first_of("12345678") + 1, "x");
+        }
 
         // Updates bitboards
         bitboard.resetBit(pieceType, fromIdx);
@@ -486,9 +506,31 @@ void Engine::takeMove() {
         if (captured) {
             const enumColor capturedPiece = captureHistory.top();
             captureHistory.pop();
-
-            bitboard.setBit(toMove, toIdx);
-            bitboard.setBit(capturedPiece, toIdx);
+            
+            // Check if this was an en passant capture
+            // En passant: pawn capture, diagonal move, and previous en passant square matches destination
+            int prevEnPassantSquare = enPassantHistory.empty() ? 0 : enPassantHistory.top();
+            bool isEnPassant = (pieceType == nPawn && 
+                                fromIdx % 8 != toIdx % 8 && 
+                                prevEnPassantSquare == toIdx);
+            
+            if (isEnPassant) {
+                // Restore captured pawn to adjacent square, not destination square
+                int capturedPawnIdx;
+                if (hasMoved == nWhite) {
+                    // White moved, so white captured: captured pawn was south of destination
+                    capturedPawnIdx = toIdx - 8;
+                } else {
+                    // Black moved, so black captured: captured pawn was north of destination
+                    capturedPawnIdx = toIdx + 8;
+                }
+                bitboard.setBit(toMove, capturedPawnIdx);
+                bitboard.setBit(capturedPiece, capturedPawnIdx);
+            } else {
+                // Normal capture: restore to destination square
+                bitboard.setBit(toMove, toIdx);
+                bitboard.setBit(capturedPiece, toIdx);
+            }
         }
 
         bitboard.updateBitboard();

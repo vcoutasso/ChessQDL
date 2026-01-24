@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/build/bin/ChessQDL",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "cmake: build [debug]"
+            "preLaunchTask": "build [debug]"
         }
     ]
 }

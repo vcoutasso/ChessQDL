@@ -242,7 +242,7 @@ TEST(MoveGenerator, PawnPromotionHBlack_Test) {
 // EN PASSANT TESTS
 // ============================================================================
 
-TEST(MoveGenerator, EnPassantCaptureWhite_Test) {
+TEST(MoveGenerator, EnPassantCaptureByBlack_Test) {
 	// Black pawn on d4, white pawn just moved e2-e4, black can capture en passant
 	chessqdl::Bitboard board("rnbqkbnr/pppp1ppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
 	chessqdl::MoveGenerator generator;
@@ -255,7 +255,7 @@ TEST(MoveGenerator, EnPassantCaptureWhite_Test) {
 	EXPECT_TRUE(canEnPassant);
 }
 
-TEST(MoveGenerator, EnPassantCaptureBlack_Test) {
+TEST(MoveGenerator, EnPassantCaptureByWhite_Test) {
 	// White pawn on e5, black pawn moves d7-d5, white can capture en passant
 	chessqdl::Bitboard board("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1");
 	chessqdl::MoveGenerator generator;

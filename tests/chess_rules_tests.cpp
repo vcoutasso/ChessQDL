@@ -147,7 +147,7 @@ TEST(ChessRules, PawnCannotMoveBackward_Test) {
 	EXPECT_EQ(popCount(moves), 1);
 }
 
-TEST(ChessRules, PawnDoubleMoveFroInitialPosition_Test) {
+TEST(ChessRules, PawnDoubleMoveFromInitialPosition_Test) {
 	chessqdl::Bitboard board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	chessqdl::MoveGenerator generator;
 	
@@ -168,7 +168,7 @@ TEST(ChessRules, PawnBlockedByPiece_Test) {
 	EXPECT_EQ(moves, 0ULL);
 }
 
-TEST(ChessRules, PawnCanOnlyCaptureDigonally_Test) {
+TEST(ChessRules, PawnCanOnlyCaptureDiagonally_Test) {
 	// Pawn can capture diagonally but not straight ahead if blocked
 	chessqdl::Bitboard board("8/8/8/3ppp2/4P3/8/8/4K3 w - - 0 1");
 	chessqdl::MoveGenerator generator;
