@@ -189,18 +189,18 @@ void Engine::parser() {
         }
         
         // Check for draw conditions
-        if (isDraw()) {
-            std::cout << std::endl << "Draw! ";
-            if (isStalemate(toMove)) {
-                std::cout << "Stalemate";
-            } else if (isFiftyMoveRule()) {
-                std::cout << "50-move rule";
-            } else if (isThreefoldRepetition()) {
-                std::cout << "Threefold repetition";
-            } else if (isInsufficientMaterial()) {
-                std::cout << "Insufficient material";
-            }
-            std::cout << std::endl;
+        std::string drawReason;
+        if (isStalemate(toMove)) {
+            drawReason = "Stalemate";
+        } else if (isFiftyMoveRule()) {
+            drawReason = "50-move rule";
+        } else if (isThreefoldRepetition()) {
+            drawReason = "Threefold repetition";
+        } else if (isInsufficientMaterial()) {
+            drawReason = "Insufficient material";
+        }
+        if (!drawReason.empty()) {
+            std::cout << std::endl << "Draw! " << drawReason << std::endl;
             break;
         }
 
@@ -342,7 +342,7 @@ bool Engine::isInsufficientMaterial() const {
         }
         
         // Check if both bishops are on same color squares
-        // Light squares: (file + rank) % 2 == 0, Dark squares: (file + rank) % 2 == 1
+        // In this board mapping: dark squares: (file + rank) % 2 == 0 (e.g., a1), light squares: (file + rank) % 2 == 1
         int whiteSquareColor = ((whiteBishopSquare % 8) + (whiteBishopSquare / 8)) % 2;
         int blackSquareColor = ((blackBishopSquare % 8) + (blackBishopSquare / 8)) % 2;
         
@@ -610,17 +610,11 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         // Updates the bitboard that contains info about both players
         bitboard.updateBitboard();
 
+        // Update toMove before recording position (position key includes player to move)
+        toMove = otherPlayer;
+
         // Update position history for threefold repetition detection
-        std::string posKey = bitboard.getPiecePlacementFEN();
-        posKey += (otherPlayer == nWhite) ? " w " : " b ";  // Next player to move
-        posKey += bitboard.getCastlingFEN();
-        posKey += " ";
-        if (newEnPassantSquare > 0) {
-            posKey += static_cast<char>('a' + (newEnPassantSquare % 8));
-            posKey += static_cast<char>('1' + (newEnPassantSquare / 8));
-        } else {
-            posKey += "-";
-        }
+        std::string posKey = getPositionKey();
         positionHistory[posKey]++;
 
         // Move number after the string when appropriate (if ply is even)
@@ -632,9 +626,7 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         // Updates move history
         moveHistory.push(mv);
 
-        toMove = otherPlayer;
-
-        if (isKingInCheck(otherPlayer)) mv.append("+");
+        if (isKingInCheck(toMove)) mv.append("+");
 
         if (verbose)
             std::cout << mv << std::endl;
