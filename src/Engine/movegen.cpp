@@ -270,7 +270,7 @@ U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor c
             if (color == nWhite) {
                 // White pawn can move to ep square if it can attack there diagonally
                 // A white pawn at d4 attacks diagonally NW and NE to c5 and e5
-                // So to reach ep square d5, we need pawns at shiftSouthWest(d5) or shiftSouthEast(d5)
+                // So to reach ep square e3, we need pawns at shiftSouthWest(e3) or shiftSouthEast(e3)
                 U64 attackersFromWest = shiftSouthWest(epTargetSquare) & pawn;
                 U64 attackersFromEast = shiftSouthEast(epTargetSquare) & pawn;
                 if ((attackersFromWest | attackersFromEast).any()) {
@@ -279,7 +279,7 @@ U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor c
             } else {
                 // Black pawn can move to ep square if it can attack there diagonally
                 // A black pawn at d5 attacks diagonally SW and SE to c4 and e4
-                // So to reach ep square d4, we need pawns at shiftNorthWest(d4) or shiftNorthEast(d4)
+                // So to reach ep square e6, we need pawns at shiftNorthWest(e6) or shiftNorthEast(e6)
                 U64 attackersFromWest = shiftNorthWest(epTargetSquare) & pawn;
                 U64 attackersFromEast = shiftNorthEast(epTargetSquare) & pawn;
                 if ((attackersFromWest | attackersFromEast).any()) {

@@ -1,4 +1,4 @@
-.PHONY: all release debug compile_commands run run-debug test test-debug remake clean clean-all help
+.PHONY: all release debug run run-debug test test-debug remake clean clean-all help
 
 PROJ_NAME := ChessQDL
 BUILD_DIR := build
