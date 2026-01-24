@@ -73,13 +73,12 @@ TEST(MoveRoundtrip, CaptureMove_Test) {
     std::string fen = "rnbqkbnr/ppp1pppp/8/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3";
     Engine engine(fen, nWhite, 1, false, true, 42);
     
+    std::string originalFen = engine.getFEN();
     engine.makeMove("f3d4", false, false);  // Capture doesn't happen here, let me fix this
     engine.takeMove();
     
     // The position should be restored
-    // Note: FEN move counters will differ, check piece placement
-    Bitboard expectedBoard(fen);
-    EXPECT_EQ(engine.getToMove(), nWhite);
+    EXPECT_EQ(engine.getFEN(), originalFen);
 }
 
 TEST(MoveRoundtrip, EnPassantCapture_Test) {
@@ -319,14 +318,10 @@ TEST(Castling, CastlingWhenRookAttacked_Allowed_Test) {
 
 TEST(Castling, QueensideCastlingB1Attacked_Allowed_Test) {
     // b1 can be attacked for queenside castling (rook passes through, not king)
-    // Bishop on a2 attacks b1
-    Engine engine("4k3/8/8/8/8/8/B7/R3K2R w KQ - 0 1", nBlack, 1, false, true, 42);
+    // Black bishop on a2 attacks b1
+    Engine engine("4k3/8/8/8/8/8/b7/R3K2R w KQ - 0 1", nWhite, 1, false, true, 42);
     
-    // Wait, this puts white's bishop on a2 attacking b1... but that's white's own piece
-    // Let me use black bishop
-    Engine engine2("4k3/8/8/8/8/8/b7/R3K2R w KQ - 0 1", nWhite, 1, false, true, 42);
-    
-    auto legalMoves = engine2.getLegalMoves();
+    auto legalMoves = engine.getLegalMoves();
     
     // b1 is attacked but king doesn't pass through b1, so castling allowed
     bool canCastleQueenside = std::find(legalMoves.begin(), legalMoves.end(), "e1c1") != legalMoves.end();
@@ -339,18 +334,13 @@ TEST(Castling, QueensideCastlingB1Attacked_Allowed_Test) {
 
 TEST(Check, DoubleCheck_Test) {
     // King is in check by two pieces simultaneously
-    std::string fen = "4k3/8/5N2/8/8/8/4R3/4K3 b - - 0 1";
-    Engine engine(fen, nBlack, 1, false, true, 42);
+    // Bishop on b5 + Rook on e1 checking king on e8
+    Engine engine("4k3/8/8/1B6/8/8/8/4RK2 b - - 0 1", nBlack, 1, false, true, 42);
     
-    // Wait, let me set up a proper double check
-    // Knight on f6 and rook on e2 don't both attack e8
-    // Better: Bishop on b5 + Rook on e1 checking king on e8
-    Engine engine2("4k3/8/8/1B6/8/8/8/4RK2 b - - 0 1", nBlack, 1, false, true, 42);
-    
-    EXPECT_TRUE(engine2.isKingInCheck(nBlack));
+    EXPECT_TRUE(engine.isKingInCheck(nBlack));
     
     // In double check, only king moves are legal (can't block two pieces)
-    auto legalMoves = engine2.getLegalMoves();
+    auto legalMoves = engine.getLegalMoves();
     
     // All legal moves should be king moves
     for (const auto& move : legalMoves) {

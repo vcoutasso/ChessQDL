@@ -85,7 +85,7 @@ void chessqdl::readInteger(int &n) {
 
 /**
  * @details Performs some bitset operations to encounter the least significant bit that is set. Log2 just finds out its index.
- * @pre value must be non-zero. If value is 0, returns -1 to indicate no bit is set.
+ * @note Callers typically pass a non-zero value. If value is 0, this function returns -1 to indicate that no bit is set.
  */
 int chessqdl::leastSignificantSetBit(const uint64_t value) {
 	if (value == 0) return -1;
