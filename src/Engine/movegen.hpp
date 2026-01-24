@@ -156,9 +156,11 @@ namespace chessqdl {
 		 * @brief Get pseudo-legal moves for a given color set of pawns
 		 * @param bitboard  reference to bitboards representing the current board status
 		 * @param color  color of desired piece
+		 * @param enPassantSquare  en passant square (0 if not available)
+		 * @param originalBitboard  reference to original bitboards for checking opponent pieces in en passant
 		 * @return Bitboard with pseudo-legal moves for pawns.
 		 */
-		static U64 getPawnMoves(const BitboardArray &bitboard, enumColor color);
+		static U64 getPawnMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0, const BitboardArray* originalBitboard = nullptr);
 
 
 		/**
@@ -221,9 +223,10 @@ namespace chessqdl {
 		 * @brief Get all possible pseudo-legal moves for a given bitboard
 		 * @param bitboard  reference to bitboards representing the current board status
 		 * @param color  current player color
+		 * @param enPassantSquare  en passant square (0 if not available)
 		 * @return  a list of all possible moves (e.g "e2e4", "b1c3", etc)
 		 */
-		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color);
+		static std::vector<std::string> getPseudoLegalMoves(const BitboardArray &bitboard, enumColor color, int enPassantSquare = 0);
 	};
 
 }

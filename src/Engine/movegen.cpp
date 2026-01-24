@@ -215,8 +215,8 @@ U64 MoveGenerator::noWeOccl(U64 generator, U64 propagator) {
  * @details Returns a bitboard with all pseudo-legal moves for a given color of pawn pieces.
  */
 // NOLINTBEGIN(misc-no-recursion)
-U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor color) {
-    if (color == nColor) return getPawnMoves(bitboard, nBlack) | getPawnMoves(bitboard, nWhite);
+U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor color, int enPassantSquare, const BitboardArray* originalBitboard) {
+    if (color == nColor) return getPawnMoves(bitboard, nBlack, enPassantSquare, originalBitboard) | getPawnMoves(bitboard, nWhite, enPassantSquare, originalBitboard);
 
     const enumColor opponentColor = color == nWhite ? nBlack : nWhite;
     const U64 pawn = bitboard[nPawn] & bitboard[color];
@@ -240,7 +240,56 @@ U64 MoveGenerator::getPawnMoves(const BitboardArray &bitboard, const enumColor c
                                                        ? shiftNorthEast(pawn) | shiftNorthWest(pawn)
                                                        : shiftSouthEast(pawn) | shiftSouthWest(pawn));
 
-    return (validSingleMoves | validDoubleMoves) | attacks;
+    // En passant captures  
+    // The en passant target square in FEN indicates where the opponent's pawn passed through.
+    // The capturing pawn moves diagonally TO the en passant square.
+    //
+    // Example: White pawn moves e2→e4, en passant square is e3
+    // - Black pawn on d4 or f4 can capture by moving diagonally to e3
+    // - The white pawn at e4 (one rank NORTH of e3) is removed
+    U64 enPassantMoves = 0UL;
+    if (enPassantSquare > 0 && originalBitboard != nullptr) {
+        U64 epTargetSquare = U64().reset();
+        epTargetSquare.set(enPassantSquare);
+        
+        // Check if there's actually an opponent pawn adjacent to the en passant square
+        // The opponent pawn is one rank AWAY from the en passant square
+        // For white capturing: opponent pawn is SOUTH (one rank down) from ep square
+        // For black capturing: opponent pawn is NORTH (one rank up) from ep square
+        U64 opponentPawnSquare;
+        if (color == nWhite) {
+            // White captures: opponent pawn is south of ep square
+            opponentPawnSquare = shiftSouth(epTargetSquare);
+        } else {
+            // Black captures: opponent pawn is north of ep square  
+            opponentPawnSquare = shiftNorth(epTargetSquare);
+        }
+        
+        // Only valid if there's an opponent pawn at the calculated square (check original bitboard!)
+        if ((opponentPawnSquare & (*originalBitboard)[nPawn] & (*originalBitboard)[opponentColor]).any()) {
+            if (color == nWhite) {
+                // White pawn can move to ep square if it can attack there diagonally
+                // A white pawn at d4 attacks diagonally NW and NE to c5 and e5
+                // So to reach ep square e3, we need pawns at shiftSouthWest(e3) or shiftSouthEast(e3)
+                U64 attackersFromWest = shiftSouthWest(epTargetSquare) & pawn;
+                U64 attackersFromEast = shiftSouthEast(epTargetSquare) & pawn;
+                if ((attackersFromWest | attackersFromEast).any()) {
+                    enPassantMoves = epTargetSquare;
+                }
+            } else {
+                // Black pawn can move to ep square if it can attack there diagonally
+                // A black pawn at d5 attacks diagonally SW and SE to c4 and e4
+                // So to reach ep square e6, we need pawns at shiftNorthWest(e6) or shiftNorthEast(e6)
+                U64 attackersFromWest = shiftNorthWest(epTargetSquare) & pawn;
+                U64 attackersFromEast = shiftNorthEast(epTargetSquare) & pawn;
+                if ((attackersFromWest | attackersFromEast).any()) {
+                    enPassantMoves = epTargetSquare;
+                }
+            }
+        }
+    }
+
+    return (validSingleMoves | validDoubleMoves) | attacks | enPassantMoves;
 }
 // NOLINTEND(misc-no-recursion)
 
@@ -421,10 +470,10 @@ std::vector<std::string> MoveGenerator::getPawnPromotions(U64 &pawnMoves, const 
  * It does so for every type of piece on the board, and then returns a list with strings of all possible moves it has found.
  */
 // NOLINTBEGIN(misc-no-recursion)
-std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray &bitboard, const enumColor color) {
+std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray &bitboard, const enumColor color, int enPassantSquare) {
     if (color == nColor) {
-        std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite);
-        std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack);
+        std::vector<std::string> white = getPseudoLegalMoves(bitboard, nWhite, enPassantSquare);
+        std::vector<std::string> black = getPseudoLegalMoves(bitboard, nBlack, enPassantSquare);
 
         // Concatenates both lists (inserts the black list on the end of white list)
         white.insert(white.end(), black.begin(), black.end());
@@ -457,7 +506,7 @@ std::vector<std::string> MoveGenerator::getPseudoLegalMoves(const BitboardArray 
 
             switch (k) {
                 case nPawn:
-                    pieceMoves = getPawnMoves(bitboardCopy, color);
+                    pieceMoves = getPawnMoves(bitboardCopy, color, enPassantSquare, &bitboard);
                     promotions = getPawnPromotions(pieceMoves, fromPos);
                     if (!promotions.empty()) {
                         moves.insert(moves.end(), promotions.begin(), promotions.end());

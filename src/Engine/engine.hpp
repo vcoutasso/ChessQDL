@@ -36,6 +36,11 @@ namespace chessqdl {
         std::stack<enumColor> captureHistory;
 
         /**
+         * @brief Stack with en passant square history. Used to restore en passant on undo
+         */
+        std::stack<int> enPassantHistory;
+
+        /**
          * @brief Ply counter. The counter is incremented after every valid move made and decremented after each undo
          */
         int ply = 0;
@@ -191,6 +196,12 @@ namespace chessqdl {
          */
         int alphaBetaMin(int alpha, int beta, int depth, int depthLeft, enumColor color, int &nodesVisited,
                          std::string &bestMove);
+
+        /**
+         * @brief Generates a complete FEN string representing the current game state.
+         * @return Complete FEN string (e.g., "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+         */
+        std::string getFEN() const;
     };
 }
 

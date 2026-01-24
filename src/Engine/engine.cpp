@@ -124,6 +124,8 @@ void Engine::parser() {
                 std::cout << mv << std::endl;
         } else if (input == "hint") {
             std::cout << getBestMove(depthLevel, toMove) << std::endl;
+        } else if (input == "fen") {
+            std::cout << getFEN() << std::endl;
         } else if (input == "help") {
             std::cout << "print_board (print for short) - prints out the current state of the board" << std::endl;
             std::cout << "move (mv for short)           - makes a movement if valid. 'move' and 'mv' can be omitted" <<
@@ -134,6 +136,7 @@ void Engine::parser() {
             std::cout << "list                          - prints out a list of valid moves in the expected format" <<
                     std::endl;
             std::cout << "hint                          - prints the move that the engine would make" << std::endl;
+            std::cout << "fen                           - exports the current board position as a FEN string" << std::endl;
             std::cout <<
                     "undo                          - takes a movement from the stack. Accepts an integer as argument to specify the amount of moves to be taken"
                     << std::endl;
@@ -189,7 +192,7 @@ bool Engine::isKingInCheck(const enumColor color) const {
     const U64 underAttack = MoveGenerator::getBishopMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getRookMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKnightMoves(bitboard.getBitBoards(), opponentColor) |
-                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor) |
+                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor, 0) |
                             MoveGenerator::getQueenMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKingMoves(bitboard.getBitBoards(), opponentColor);
 
@@ -242,7 +245,7 @@ bool Engine::isStalemate(const enumColor color) {
  * @details Returns the evaluation of the current board state
  */
 std::vector<std::string> Engine::getLegalMoves() {
-    std::vector<std::string> moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove);
+    std::vector<std::string> moves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), toMove, bitboard.getEnPassantSquare());
 
     // `toMove` will be updated during the loop, so it is necessary to store it in a variable
     const enumColor currentPlayer = toMove;
@@ -297,6 +300,9 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
         const int fromIdx = static_cast<int>(std::distance(mapPositions.begin(), fromIt));
         const int toIdx = static_cast<int>(std::distance(mapPositions.begin(), toIt));
 
+        // Save current en passant square for undo
+        enPassantHistory.push(bitboard.getEnPassantSquare());
+
         // Type of the piece that is being moved
         enumPiece pieceType = nPawn;
 
@@ -342,6 +348,26 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             // Removes piece from the board
             bitboard.resetBit(otherPlayer, toIdx);
         }
+        // Check if this is an en passant capture
+        // En passant: pawn moves diagonally but no piece at destination
+        else if (pieceType == nPawn && fromIdx % 8 != toIdx % 8 && bitboard.getEnPassantSquare() == toIdx) {
+            // This is an en passant capture
+            // The captured pawn is adjacent to the destination square
+            int capturedPawnIdx;
+            if (toMove == nWhite) {
+                // White capturing: captured pawn is south of destination
+                capturedPawnIdx = toIdx - 8;
+            } else {
+                // Black capturing: captured pawn is north of destination
+                capturedPawnIdx = toIdx + 8;
+            }
+            
+            // Remove the captured pawn
+            bitboard.resetBit(nPawn, capturedPawnIdx);
+            bitboard.resetBit(otherPlayer, capturedPawnIdx);
+            captureHistory.push(static_cast<enumColor>(nPawn));
+            mv.insert(mv.find_first_of("12345678") + 1, "x");
+        }
 
         // Updates bitboards
         bitboard.resetBit(pieceType, fromIdx);
@@ -362,6 +388,27 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             bitboard.resetBit(pieceType, toIdx);
         }
 
+        // Handle en passant square update
+        // Clear en passant square by default (it's only valid for one move)
+        int newEnPassantSquare = 0;
+        
+        // Check if this move was a pawn double push (possible en passant)
+        if (pieceType == nPawn) {
+            int fromRank = fromIdx / 8;
+            int toRank = toIdx / 8;
+            int fromFile = fromIdx % 8;
+            int toFile = toIdx % 8;
+            
+            // Pawn moved exactly 2 squares vertically and same file
+            if (fromFile == toFile && std::abs(toRank - fromRank) == 2) {
+                // En passant square is the square the pawn passed through
+                // For white moving up (north): middle square = (fromRank + toRank) / 2 * 8 + file
+                // For black moving down (south): same calculation
+                newEnPassantSquare = ((fromRank + toRank) / 2) * 8 + fromFile;
+            }
+        }
+        
+        bitboard.setEnPassantSquare(newEnPassantSquare);
 
         // Updates the bitboard that contains info about both players
         bitboard.updateBitboard();
@@ -459,12 +506,41 @@ void Engine::takeMove() {
         if (captured) {
             const enumColor capturedPiece = captureHistory.top();
             captureHistory.pop();
-
-            bitboard.setBit(toMove, toIdx);
-            bitboard.setBit(capturedPiece, toIdx);
+            
+            // Check if this was an en passant capture
+            // En passant: pawn capture, diagonal move, and previous en passant square matches destination
+            int prevEnPassantSquare = enPassantHistory.empty() ? 0 : enPassantHistory.top();
+            bool isEnPassant = (pieceType == nPawn && 
+                                fromIdx % 8 != toIdx % 8 && 
+                                prevEnPassantSquare == toIdx);
+            
+            if (isEnPassant) {
+                // Restore captured pawn to adjacent square, not destination square
+                int capturedPawnIdx;
+                if (hasMoved == nWhite) {
+                    // White moved, so white captured: captured pawn was south of destination
+                    capturedPawnIdx = toIdx - 8;
+                } else {
+                    // Black moved, so black captured: captured pawn was north of destination
+                    capturedPawnIdx = toIdx + 8;
+                }
+                bitboard.setBit(toMove, capturedPawnIdx);
+                bitboard.setBit(capturedPiece, capturedPawnIdx);
+            } else {
+                // Normal capture: restore to destination square
+                bitboard.setBit(toMove, toIdx);
+                bitboard.setBit(capturedPiece, toIdx);
+            }
         }
 
         bitboard.updateBitboard();
+
+        // Restore en passant square from history
+        if (!enPassantHistory.empty()) {
+            int prevEnPassantSquare = enPassantHistory.top();
+            enPassantHistory.pop();
+            bitboard.setEnPassantSquare(prevEnPassantSquare);
+        }
 
         toMove = hasMoved;
 
@@ -509,7 +585,7 @@ int Engine::alphaBetaMax(int alpha, const int beta, const int depth, const int d
     if (depthLeft == 0)
         return evaluateBoard(bitboard.getBitBoards(), color);
 
-    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
+    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare());
 
     std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
@@ -548,7 +624,7 @@ int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int d
     if (depthLeft == 0)
         return -evaluateBoard(bitboard.getBitBoards(), color);
 
-    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color);
+    auto allMoves = MoveGenerator::getPseudoLegalMoves(bitboard.getBitBoards(), color, bitboard.getEnPassantSquare());
 
     std::shuffle(std::begin(allMoves), std::end(allMoves), generator);
 
@@ -565,10 +641,49 @@ int Engine::alphaBetaMin(const int alpha, int beta, const int depth, const int d
             return alpha;
         if (score < beta) {
             beta = score;
-            //std::cout << "New move found for depth " << depth << " " << currentMove << " score: " << score << std::endl;
         }
     }
     return beta;
 }
 
 // NOLINTEND(misc-no-recursion)
+
+/**
+ * @details Generates a complete FEN string representing the current game state.
+ * Components: piece placement, side to move, castling rights, en passant, halfmove clock, fullmove number
+ */
+std::string Engine::getFEN() const {
+    std::string fen = bitboard.getPiecePlacementFEN();
+    fen += ' ';
+    
+    // Side to move
+    fen += (toMove == nWhite) ? 'w' : 'b';
+    fen += ' ';
+    
+    // FIXME: Castling rights (not yet supported, assume always available)
+    fen += "KQkq";
+    fen += ' ';
+    
+    // En passant target square
+    int epSquare = bitboard.getEnPassantSquare();
+    if (epSquare > 0) {
+        int file = epSquare % 8;
+        int rank = epSquare / 8;
+        fen += static_cast<char>('a' + file);
+        fen += static_cast<char>('1' + rank);
+    } else {
+        fen += '-';
+    }
+    fen += ' ';
+    
+    // Halfmove clock (reset after captures or pawn moves - we don't track this yet, so always 0)
+    fen += '0';
+    fen += ' ';
+    
+    // Fullmove number (1-indexed, increments after each black move)
+    // ply is 0-indexed, so fullmove = (ply / 2) + 1
+    int fullmove = (ply / 2) + 1;
+    fen += std::to_string(fullmove);
+    
+    return fen;
+}

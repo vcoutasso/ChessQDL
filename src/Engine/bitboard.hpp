@@ -16,6 +16,11 @@ namespace chessqdl {
 		 */
 		BitboardArray bitBoards;
 
+		/**
+		 * @brief En passant square, if any. 0 if no en passant is available
+		 */
+		int enPassantSquare = 0;
+
 	public:
 
 		/**
@@ -191,7 +196,29 @@ namespace chessqdl {
 
 
 		/**
-		 * @brief Prints current state of the board to stdout. Mainly for debugging purposes.
+		 * @brief Returns the en passant square
+		 * @return the en passant square, or 0 if no en passant is available
+		 */
+		int getEnPassantSquare() const;
+
+		
+		/**
+		 * @brief Sets the en passant square for the current position
+		 * @param square the en passant target square (0 to clear en passant)
+		 */
+		void setEnPassantSquare(int square);
+
+
+		/**
+		 * @brief Generates the piece placement portion of a FEN string from the current board state.
+		 * Format: rank 8 to rank 1, with files a-h. Empty squares are digits (1-8), pieces are letters.
+		 * @return piece placement portion of FEN (e.g., "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+		 */
+		std::string getPiecePlacementFEN() const;
+
+
+		/**
+		 * @brief Prints the current board state to stdout
 		 */
 		void printBoard() const;
 
