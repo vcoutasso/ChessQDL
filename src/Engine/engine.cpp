@@ -225,7 +225,7 @@ bool Engine::isKingInCheck(const enumColor color) const {
     const U64 underAttack = MoveGenerator::getBishopMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getRookMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKnightMoves(bitboard.getBitBoards(), opponentColor) |
-                            MoveGenerator::getPawnMoves(bitboard.getBitBoards(), opponentColor, 0) |
+                            MoveGenerator::getPawnAttacks(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getQueenMoves(bitboard.getBitBoards(), opponentColor) |
                             MoveGenerator::getKingMoves(bitboard.getBitBoards(), opponentColor);
 
@@ -469,7 +469,7 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             for (int i = nPawn; i <= nKing; i++) {
                 if (U64 aux = bitboard.getPiecesAt(i) & bitboard.getPieces(otherPlayer); aux.test(toIdx)) {
                     bitboard.resetBit(i, toIdx);
-                    captureHistory.push(static_cast<enumColor>(i));
+                    captureHistory.push(static_cast<enumPiece>(i));
                     mv.insert(mv.find_first_of("12345678") + 1, "x");
                     break;
                 }
@@ -495,7 +495,7 @@ void Engine::makeMove(std::string mv, const bool verify, const bool verbose) {
             // Remove the captured pawn
             bitboard.resetBit(nPawn, capturedPawnIdx);
             bitboard.resetBit(otherPlayer, capturedPawnIdx);
-            captureHistory.push(static_cast<enumColor>(nPawn));
+            captureHistory.push(nPawn);
             mv.insert(mv.find_first_of("12345678") + 1, "x");
         }
 
@@ -789,7 +789,7 @@ void Engine::takeMove() {
 
         // "De-captures" a piece
         if (captured) {
-            const enumColor capturedPiece = captureHistory.top();
+            const enumPiece capturedPiece = captureHistory.top();
             captureHistory.pop();
             
             // Check if this was an en passant capture
